@@ -17,7 +17,7 @@ function SingleWord({ words }: { words: mw[] }) {
     <div>
       <div className="text-2xl">
         <span className="capitalize">{word.meta.id}</span>
-        <button className="mx-3 border-black border-[1px] hover:bg-gray-100 bg-gray-50 rounded-md px-2"
+        <button className="mx-3 border-black border-[1px] hover:bg-gray-200 bg-gray-100 rounded-md px-2"
           onClick={() => audioPlayer.current ? audioPlayer.current.play() : null}>
           <span>{phonetics}</span>
           <i className=" ml-2 mr-1 ri-volume-up-fill"></i>
