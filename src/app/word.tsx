@@ -15,20 +15,26 @@ function SingleWord({ words }: { words: mw[] }) {
 
   return (
     <div>
-      <span className="capitalize">{word.meta.id}</span>
-      <button className="mx-3 border-black border-[1px] hover:bg-gray-100 bg-gray-50 rounded-md px-2"
-        onClick={() => audioPlayer.current ? audioPlayer.current.play() : null}>
-        <span>{phonetics}</span>
-        <i className=" ml-2 mr-1 ri-volume-up-fill"></i>
-        <audio src={getAudio(word.hwi.prs[0])} ref={audioPlayer}></audio>
-      </button>
+      <div className="text-2xl">
+        <span className="capitalize">{word.meta.id}</span>
+        <button className="mx-3 border-black border-[1px] hover:bg-gray-100 bg-gray-50 rounded-md px-2"
+          onClick={() => audioPlayer.current ? audioPlayer.current.play() : null}>
+          <span>{phonetics}</span>
+          <i className=" ml-2 mr-1 ri-volume-up-fill"></i>
+          <audio src={getAudio(word.hwi.prs[0])} ref={audioPlayer}></audio>
+        </button>
+      </div>
+      <div className="text-lg ml-2">
+        <div>Related Words:</div>
+        {words.slice(1).map((w, ind) => (<div key={ind} className="capitalize">- {w.meta.id}</div>))}
+      </div>
     </div>
   );
 }
 
 export default function Word({ words }: { words: mw[][] }) {
   return (
-    <div className="text-2xl">
+    <div>
       { words.length == 0 ? ""
         : words.map((word, id) => <SingleWord words={word} key={id}/>)}
     </div>
