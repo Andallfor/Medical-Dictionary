@@ -33,15 +33,26 @@ export interface mw {
     shortdef: string[]
 }
 
-export async function getMedicalDef(word: string): Promise<mw> {
+export async function getMedicalDef(word: string): Promise<mw[]> {
     let data = null;
-    await axios.get("https://dictionaryapi.com/api/v3/references/medical/json/" + word, {
+    await axios.get("https://dictionaryapi.com/api/v3/references/medical/json/" + word.toLowerCase(), {
         params: {
             'key': process.env.NEXT_PUBLIC_MEDICAL_API
         }
-    }).then((r) => {data = r.data[0]});
+    }).then((r) => {data = r.data});
 
-    return data as unknown as mw;
+    return data as unknown as mw[];
+}
+
+export async function getCollegiateDef(word: String): Promise<mw[]> {
+    let data = null;
+    await axios.get("https://dictionaryapi.com/api/v3/references/collegiate/json/" + word.toLowerCase(), {
+        params: {
+            'key': process.env.NEXT_PUBLIC_COLLEGIATE_API
+        }
+    }).then((r) => {data = r.data});
+
+    return data as unknown as mw[];
 }
 
 export function getAudio(w: prs) {
