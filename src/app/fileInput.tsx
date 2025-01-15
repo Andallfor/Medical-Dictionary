@@ -51,8 +51,6 @@ export default function FileInput({ files, setFiles }: { files: fileData[], setF
       }
     ));
 
-    console.log(data);
-
     setFiles([...files, ...data]);
   }
 

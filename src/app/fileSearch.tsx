@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import { fileData } from "./fileInput";
 
 interface occurrence {
@@ -9,16 +9,23 @@ interface occurrence {
 
 function FileContainer({ file, phrase }: { file: fileData, phrase: string }) {
   const [occurrences, setOccurrences] = useState<occurrence[]>([]);
+  const [lastFileLength, setLastFileLength] = useState(0);
+  const [lastPhrase, setLastPhrase] = useState('');
 
   useEffect(() => {
     if (phrase.trim().length == 0) return;
+
+    // ensure only one update (for some reason useEffect triggers twice normally)
+    if (file.size == lastFileLength && phrase == lastPhrase) return;
+    setLastFileLength(file.content.length);
+    setLastPhrase(phrase);
 
     console.log(`Searching for occurrences of ${phrase} in ${file.name}`);
 
     // get all occurrences
     const match = new RegExp(phrase, 'i'); // case insensitive
-    const sentenceEnd = new RegExp(/[.?!:]\s/);
-    const newline = new RegExp(/\r?\n|\r/g);
+    const newline = new RegExp(/(\r?\n|\r)/g);
+    const doubleSpace = new RegExp(/\s{2,}/g);
     const maxDist = 100;
 
     const local: occurrence[] = [];
@@ -30,22 +37,50 @@ function FileContainer({ file, phrase }: { file: fileData, phrase: string }) {
 
       index += relative + phrase.length;
 
-      // iterate backwards until we find start of sentence (punctuation followed by space)
+      // find nearest end of sentences
       let end = file.content.substring(index, index + maxDist) + ' '; // edge case where punctuation is at the end of the string
-      const sEnd = end.search(sentenceEnd);
+      let sEnd = -1;
+      for (let i = 0; i < maxDist; i++) {
+        switch (end.charAt(i)) {
+          case '.':
+          case '!':
+          case '?':
+            if (/\s/.test(end.charAt(i + 1))) sEnd = i;
+            break;
+          case '•':
+            sEnd = i - 1;
+            break;
+        }
+
+        if (sEnd != -1) break;
+      }
+
       if (sEnd != -1) end = end.substring(0, sEnd + 1).trimEnd();
       else end = end.trimEnd() + '...';
 
-      // I am bad at regex TODO: looking into look behinds or something (or just do this with loop)
+      // find start
       const s = Math.max(0, index - maxDist - phrase.length);
       let start = file.content.substring(s, s + maxDist);
-      const sStart = Math.max(start.lastIndexOf('. '), start.lastIndexOf('! '), start.lastIndexOf('? ')); // look i spent 30 mins banging my against the regex compiler ok i give up
+      let sStart = -1;
+      for (let i = maxDist - 1; i > 0; i--) {
+        switch (start.charAt(i)) {
+          case '.':
+          case '!':
+          case '?':
+          case '•':
+            if (/\s/.test(start.charAt(i + 1))) sStart = i + 1;
+            break;
+        }
+
+        if (sStart != -1) break;
+      }
+
       if (sStart != -1) start = start.substring(sStart + 1).trimStart();
       else start = '...' + start.trimStart();
 
       local.push({
-        start: start.replace(newline, ' '), // note that this naive replacement may result in double spaces (but that is better than no space)
-        end: end.replace(newline, ' '),
+        start: start.replace(newline, ' ').replace(doubleSpace, ' '),
+        end: end.replace(newline, ' ').replace(doubleSpace, ' '),
         phrase: file.content.substring(index - phrase.length, index)
       });
     }
@@ -60,12 +95,12 @@ function FileContainer({ file, phrase }: { file: fileData, phrase: string }) {
       <div className="h-2"></div>
       <div className="ml-2 flex flex-col gap-2">
         {occurrences.map((o, i) => (
-          <div className="flex h-8 gap-2" key={i}>
-            <span className="outline outline-1 outline-purple-600 w-8 flex justify-center items-center font-semibold rounded-sm bg-gray-100">{i + 1}</span>
-            <span className="outline outline-1 outline-blue-600 px-2 flex items-center w-full rounded-sm whitespace-pre-wrap">
-              {o.start}
+          <div className="flex gap-2 h-8 w-full" key={i}>
+            <span className="outline outline-1 outline-purple-600 w-8 flex justify-center items-center font-semibold rounded-sm bg-gray-100 flex-shrink-0">{i + 1}</span>
+            <span className="outline outline-1 outline-blue-600 px-2 flex items-center rounded-sm whitespace-pre-wrap flex-grow min-w-0">
+              <span className="text-nowrap">{o.start}</span>
               <span className="bg-yellow-200 rounded-sm">{o.phrase}</span>
-              {o.end}
+              <span className="text-nowrap text-ellipsis overflow-hidden">{o.end}</span>
             </span>
           </div>))}
         </div>

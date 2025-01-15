@@ -1,27 +1,29 @@
 import { getAudio, getCollegiateDef, mw } from "./phonetics";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 function SingleWord({ words }: { words: mw[] }) {
   const audioPlayer = useRef<HTMLAudioElement | null>(null);
+  const [phonetics, setPhonetics] = useState('');
 
-  const word = words[0];
-  const [phonetics, setPhonetics] = useState(word.hwi.prs[0].mw.trim());
+  useEffect(() => {
+    setPhonetics(words[0].hwi.prs[0].mw.trim());
 
-  if (phonetics.startsWith('-')) {
-    // for some reason medical words do not always provide their full pronunciation if it is also provided in the collegiate API
-    setPhonetics('Loading...');
-    getCollegiateDef(word.meta.id).then((r) => setPhonetics(r[0].hwi.prs[0].mw.trim()));
-  }
+    if (phonetics.startsWith('-')) {
+      // for some reason medical words do not always provide their full pronunciation if it is also provided in the collegiate API
+      setPhonetics('Loading...');
+      getCollegiateDef(words[0].meta.id).then((r) => setPhonetics(r[0].hwi.prs[0].mw.trim()));
+    }
+  }, [words]);
 
   return (
     <div>
       <div className="text-2xl">
-        <span className="capitalize">{word.meta.id}</span>
+        <span className="capitalize">{words[0].meta.id}</span>
         <button className="mx-3 border-black border-[1px] hover:bg-gray-200 bg-gray-100 rounded-md px-2"
           onClick={() => audioPlayer.current ? audioPlayer.current.play() : null}>
           <span>{phonetics}</span>
           <i className=" ml-2 mr-1 ri-volume-up-fill"></i>
-          <audio src={getAudio(word.hwi.prs[0])} ref={audioPlayer}></audio>
+          <audio src={getAudio(words[0].hwi.prs[0])} ref={audioPlayer}></audio>
         </button>
       </div>
       <div className="text-lg ml-2">
