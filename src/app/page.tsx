@@ -29,7 +29,7 @@ export default function Home() {
         </div>
         <div className="w-2/3">
           <div className="ml-32 flex flex-col gap-4">
-            <FileSearch/>
+            <FileSearch files={files} phrase={word.map(x => x[0].meta.id).join(' ')}/>
             <FileInput files={files} setFiles={setFiles}/>
           </div>
         </div>
