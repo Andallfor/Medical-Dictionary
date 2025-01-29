@@ -68,6 +68,10 @@ export function getAudio(w: prs) {
     return link;
 }
 
-export default function phonetics(): JSX.Element {
-    return <div></div>;
+// ideally we'd use oxford english dictionary but its really expensive so.... merriam webster it is
+// (mw uses a modified version of IPA)
+// https://www.merriam-webster.com/assets/mw/static/pdf/help/guide-to-pronunciation.pdf
+// though maybe can just make a web scraping version and run overnight?
+export function mwToIPA() {
+
 }
