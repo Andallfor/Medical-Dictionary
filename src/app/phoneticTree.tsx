@@ -1,3 +1,4 @@
+import { InferGetStaticPropsType } from "next";
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 
 // https://tfcs.baruch.cuny.edu/introduction-to-vowels/
@@ -14,6 +15,11 @@ const vowelToPrint: Record<string, string> = {
     'central': 'Central',
     'diphthong': 'Diphthong'
 };
+
+interface phonetic {
+    word: string,
+    stress: string[] // is primary stress backwards including only vowels
+}
 
 export function VowelCombo({ vowel, setVowel }: { vowel: string | undefined, setVowel: (s: string | undefined) => void }) {
     return (
@@ -36,6 +42,34 @@ export function VowelCombo({ vowel, setVowel }: { vowel: string | undefined, set
 
 export default function PhoneticTree() {
     const [vowels, setVowels] = useState<(string | undefined)[]>([]);
+    const [data, setData] = useState<phonetic[]>([]);
+    const [loaded, setLoaded] = useState(false);
+
+    useEffect(() => {
+        if (loaded) return;
+        setLoaded(false);
+        // https://observablehq.com/@mbostock/fetch-utf-16
+        fetch('/data.txt').then(response => response.arrayBuffer()).then(buffer => {
+            const lines = new TextDecoder('utf-16le').decode(buffer).split('\n');
+            const phonetics: phonetic[] = [];
+
+            const matchVowels = new RegExp([...Vowels['diphthong'], ...Vowels['central'], ...Vowels['back'], ...Vowels['front']].join('|'), 'g');
+
+            lines.forEach((line) => {
+                if (line.length == 0) return;
+
+                const [word, pron] = line.split('=');
+                const primary = pron.includes('ˈ') ? pron.split('ˈ')[1] : pron;
+                
+                phonetics.push({
+                    word: word,
+                    stress: [...primary.matchAll(matchVowels)].map(x => x[0] as string).toReversed()
+                });
+            });
+
+            setData(phonetics);
+        });
+    }, [])
 
     function updateCombo(ind: number, s: string | undefined) {
         const c = [...vowels];

@@ -1,0 +1,3724 @@
+abdominal aortic aneurysm 503, 667
+endoleaks 668
+abdominal calcification 790
+abdominal/pelvic angiography  
+703–721
+anastomotic pathways 708–709
+anatomy 703–707
+abscess
+amebic 473
+Bezold 284
+brain 211, 277
+breast 596, 632
+Brodie 385
+kidney/renal 171, 174, 489
+liver 89
+lung 22
+orbital 315
+paraspinal 74
+peritonsillar 284
+pyogenic
+brain 277
+liver 472
+spleen 119
+retropharyngeal 284
+pediatric 744
+spleen 119
+submandibular/masticator 287
+subperiosteal 315
+acalculous cholecystitis 466
+acardiac twins 529
+accordion ribs 810
+ACE inhibitor renogram 583
+acetabular fracture 427
+achalasia 128
+Achilles tendon injury 410
+achondroplasia 809
+acinar cell carcinoma 109
+acromegaly 358, 391
+acromioclavicular joint 438
+acute disseminated 
+encephalomyelitis 276
+adamantinoma 382
+adenocarcinoma
+bladder 183
+lung 35
+pancreas 108, 484
+adenoid cystic carcinoma
+anterior skull base 301
+salivary gland 297
+trachea 81
+adenoma
+adrenal gland 161
+esophagus 126
+hepatic 98, 474
+lactational 627
+parathyroid 506, 569
+adenomatous polyp 131
+adenomyomatosis 467
+adenomyosis 192, 512
+adenosine stress test 562
+adhesive capsulitis 446
+adnexae
+cystic lesions 516–517
+torsion 517
+vascular disease 517
+adrenal biopsy 162
+adrenal calcification 165
+adrenal cyst 163
+adrenal glands 160–165
+anatomy 160
+cortex 160
+carcinoma 160, 165, 800
+hemorrhage 165
+hyperplasia 165
+lesions of 160–161
+medulla 160
+tumors
+imaging 161–163
+malignant 164–165
+pediatric 799–800
+adrenal hemorrhage 800
+Adson’s maneuver 734
+aggar nasi cell 292
+AIDS see HIV/AIDS
+air crescent sign 30
+air embolism 697
+air kerma 844
+airway-invasive aspergillosis 30
+airways 75–82
+emphysema 19, 79–80
+large airway disease 77–78
+pediatric 742
+anatomy 742
+congenital pulmonary airway 
+malformation 542, 755
+small airways disease  
+756–758
+stridor 744–745
+upper airway obstruction 743
+vascular rings/slings 746–749
+tracheal stenosis/thickening
+focal 77
+multifocal/diffuse 75–77
+tumors 80–82
+ALCAPA 677
+alkaptonuria 359
+allergic bronchopulmonary 
+aspergillosis 29
+alveolar edema 31
+amebic abscess 473
+amniotic fluid 537
+index 532
+Amplatz wire 699
+amyloid 91
+amyloid arthropathy 359
+amyloidosis, trachea 76
+anaplastic astrocytoma 218
+Andersson lesion 354
+anencephaly 538
+aneurysm
+aortic
+abdominal 503, 667, 668
+thoracic 73, 666
+aortic arch 72
+brain 231, 237, 263
+false 683
+hepatic artery 710
+iliac artery 728
+left ventricle 683
+popliteal 732
+splenic artery 710
+vein of Galen 242
+aneurysmal bone cyst 334
+aneurysmal hemorrhage 269
+angiodysplasia 711
+Index
+866
+angiography 694–740
+abdominal/pelvic 703–721
+catheters 698
+CT see CT angiography
+femoral access 696
+injection rates 697
+interpretation 695
+lower extremity 726–732
+thoracic 699–702
+upper extremity 733–738
+wires 699
+angioinvasive aspergillosis 30
+angiomyolipoma 797
+renal 168, 487
+renal artery 714–715
+angiosarcoma
+bone 378
+breast 634
+spleen 120
+ankle see foot/ankle
+ankylosing spondylitis 354
+ankylosis 362–363
+anomalous left coronary artery from 
+pulmonary artery see ALCAPA
+anorectal malformations 783
+anterior cerebral artery 250
+anterior cruciate ligament 417–419
+anterior labro-ligamentous periosteal 
+sleeve avulsion 450
+anterior skull base 299–301
+anatomy 299–300
+benign neoplasms 300
+malignant neoplasms 301
+antrochoanal polyp 293
+anus, imperforate 783
+aorta 659–672
+acute aortic syndrome 661–664
+anatomy 659–660
+aneurysms
+abdominal aorta 503, 667
+aortic arch 72
+thoracic aorta 73, 666
+ascending 72
+atherosclerotic distal occlusive 
+disease 727
+disease 503–504
+dissection 504, 661–662
+intramural hematoma 663
+penetrating atherosclerotic 
+ulcer 664
+trauma 665
+aortic arch
+aneurysm 72
+double 747
+left-sided, with aberrant right 
+subclavian artery 748
+right-sided 746
+with aberrant left subclavian 
+artery 747
+aortic coarctation 672, 762, 769
+aortic valve
+stenosis 685
+regurgitation 685
+aortitis 670
+AP window 67
+apical petrositis 309
+appendicitis 771, 782
+arachnoid cyst 231
+arachnoiditis 332
+arc of Barkow 708
+arc of Buhler 708
+arc of Riolan 709
+arcuate uterus 509
+arrhythmogenic cardiomyopathy 686
+arterial compression syndromes  
+716–717
+arterial occlusive disease 731
+arteriovenous fistula
+dialysis access 736
+femoral 696
+renal 715
+arteriovenous malformation
+brain 257
+intraparenchymal hemorrhage 269
+pulmonary 701
+renal 169, 715
+arteritis
+giant cell 699
+Takayasu 671
+arthritis 347–362
+juvenile idiopathic 360, 820
+osteoarthritis 347
+psoriatic 355
+rheumatoid 350–352
+septic 389
+hip 812
+arthritis mutilans 355
+asbestosis 56
+ascites, fetus 536
+aspergillosis
+airway-invasive 30
+allergic bronchopulmonary 29
+angioinvasive 30
+saprophytic 29
+semi-invasive (chronic 
+necrotizing) 30
+Aspergillus 28–30
+sinusitis 293
+asphyxiating thoracic dystrophy 810
+astrocytes 216
+astrocytoma 237
+fibrillary 217–218
+grade I 217
+intramedullary 329
+see also specific types
+atalectasis 3–7
+lobar 3–7
+round 7
+atherosclerosis 664
+distal aortic 727
+iliac 727
+atlantoaxial subluxation 352
+atoll sign 757
+atria
+left, enlargement 682
+septal defect 763
+atypical teratoid/rhabdoid tumor 220
+autoimmune pancreatitis 115–116
+autosomal dominant polycystic disease
+kidney 173, 490, 795
+liver 99
+autosomal recessive polycystic disease, 
+kidney 491, 795
+avascular necrosis 431
+nuclear imaging 580
+axillary masses 633
+azygoesophageal recess 67, 68
+bacterial infection
+brain 277–278
+see also infection
+Baker’s cyst 425
+ball on tee sign 176
+Balthazar grading system 114
+bamboo spine 354
+banana sign 539
+Bankart lesion 439, 450
+Barrett esophagus 124
+stricture 125
+basal cisterns 205
+bear paw sign 175
+Beckwith–Wiedeman syndrome 549
+Behçet syndrome, tracheal stenosis 77
+bell-clapper deformity 497
+Bennett fracture 461
+Bennett lesion 452
+Bentson wire 699
+Bezold abscess 284
+biceps tendon 447–448
+dislocation 448
+subluxation 447
+tear 447
+bicornuate uterus 196, 509
+bile ducts
+anatomical variants 102
+867
+aberrant right posterior duct 102
+low insertion of cystic duct 102
+dilation 471
+infection/inflammation 104–105
+injury 723
+malignant obstruction 723
+ultrasound 470–471
+biliary atresia 784
+biliary cystadenoma 474
+biliary hamartoma 99
+biliary imaging 100–106
+biliary leak 574
+biliary tumors 105–106
+biopsy
+adrenal 162
+breast 652, 653–654, 654
+biparietal diameter 531
+Birt–Hogg–Dube syndrome 170
+bladder 183–185
+adenocarcinoma 183
+cancer, PET-CT 559
+stones 183
+transitional cell carcinoma 183
+trauma 184–185
+Blalock–Taussig shunt 762
+Bland–White–Garland syndrome 677
+Blastomyces dermatitidis 26
+bleb 19
+blood–brain barrier 209
+Blount disease 822
+bone 347
+formation 362–363
+bone cyst 382
+aneurysmal 382
+bone disease
+differential diagnosis 398
+diffuse 390–397
+endocrine 391–393
+hematologic 396–397
+idiopathic 394–395
+infection 385–390
+lytic bone lesions 816–819
+metabolic 819
+multifactorial 390
+vitamin deficiency 391
+see also specific lesions
+bone mineral density 362
+bone tumors 365–366
+benign mimics 383–384
+Lodwick classification 366
+metastatic 383
+morphology 365–366
+pediatric 815
+bone-forming lesions 367–370
+Borrelia burgdorferi 278
+boutonniere deformity 460
+boxer’s fracture 461
+brachiocephalic artery 659
+brain
+abscess 211, 277
+aneurysm 231, 237, 263
+cortical anatomy 246
+fetus 538–541
+gray matter heterotopia 827
+hemorrhage 214
+intraparenchymal 266–271, 269
+intraventricular 243
+subarachnoid 243, 260–263
+infection 277–281
+bacterial 277–278
+fungal 278
+parasitic 278–279
+prion 281
+viral 280
+toxic/metabolic disease 282
+trauma 243–245
+tumors 214–242
+evaluation 214–216
+metastatic 82, 227, 238, 242
+recurrence vs. radiation 
+necrosis 589
+see also individual types/regions
+vascular anatomy 247–251
+arterial territories 251
+venous disease 264–265
+white matter disease 272–276
+brain death 588
+branchial cleft cyst 286
+breast
+abscess 596, 632
+accessory tissue 638
+architectural distortion 637
+asymmetries 636, 637
+biopsy
+MR-guided 654
+stereotactic-guided 653–654
+ultrasound-guided 652
+interventions 652–655
+mammographic-guided wire 
+localization 655
+ultrasound-guided cyst 
+aspiration 653
+normal variants 638
+breast cancer 593–595
+angiosarcoma 634
+histologic subtypes 594
+imaging
+mammography see mammography
+PET-CT 558
+ultrasound 626
+inflammatory carcinoma 595
+invasive ductal carcinoma 631
+invasive lobular carcinoma 594, 631
+lymphoma 634
+men 651
+metastasis 635
+nodal 633
+Paget disease of nipple 595
+prognosis 595
+risk factors 594
+tubular carcinoma 631
+benign breast disease 596–597
+fibrocystic change 596
+fibrosis 633
+sclerosing adenosis 596
+calcifications 607–613
+benign 607–609
+calcium distribution 612–613
+high probability of 
+malignancy 611
+intermediate concern 610
+cystic lesions 629–630
+clustered microcysts 630
+complex mass 630
+complicated 629
+simple 629
+infectious/inflammatory 596–597
+masses see breast masses
+men 651
+breast feeding
+contrast media
+gadolinium-based 843
+iodinated 842
+thyroid imaging 566
+breast imaging 592–657
+mammography see mammography
+MRI 639–647
+breast masses 641–642
+clinical role 639
+enhancement kinetics 640
+focus 642
+indications 645–647
+interpretation 644
+non-masslike enhancement  
+643–644
+technique 639
+post-surgical 647–650
+implants 647–649
+reduction mammoplasty 650
+ultrasound 617–621
+architectural distortion 637
+asymmetries 636, 637
+BI-RADS 3 620–621
+BI-RADS lexicon 619–620
+breast masses 622–637
+868
+breast imaging (cont.)
+cystic lesions 629–630
+spiculated masses 631–633
+technique 618
+zonal anatomy and 
+pathology 617–618
+breast implants 647–649
+saline implant rupture 648
+silicone implant rupture
+extracapsular 649
+intracapsular 648
+breast masses
+axillary 633
+fat-containing 623–624
+fatty 622
+imaging
+mammography 603–606
+MRI 641–642
+ultrasound 622, 637
+malignant see breast cancer
+management 644
+multiple skin masses 628
+multiple solid 628
+post-lumpectomy/post-excisional 
+biopsy 632
+radial scar 632
+solid 625–626
+spiculated 631–633
+breast reduction 650
+breast screening
+mammography 597–599
+MRI 645
+BReTh Lung mnemonic 82
+Brodie abscess 385
+bronchial artery, angiography 702
+bronchial atresia 754
+bronchiectasis 77
+diffuse cystic 19
+pediatric 758
+bronchioalveolar carcinoma 36
+mucinous 37
+nonmucinous 36
+bronchiolitis 756
+bronchiolitis obliterans
+organizing pneumonia (BOOP) 757
+syndrome 757
+bronchogenic carcinoma 18
+bronchogenic cyst 126
+broncholithiasis 78
+bronchopleural fistula 22
+bronchopneumonia 21
+bronchopulmonary dysplasia (BPD) 751
+bronchopulmonary foregut 
+malformation 542
+brown tumor 384
+Budd–Chiari syndrome 89, 99
+Buerger disease 732
+hand 738
+Buford complex 449
+bulla 19
+bunch of grapes sign 801
+burnt-out germ cell tumor 494
+burst fracture 437
+butterfly glioma 219
+CADASIL 275
+Caesarean section, complications 513
+calcaneal fracture 405
+stress 405
+calcifications 363
+abdominal 790
+adrenal 165
+breast 607–613
+pericardial 690
+calcium hydroxyapatite deposition 
+disease (HADD) 356
+calcium pyrophosphate dihydrate 
+deposition disease (CPPD) 357
+calyceal diverticulum 179
+cancer
+breast see breast cancer
+lung 34–42
+radiation-induced 855
+see also tumors
+Candida albicans 473
+Candida glabrata 473
+candidiasis
+esophageal 124
+liver 92, 473
+Cannon–Böhm point 709
+capillary telangiectasia 259
+CAPTain Kangaroo has Mounier–Kuhn 
+mnemonic 78
+caput medusa 258–259
+carbon monoxide poisoning 282
+carcinoid tumor
+endobronchial 81
+lung 37
+mesenteric 151
+metastatic 587
+thymic 70
+cardiac hepatopathy 99
+cardiac shunts, left-to-right 45
+cardiomegaly 765
+cardiomyopathy
+arrhythmogenic 686
+catecholamine-induced 
+(takotsubo) 686
+dilated 679, 688–689
+hypertrophic 679, 687
+ischemic 678–679
+restrictive 688
+cardiovascular imaging 658–693
+aorta 659–672
+coronary CT angiography 673–678
+MRI see cardiovascular MRI
+non-ischemic disease 686–689
+pediatric 760–769
+anatomy 761
+congenital heart disease see heart 
+disease, congenital
+plain film 760
+tumors 769
+pericardial disease 689–691
+plain film 681–685, 760
+see also nuclear cardiology
+cardiovascular MRI 678–680
+contrast-enhanced 678
+delayed contrast-enhanced 678
+circumferential 
+subendocardial 680
+ischemic 678–679
+mid-myocardial 679
+non-ischemic 679–680
+subendocardial 678
+subepicardial 680
+transmural 679
+Caroli disease 102, 786
+carotid artery 500–501
+carotid body tumor 313
+carotid space 324
+carotid-basilar connections, 
+persistent 250
+carotid-cavernous fistula 257
+carpal coalition 823
+cartilage spaces 363
+cartilage-forming lesions 371–375
+Castleman disease 72
+catecholamine-induced 
+cardiomyopathy 686
+caterpillar sign 771
+catheters 698
+caustic stricture of esophagus 125
+cavernous hemangioma 473–474
+cavernous lymphangioma 287
+cavernous malformation 
+(cavernoma) 258–259
+intraparenchymal hemorrhage 270
+cavernous sinus 233
+thrombosis 315
+cavum septum pellucidum, absence 
+of 540, 541
+celiac artery 704
+celiac axis 703
+celiac disease 142
+869
+cellulitis, orbital 315
+central nervous system
+lymphoma 209, 226–227, 238
+immunocompetent patient 226
+immunocompromised patient 227
+metastatic disease 211, 227, 238, 242
+neuroimaging 201–345
+vascular malformations 257–259
+see also brain; spine
+central sulcus 246
+centrilobular emphysema 79
+centrilobular nodules 14
+cephalocele 539
+cerebellar tonsillar herniation 205
+cerebellopontine angle mass 230–232
+cerebral amyloid angiopathy 268
+cerebral contusion 211
+cerebral edema 203–203
+cytotoxic 203
+interstitial 203
+vasogenic 203
+cerebral perfusion 588
+cerebrospinal fluid 203
+cerebrovascular imaging 588–589
+clinical applications 588–589
+radiotracers 588
+cervical lymph nodes 326–327
+cervix 195, 507
+carcinoma 195
+late pregnancy 532
+Chagas disease, cardiac 
+involvement 679, 680
+Chance fracture 434
+Charcot joint 361
+CHARGE syndrome 743
+chemotherapy, white matter 
+disease 276
+Chiari I malformation 830
+Chiari II malformation 539, 831
+child abuse 808
+children see pediatric imaging
+choanal atresia 743
+cholangiocarcinoma 106, 471
+cholangiography 722–724
+percutaneous transhepatic 722–723
+cholangitis
+AIDS 105
+ascending 104
+primary sclerosing 104
+recurrent pyogenic 105
+sclerosing 723
+cholecystitis 465–467
+acalculous 466
+acute 103, 573, 724
+acute calculous 466
+chronic 573
+emphysematous 103, 466
+nuclear imaging 573
+cholecystoses, hyperplastic 467–468
+choledochal cysts 101–102
+pediatric 786
+choledocholithiasis 470
+cholelithiasis 465
+cholestatic jaundice, neonatal 784
+cholesteatoma 303, 305–306
+petrous 309
+cholesterol granuloma/cyst 304, 309
+chondroblastoma 374
+vertebral body 334
+chondrodysplasia punctata 811
+chondroma, endobronchial 82
+chondromyxoid fibroma 374
+chondrosarcoma 489
+clival 311
+petrous apex 310
+vertebral body 334
+Chopart fracture–dislocation 404
+chordoma 381
+clival 311
+petrous apex 310
+vertebral body 334
+choroid plexus
+cells 216
+cyst 541
+papilloma/carcinoma 224
+chronic allergic fungal sinusitis 293
+chronic thromboembolic pulmonary 
+hypertension 45
+Churg–Strauss vasculitis 57
+chylothorax 85
+circle of Willis 247–248
+cirrhosis
+hepatic 93, 472, 710
+primary biliary 104
+clay-shoveler’s fracture 437
+clear cell sarcoma 796
+cleidocranial dysostosis 810
+clivus 311
+chondrosarcoma 311
+metastatic disease 311
+cloaca 385
+cloverleaf skull 547
+CNS see central nervous system
+coal worker’s pneumoconiosis 56
+Coat disease 321
+Coccidiodes immitis 26
+cochlear dysplasia 307
+Cognard classification 257
+colic arteries
+left 706
+middle 706
+right 706
+Colles fracture 456
+coloboma 322
+colon
+atresia 779
+cancer, PET-CT 557
+functional immaturity 780
+colpocephaly 540
+common carotid arteries 659
+common channel syndrome 112
+community-acquired pneumonia 21
+complex regional pain syndrome 581
+Compton scatter 846
+computed tomography see CT
+concentric (Balo) sclerosis 274
+concha bullosa 292
+congenital anomalies
+brain 825–829
+heart see heart disease,  
+congenital
+pancreas 111–112
+spine 340–341
+spleen 116
+see also individual anomalies
+congenital lobar emphysema 754
+congenital pulmonary airway 
+malformation 542, 755
+Conn syndrome 160
+connective tissue disorders, joint 
+involvement 356
+consolidation 9
+differential diagnosis 11
+peripheral 11
+radiologic presentation 38
+contrast media
+gadolinium-based 842–843
+iodinated 840–842
+treatment of reactions 839
+coracoacromial arch 441–442
+corduroy lesion 220
+corkscrew esophagus 128
+coronary arteries
+anatomy 674–676
+dominance 676
+left anterior descending 675
+left circumflex 675
+left main 675
+origination 674
+right 675
+structural anomalies 676–678
+ALCAPA 677
+benign 676
+malignant 677
+myocardial bridging 678
+870
+corpus callosum, agenesis/hypogenesis  
+540, 827
+corpus luteal cyst 515
+cortical contusion 244
+cortical necrosis 178
+Couinaud classification 88–89
+Courvoisier gallbladder 467
+craniopharyngioma 235
+crazy paving 13, 13, 27
+Creutzfeldt–Jakob disease 281
+cribriform plate, dehiscent 291
+CRITOE mnemonic 804
+Crohn disease 131
+enteritis 140–141
+esophagitis 124
+pediatric 782
+small bowel obstruction 139
+tracheal stenosis 77
+Cronkhite–Canada sydrome 132
+crossed cerebellar diaschisis 589
+croup 744
+crown–rump length 530
+Cryptococcus neoformans 28, 278
+cryptogenic organizing pneumonia 51
+pediatric 757
+crystal deposition arthropathies  
+356–358
+CT
+adrenal gland 162
+dosimetry 852
+liver 89
+parenchymal hemorrhage 266
+physics 851
+small bowel obstruction 136
+stroke 252–256
+CT angiography 673–678
+coronary arteries 674–676
+ECG gating and radiation dose 673
+freezing of cardiac motion 673
+grading of stenosis 673
+ischemic heart disease 673
+spatial resolution 673
+temporal resolution 673
+CT severity index 114
+CT urography 180
+currant jelly stool 774
+Cushing disease 160
+Cushing syndrome 160
+cystadenoma, biliary 105
+cystic adventitial disease 732
+cystic fibrosis
+bronchiectasis 78
+pancreatic manifestations 112
+cystic hygroma 287
+cystic lung disease 19
+cystic metastasis 286
+cystic renal cell carcinoma 171, 489
+cystography, radionuclide 584
+cysts
+adrenal 163
+arachnoid 231
+Baker’s 425
+bone 334, 382, 382
+branchial cleft 286, 286
+breast 629–630
+oil cyst 622
+bronchogenic 126
+choledochal 101–102, 786
+cholesterol 304, 309
+choroid plexus 541
+corpus luteum 515
+dermoid see dermoid cyst
+echinococcal
+liver 473
+spleen 119
+epidermoid see epidermoid cyst
+epididymal 496
+esophageal duplication 126
+foregut duplication 73, 74
+meniscal 415
+mucous retention 292
+Müllerian duct 801
+neurenteric 126
+ovarian 515
+paralabral 453
+paraovarian 516
+pericardial 72
+peritoneal occlusion 517
+pineal 241
+Rathke’s cleft 234, 236
+renal 171–172, 488–489
+cortical 488
+hemorrhagic 171
+pediatric 794
+sinus 489
+spleen 118
+testis 496
+theca-lutein 515
+thymic 70
+thyroglossal duct 285
+tunical 496
+cytomegalovirus
+encephalitis 280
+esophagitis 124
+Damus–Kaye–Stansel procedure 762
+Dandy Walker malformation 539, 831
+Dawson fingers 273
+de Quervain thyroiditis 505
+nuclear imaging 568
+death by radiation 854
+decibel 859
+deep venous thrombosis 502–503
+dementia 588–589
+demyelinating disease 211
+spine 330
+dermatomyositis see polymyositis/
+dermatomyositis
+dermoid cyst
+adnexal 197
+floor of mouth 285
+intradural-extramedullary 331
+ovary 518, 801
+suprasellar 237
+descending thoracic aortic 
+aneurysm 73
+desmoid tumor 151
+desquamative interstitial 
+pneumonia 53
+developmental venous anomaly 259
+Devic disease 274
+diabetic mastopathy 597
+dialysis access 736–737
+diaphragmatic hernia, congenital 542, 
+753
+diastematomyelia 341
+didelphys uterus 509
+diethylstilbestrol uterus 509
+diffuse axonal injury 244
+diffuse idiopathic skeletal hyperostosis 
+(DISH) 338, 350
+diffuse lung disease 48–64
+antigen and exposure-related 56
+eosinophilic 57
+iatrogenic 59
+idiopathic interstitial 
+pneumonias 48–55
+pulmonary vasculitis 57–58
+systemic disease-related 60–62
+diffusion weighted imaging 207
+dilated cardiomyopathy 679, 688–689
+dipyridamole stress test 562
+discitis 333
+pyogenic 339
+dislocations
+biceps tendon 448
+elbow/forearm 455
+glenohumeral 438–440
+hand 362
+interfacetal 437
+knee 411
+lunate/perilunate 458
+diverticulum
+bleeding 712
+calyceal 179
+871
+Killian–Jamieson 129
+of Kommerel 660
+Meckel 572
+urethral 188
+Zenker 129
+DNA, radiation-induced damage 854
+dobutamine stress test 562
+dosimetry 852
+double bubble sign 112, 773, 777
+double density sign 579
+double line sign 431
+Down syndrome 549
+Dressler syndrome 683
+duodenal atresia 543, 777
+duplex collecting system 792
+dural arterio-venous fistula 257, 340
+intraparenchymal hemorrhage 269
+dural sinuses 264
+dural tail 212
+dural tumors 228
+metastatic 82
+ear
+external 303
+congenital malformations 303
+exostosis 303
+malignancy 303
+inner 307–308
+middle 303–306
+Ebstein anomaly 765
+echinococcal cyst
+liver 473
+spleen 119
+echinococcal disease 92
+ectopic pregnancy 522–524
+edema
+bone marrow 432
+cerebral see cerebral edema
+mesenteric 150
+pulmonary see pulmonary edema
+eggshell calcification 71
+Eisenmenger syndrome 763
+elbow/forearm 455–456
+dislocation 455
+elbow effusion 805
+little league elbow 822
+rheumatoid arthritis 352
+embolization 698
+non-target 698
+post-embolization syndrome 698
+uterine artery 730
+embryonal sarcoma, 
+undifferentiated 788
+embryonal tumors 220–221
+emphysema 19, 79–80
+centrilobular 79
+congenital lobar 754
+panacinar (panlobular) 80
+paraseptal 79
+pulmonary interstitial 751
+emphysematous cholecystitis 103, 466
+emphysematous pyelonephritis 174, 
+489
+empty delta sign 265
+empty gallbladder sign 93
+empyema 22
+encephalitis 213
+cytomegalovirus 280
+herpes-related 280
+HIV/AIDS 280
+enchondroma 372–373
+enchondromatoses 811
+endobronchial carcinoid 81
+endobronchial metastasis 82
+endocardial cushion defect 764
+endocarditis 683
+endometrial carcinoma 194
+endometrial fluid 513
+endometriosis 197, 512
+endometrium 509–511
+cancer 511
+cyclical thickness 510
+ectopic 512
+polyp 511
+postmenopausal changes 511
+tamoxifen effect 511
+endotracheal tubes 32
+enlarged vestibular aqueduct 
+syndrome 307
+enostosis 367
+enteritis 140–143
+eosinophilic gastritis 131
+eosinophilic granuloma 379
+eosinophilic lung disease 57
+eosinophilic pneumonia 57
+ependymal cells 216
+ependymitis, infectious 209
+ependymoma 220
+intramedullary 330
+myxopapillary 332
+epicardial fat pad 72
+epidermoid cyst
+cerebellopontine angle 232
+floor of mouth 285
+intradural–extramedullary 331
+suprasellar 237
+testis 494–495
+epididymal cyst 496
+epididymitis 498
+epididymo-orchitis 498
+epidural hematoma 243
+epidural lipomatosis 334
+epidural metastasis 333
+epiglottitis 744
+epithelioid hemangioendothelioma 95
+erosions 364
+esophagitis 124
+esophagus/esophageal 123–130
+anatomy 123
+atresia 543, 775
+cancer 74, 127
+PET-CT 559
+candidiasis 124
+diverticula 129
+duplication cyst 126
+feline 129
+foreign body 126
+hernia 130
+masses
+benign 126
+evaluation 125
+malignant 127
+motility disorders 128
+strictures 125
+varices 126
+web 123
+Essex–Lopresti fracture–
+dislocation 455
+esthesioneuroblastoma 301
+Ewing sarcoma 379, 815
+nuclear imaging 579
+extra-axial lesions 205
+hemorrhage 243
+extracalyceal contrast medium 179
+extracardiac shunt 762
+facet arthropathy 338
+facial fractures 245
+facial nerve, schwannoma 304
+Fairbank disease 811
+fallen-fragment sign 366
+fallopian tube, dilated 517
+fat pad sign 455, 805
+fatty filum 341
+fatty lesions of bone 381
+fatty liver 90
+FDG 554
+normal distribution 555
+nuclear imaging 562
+feline esophagus 129
+femoral artery 707
+angiographic access 696
+femoral head fracture–dislocation  
+428
+femoral neck fracture 428–429
+872
+femoroacetabular impingement  
+433–434
+cam-type 433
+mixed type 434
+pincer-type 434
+femoropopliteal disease 731
+fetus/fetal
+abdomen 543–544
+abdominal diameter 531
+ascites 536
+biparietal diameter 531
+bowel obstruction 543
+brain and spine 538–541
+femur length 531
+genitourinary tract 545–546
+heart rate 519–520
+heartbeat 519–520
+hydronephrosis 545
+hydrops 536
+musculoskeletal imaging 547
+occipital frontal diameter 531
+pleural effusion 536
+radiation effects/dose 855
+thorax 542–543
+fibrillary astrocytoma 217–218
+fibroadenolipoma of breast 623
+fibroadenoma of breast 625
+giant 627
+fibroepithelial polyp 181
+fibroid 193, 512
+fibrolamellar carcinoma 476
+fibroma
+cardiac 769
+chondromyxoid 374
+nonossifying 375
+fibromuscular dysplasia 502
+fibrosing mediastinitis 46
+fibrous bone lesions 375–377
+fibrous dysplasia 376–377
+Ficat staging system 431
+finger-in-glove sign 29
+Fisher grade 261
+flat waist sign 6
+Fleischner sign 47
+fluid attenuation inversion recovery 
+(FLAIR) 206
+fluorine-18-fluorodeoxyglucose see FDG
+fluoroscopy 851
+focal nodular hyperplasia 96, 474
+nuclear imaging 570
+follicular cyst 515
+Fontan procedure 762
+foot/ankle 401–410
+ankle
+fractures 409
+tendons 407–410
+forefoot 401–404
+midfoot/hindfoot trauma 404–406
+osteoarthritis 348
+rheumatoid arthritis 351
+football sign 770
+foramen rotundum 299
+foramen of Winslow hernia 138
+foregut duplication cyst 73, 74
+foreign body
+aspirated 744
+esophagus 126
+Fournier gangrene 498
+fracture-dislocations
+Chopart 404
+Essex–Lopresti 455
+femoral head 428
+Galeazzi 456
+Lisfranc 402–404
+Monteggia 456
+fractures 399–400
+elbow/forearm 455–456
+facial 245
+foot/ankle
+ankle 409
+forefoot 401–404
+midfoot/hindfoot 404–406
+hand/wrist 451
+hip 427–429
+insufficiency 580
+nuclear imaging 579
+pediatric 802–807
+Salter Harris classification 802–803
+stress 579
+see also specific fractures
+Freiberg’s infraction 401, 822
+fundic gland polyposis syndrome 131
+fungal infection
+brain 278
+liver 92
+lung 26
+sinusitis
+acute invasive 293
+chronic allergic 293
+spleen 119
+see also aspergillosis
+fusiform aneurysm 263
+gadolinium-based contrast media 842–
+843
+breast feeding 843
+extravasation 842
+nephrogenic systemic fibrosis 843
+pregnancy 843
+galactocele 623–624
+galaxy sign 15
+Galeazzi fracture–dislocation 456
+gallbladder 724
+cancer 468
+carcinoma 106
+Courvoisier 467
+hydrops 786
+imaging patterns 469
+infection/inflammation 103
+metastases 106
+perforation 103
+polyps 468
+porcelain 103, 467
+strawberry 467
+ultrasound 465–471
+gallium-67 585
+gallium–thallium imaging 586
+gallstones 465–467
+small bowel obstruction 139
+gamekeeper’s thumb 460
+Gamna-Gandy bodies 93, 121
+ganglioglioma 223
+ganglioneuroma 800
+gangrene, pulmonary 22
+gangrenous cholecystitis 103
+gastric atresia 775
+gastric bypass surgery 134–135
+complications 135
+gastric cancer 133
+gastric carcinoma 133
+gastrinoma 110
+gastrogastric fistula 135
+gastrointestinal bleeding 571, 711–712
+acute 571
+angiodysplasia 711
+diverticular 712
+gastrointestinal imaging 87–156
+biliary tract 100–106
+hepatobiliary 572–574
+large bowel 144–148
+liver 88–100
+Meckel diverticulum 572
+mesentery and peritoneum 149–153
+nuclear imaging 570–574
+pancreas 107–116
+pediatric 770–790
+anorectal malformations 783
+bowel obstruction 776–782
+congenital gastroesophageal 
+disorders 775
+emergencies 770–774
+hepatobiliary tumors 785
+liver masses 786–542
+neonatal cholestatic jaundice 784
+small bowel 136–143
+873
+spleen 116–122
+stomach 131–135
+gastrointestinal stromal tumor see GIST
+gastroschisis 544
+Gaucher disease 121, 395
+genitourinary imaging 157–200
+adrenal glands 160–165
+bladder 183–185
+fetus 545–546
+kidney 166–179
+pediatric 791–801
+adrenal masses 799–800
+benign masses 797
+cystic pelvic masses 801
+cystic renal lesions 794–795
+hydronephrosis and 
+hydroureter 791–793
+renal tumors 795–796, 798
+solic pelvic masses 801
+retroperitoneum 158–159
+ureter 180–182
+urethra 186–191
+germ cell tumors 70–72
+burnt-out 494
+malignant 493
+nonseminomatous 494
+pineal 240
+germinal matrix hemorrhage 549
+germinoma 237, 241
+gestational sac 519
+gestational trophoblastic disease 525
+ghost meniscus sign 415
+giant cell arteritis 699
+giant cell tumor of bone 379
+GIST
+benign 132
+malignant 127, 133
+Glenn shunt 762
+glenohumeral dislocation 438–440
+anterior 438
+inferior (luxatio erecta) 439–440
+posterior 439
+glenohumeral ligament, inferior, 
+humeral evulsion 450
+bony 450–451
+glenoid labral articular disruption 453
+glial cells 216
+glial tumor 209
+Glidewire 699
+glioblastoma multiforme 218
+glioma 211, 219, 242
+optic nerve 319
+optic pathway 237
+gliomatosis cerebri 219
+globe of eye 321–322
+glomus
+caroticum 313
+jugulare 312
+jugulotympanicum 313
+tympanicum 304, 312
+vagale 313
+glucagonoma 110
+gluten-sensitive enteropathy 142
+Golden’s S sign 5
+gout 358
+gradient recall echo 208
+graft versus host disease,  
+enteritis 143
+granulomatous disease 212
+granulomatous hypophysitis 234
+granulomatous mastitis 596
+Graves disease 504
+nuclear imaging 567
+treatment 568–569
+gray matter heterotopia 827
+Grisel syndrome 437
+groove pancreatitis 116
+ground glass matrix 366
+ground glass opacification 9, 10
+differential diagnosis 11
+peripheral 11
+gynecomastia 651
+gyriform enhancement 210
+Haller cell 292
+halo sign 30
+hamartoma
+biliary 99
+breast 623
+hypothalamic 238
+mesenchymal 785
+spleen 117
+hamartomatous polyp 51
+Hampton’s hump 47
+hand/wrist 451–461, 737–738
+arthritis 362–364
+Buerger disease 738
+fractures 451
+hypothenar hammer 737–738
+osteoarthritis 348
+erosive 350
+Raynaud disease 738
+rheumatoid arthritis 351
+thromboembolic disease 738
+trauma 460–461
+wrist 458–459
+hangman’s fracture 436
+Hashimoto thyroiditis 504
+nuclear imaging 567
+head and neck cancer, PET-CT 557
+health care-associated pneumonia 21
+heart disease, congenital
+acyanotic 761
+pulmonary edema 762
+shunt vascularity 763–764
+cyanotic 761
+decreased pulmonary vascularity 
+with cardiomegaly 765
+decreased pulmonary vascularity 
+without cardiomegaly 766
+increased pulmonary 
+vascularity 766–768
+valvular see valvular heart disease
+heel effect 845
+Helicobacter pylori gastritis 131
+hemangioblastoma 222
+intramedullary 330
+hemangioma
+bone 378
+cardiac 769
+hepatic 97
+infantile 787
+orbit 316
+spleen 117
+subglottic 745
+vertebral body 333
+hematocele 495
+hematologic arthropathies 358–362
+hematologic bone disease 396–397
+hematoma
+aortic intramural 663
+epidural 243
+femoral arterial 696
+intraparenchymal 244, 267
+scrotal 497
+subdural 243
+hematopoiesis, extramedullary 74
+hematopoietic bone lesions  
+379–381
+hematosalpinx 517
+hemochromatosis 91, 358
+hemophilic arthropathy 359–360
+hemoptysis, bronchial artery 
+embolization 702
+hemorrhage
+adrenal 165
+aneurysmal 269
+brain 214
+intraparenchymal 266–271
+intraventricular 243
+subarachnoid 243, 260–263
+gastrointestinal 571, 711–712
+hemorrhagic cyst 515–516
+hemorrhagic neoplasm 269
+hemosiderosis 91
+874
+hepatic artery 705–706
+aneurysm 710
+left
+accessory 706
+replaced 706
+right
+accessory 705
+replaced 705
+hepatic steatosis 90, 471
+hepatic veins 482–483
+hepatitis
+neonatal 752
+viral 92, 472
+hepatobiliary imaging 572–574
+biliary leak 574
+hepatic dysfunction 574
+HIDA protocol 572
+radiotracers 572
+tumors 756–785
+hepatoblastoma 788
+hepatocellular carcinoma 94, 476
+fibrolamellar 94
+pediatric 788
+PET-CT 559
+whole-body imaging 586
+hernia
+diaphragmatic 542, 753
+foramen of Winslow 138
+hiatal 73, 130
+inguinal 138, 782
+Morgagni 72
+obturator 138
+paraduodenal 138
+paraesophageal 130
+post-gastric bypass 135
+transmesenteric 138
+ventral 138
+herniation, cerebral 204–205, 216
+cerebellar tonsillar 205
+subfalcine 204
+transtentorial (uncal) 204
+herpes encephalitis 210, 280
+herpes esophagitis 124
+heterotopic pregnancy 523
+Heubner’s recurrent artery 248
+hiatal hernia 73, 130
+hilar mass 38
+Hill–Sachs lesion 439, 450
+hilum overlay sign 68
+hindfoot (tarsal) coalition 406
+hip 425–434
+anatomy 425–426
+developmental dysplasia 821
+femoroacetabular 
+impingement 433–434
+fractures 427–429
+occult stress 430
+occult traumatic 430
+labral injury 432
+MRI 430–432
+osteoarthritis 349
+rheumatoid arthritis 351
+septic arthritis 812
+Hirschsprung disease 781
+Histoplasma capsulatum 26
+HIV/AIDS
+cholangitis 105
+encephalitis 280
+esophagitis 124
+nephropathy 490
+salivary gland involvement 298
+hockey stick sign 281
+holoprosencephaly 540, 829
+hospital-acquired pneumonia 21
+hot-nose sign 588
+hot-potato voice 284
+“hot-tub” lung 26
+Hounsfield units 851
+Hunt and Hess score 261
+Hunter’s angle 208
+Hurler’s syndrome 811
+Hutchinson (chauffeur’s) fracture 456
+hyaline membrane disease 751
+hydatid disease 119, 473
+hydatidiform mole 525
+hydranencephaly 541
+hydrocele 495
+hydrocephalus 205, 214
+hydronephrosis 486–487, 791–793, 794
+fetal 545
+hydrosalpinx 517
+hydroureter 791–793
+hyperdense artery sign 253
+hyperechoic small bowel 544
+hyperparathyroidism 392
+hyperphosphatasia, hereditary 395
+hypersensitivity pneumonitis 14, 56
+hypertension, portal 477–480
+hypertensive hemorrhage 268
+hyperthyroidism 393
+hypertrophic cardiomyopathy 679, 687
+hypertrophic pulmonary 
+osteoarthropathy 580
+hyperplastic polyp 131
+hypoglycemia, cerebral 
+involvement 282
+hypoparathyroidism 393
+hypopharynx 123
+hypoplastic left heart 762
+hypothalamic hamartoma 238
+hypothenar hammer 737–738
+hypothyroidism 393, 811
+hypoxemic lung disease 45
+hypoxic ischemic encephalopathy 282
+iatrogenic disease
+lung 59
+radiation exposure 855, 856
+idiopathic interstitial pneumonias  
+48–55
+idiopathic pulmonary fibrosis 20
+ileal atresia 779
+ileocolic artery 706
+iliac arteries
+anastomoses 709
+aneurysm 728
+atherosclerosis 727
+deep circumflex iliac 707
+external 707
+internal 707
+iliotibial band syndrome 420
+immune hydrops 536
+immunocompromised patients
+pneumonia 21
+pulmonary infection 27–30
+impingement syndrome 441–442
+indium-111 oxine leukocytes 586
+indium-111 pentetreotide 584–585
+infantile hemangioma 787
+infarction
+cerebral see stroke, infarction
+spinal 340
+infection
+brain 277–281
+breast 596–597
+gallbladder 103
+kidney 173–176
+liver 92, 472–473
+lung 21–26
+musculoskeletal 385–390
+neck 283–284
+orbit 315
+scrotum 498
+spleen 119
+ureter 181
+uterus 513
+see also specific infections
+infectious enteritis 143
+inferior epigastric artery 707
+inferior mesenteric artery 706
+inferior orbital fissure 299
+inferior pancreaticoduodenal 
+artery 706, 708
+inferior vena cava, filter 
+placement 720–721
+875
+inflammatory bowel disease 353
+see also Crohn disease
+inguinal hernia 138, 782
+innominate artery syndrome 748
+insufficiency fracture 580
+insulinoma 110
+interatrial septum, lipomatous 
+hypertrophy 689
+interfacetal dislocation
+bilateral (locked facets) 437
+unilateral 437
+interlobular fissures 2
+interlobular septal thickening 12, 13
+internal carotid artery 247
+interstitial pneumonia 21
+acute 55
+desquamative 53
+idiopathic 48–55
+lymphoid 19, 54
+intertrochanteric fracture 429
+interventional radiology 694–740
+abdominal/pelvic angiography  
+703–721
+cholangiography 722–724
+lower extremity angiography 726–732
+percutaneous gastrostomy 725
+percutaneous nephrostomy 
+(PCN) 725
+thoracic angiography 699–702
+upper extremity angiography  
+733–738
+intestinal obstruction 776–782
+childhood 782
+low/distal bowel 778
+microcolon 778–781
+proximal bowel 777–778
+intra-abdominal hemorrhage 150
+intra-axial lesions 205
+neoplasm 232
+traumatic 244
+intracranial hypotension 212
+intraductal papillary mucinous 
+neoplasm 110
+intraductal papilloma 626
+multiple 628
+intramammary lymph node 624
+intrapancreatic accessory spleen 113
+nuclear imaging 571
+intraparenchymal hematoma 244, 267
+intraparenchymal hemorrhage  
+266–271
+causes 268–270
+imaging 266
+intrauterine device 513
+intraventricular hemorrhage 243
+intussusception 139, 774
+inverted papilloma 181, 294
+involucrum 385
+iodinated contrast media 840–842
+breastfeeding 842
+contrast-induced nephropathy 841
+extravasation 842
+and metformin 841
+pheochromocytoma 841
+pregnancy 842
+reactions 840
+thyroid uptake 841
+iodine-123 566
+iodine-123 MIBG 584, 585
+iodine-131 566
+iron overload 91
+ischemia, mesenteric 710–711
+ischemic cardiomyopathy 678–679
+subendocardial delayed 
+enhancement 678
+transmural delayed 
+enhancement 679
+ischemic heart disease 673
+ivy sign 270
+Jaccoud arthropathy 356
+jaundice, neonatal cholestatic 784
+Jefferson fracture 436
+jejunal atresia/stenosis 778
+Jeune syndrome 810
+joints 347
+connective tissue disorders 356
+Joubert syndrome 835
+jumper’s knee 421
+juvenile idiopathic arthritis 360, 820
+juvenile nasopharyngeal 
+angiofibroma 300, 743
+juvenile pilocytic astrocytoma 217
+juvenile polyposis 132
+juxtaphrenic peak sign 5
+Kager’s fat pad 410
+Kasabach–Merritt syndrome 117
+keratosis obturans 303
+kidney 166–179
+abscess 489
+cystic masses 488–489
+cortical cyst 488
+pediatric 794–795
+renal sinus cyst 489
+echogenic 492
+echogenic mass 492
+imaging patterns 177–179, 492
+infection/inflammation 173–176, 
+489–490
+multicystic disease 490–491
+acquired 491
+autosomal dominant 173, 490, 795
+autosomal recessive 491, 795
+nuclear imaging 582–584
+clinical applications 582–584
+radiotracers 582
+stones 486–487
+transplant 491
+trauma 179, 715
+tumors 487–488
+benign 800
+cystic 171–172
+diagnosis 166
+metastatic 796
+pediatric 795–796
+solid 167–170
+syndromes with 170
+ultrasound 486–492
+see also entries under renal
+Kienbock disease 459, 822
+Killian–Jamieson diverticulum 129
+Klatskin tumor 106
+Klippel–Trenaunay–Weber 
+syndrome 117
+knee 411–425
+cartilage 423
+extensor mechanism and 
+patella 421–422
+ligaments 417–420
+anterior cruciate 417–419
+iliotibial band syndrome 420
+lateral cruciate 420
+medial collateral 420
+posterior cruciate 419
+menisci 412–416
+bucket handle tear 414
+cyst 415
+discoid 416
+myxoid degeneration 413
+oblique/horizontal tear 413
+radial/transverse tear 415
+vertical/longitudinal tear 414
+osteoarthritis 348
+rheumatoid arthritis 352
+synovium 424–425
+trauma 411
+dislocation 411
+patellar fracture 411
+tibial plateau fracture 411
+Kohler disease 404, 822
+Labbé’s vein 264
+labral injury of hip 432
+labyrinthitis 308
+876
+lacrimal gland lesion 317
+lactational adenoma 627
+Ladd procedure 773
+Lady Windermere syndrome 26
+lamina papyracea, dehiscent 291
+Langerhans’ cell histiocytosis 379
+osseous 816
+petrous apex 309
+pulmonary 16, 19, 62
+large airway disease 77–78
+large bowel 144–148
+obstruction see intestinal obstruction
+large cell lung carcinoma 37
+laryngocele 289
+laryngotracheobronchitis 744
+larynx/laryngeal 288–289
+anatomy 288
+atresia 543
+cancer 289
+lesions of 289
+papillomatosis 745
+trauma 289
+lasix renogram 584
+Le Fort fractures 245
+left superior intercostal vein 67
+Legg–Calvé–Perthes disease 814, 822
+leiomyoma 193, 512
+leiomyosarcoma 512
+Lemierre syndrome 284
+lemon sign 539
+leptomeningeal carcinomatosis 213
+leptomeningeal (pia-arachnoid) 
+enhancement 213
+Leriche syndrome 727
+leukemia, osseous changes 819
+leukoplakia, ureter 181
+Lhermitte–Duclos gangliocytoma 220
+ligamentum flavum, infolding/
+hypertrophy 337
+lightbulb sign 439
+limp in children 812–814
+linear attenuation coefficient 847
+lingual thyroid 287
+lipoma
+arborescens 425
+bone 381
+breast 622
+gastric 132
+hepatic 474
+quadrigeminal plate 242
+liposarcoma
+bone 381
+retroperitoneal 159
+Lisfranc fracture–dislocation 402–404
+lissencephaly 826
+little league elbow 822
+liver
+Doppler ultrasound 477–483
+hepatic veins 482–483
+portal veins 477–481
+imaging patterns 476
+nuclear imaging 570
+ultrasound 471–476
+see also entries under hepatic
+liver disease 88–100
+abscess 89
+anatomy 88–89
+cerebral involvement 282
+cirrhosis 93, 472, 710
+congenital cystic disease 99,  
+785–756
+diffuse metabolic parenchymal  
+471–472
+fatty 90
+imaging
+CT 89
+MRI 89
+infections 92, 472–473
+iron overload 91
+metabolic disorders 90–91
+nuclear imaging 574
+trauma 100
+tumors
+benign 96–98, 473–474
+malignant 93–95, 475–476
+metastatic 95, 475, 788
+pediatric 786–542
+vascular 99
+see also individual conditions
+lobal emphysema, congenital 754
+lobal pneumonia 21
+lobar atalectasis 3–7
+radiologic presentation 38
+lobster claw sign 176
+lobular pneumonia 21
+Löffler syndrome 57
+low-grade astrocytoma 217
+lower extremity angiography 726–732
+anatomy 726–727
+distal aorta, iliac, pelvic and leg 
+arteries 727–730
+non-atherosclerotic arterial 
+disease 732
+thrombolic and atherosclerotic 
+disease 731–732
+Ludwig angina 283
+luftsichel (air-sickle) sign 5
+lunate/perilunate dislocation 458
+lung
+anatomy 8
+unilateral hyperlucent 758
+see also entries under pulmonary
+lung cancer 34–42
+clinical overview 34
+histologic subtypes 35
+PET-CT 556
+radiologic presentation 38–40
+solitary pulmonary nodule 34
+staging 40–42
+lung disease 8–20
+abscess 22
+cavitary 18–19
+cystic 19
+diffuse see diffuse lung disease
+iatrogenic 59
+infection see pulmonary infection
+nuclear imaging 575–577
+radiotracers 575
+VQ scanning 575–576
+see also specific diseases
+Lyme disease 278
+lymph nodes
+cervical 326–327
+intramammary 624
+lymphadenopathy, mediastinal 72
+lymphangioleiomyomatosis 19, 64
+lymphangioma
+orbit 317
+spleen 118
+lymphangitic carcinomatosis 12
+radiologic presentation 39
+lymphatic malformations of neck 287
+lymphocytic hypophysitis 234
+lymphoid interstitial pneumonia 19, 54
+lymphoma 71
+adrenal 165
+bone 381
+breast 634
+CNS 209, 226–227
+parasellar 238
+esophageal 127
+gastric 133
+liver 95, 476
+mesenteric 152
+orbital 316
+pancreas 484
+PET-CT 558
+renal 169, 488
+splenic 120
+trachea 82
+McCune–Albright syndrome 338
+macroadenoma, pituitary 234
+Madelung deformity 822
+Maffucci syndrome 373, 811
+877
+MAGIC DR mnemonic 211
+magic-angle phenomenon 444
+magnetic resonance 
+cholangiopancreatography 
+(MRCP) 100
+magnetic resonance imaging see MRI
+main-en-lorgnette deformity 355
+Maisonneuve fracture 409
+malacoplakia of ureter 181
+malignant fibrous histiocytoma 375
+mallet finger 460
+malrotation 772–773, 781
+mammography 597–616
+BI-RADS 3 616
+BI-RADS assessment categories 601
+breast compression 849
+breast masses 603–606
+calcifications 607–613
+diagnostic 599
+digital 850
+fibroglandular density 602
+interpretation 599–600
+magnification 850
+physics 849–850
+average glandural dose 850
+X-ray generator and filters 849
+quality control 850
+report 600
+screening 597–599
+skin thickening 602–603
+workup and problem solving  
+614–616
+mandible, cystic lesions 286–287
+Marchiafava–Bignami disease 274
+marching cleft sign 415
+marginal artery of Drummond 706, 709
+Marmor–Lynn fracture 409
+masticator space 323
+mastitis 596
+granulomatous 596
+periductal 596
+mastocytosis 397
+mature cystic teratoma 197
+May–Thürner syndrome 717
+Mazabraud syndrome 338
+Meckel diverticulum 572
+pediatric 789
+Meckel–Gruber syndrome 549
+meconium 544
+aspiration 752, 790
+peritonitis 790
+meconium ileus 779, 790
+meconium ileus-equivalent 
+syndrome 790
+meconium plug syndrome 780, 790
+medial collateral ligament 420
+median arcuate ligament 
+syndrome 716
+mediastinal mass
+anterior
+precardiac 72
+prevascular 69–72
+middle 72–73
+pediatric 759
+posterior 73–74
+radiographic localization 68
+mediastinum 65–74
+anatomy 65–67
+medication esophagitis 124
+medullablastoma 221
+medullary sponge kidney 179
+megacystis microcolon intestinal 
+hypoperistalsis syndrome 781
+melorheostosis 367
+Menetrier disease 131
+meningeal neoplasm 212
+meningioma 228, 231, 236, 242
+intradural-extramedullary 331
+intraventricular 224
+olfactory groove 300
+optic nerve 320
+meningitis 210, 213
+meningocele, lateral 74
+mesenchymal hamartoma 785
+mesenchymal tumor of esophagus 126
+mesentery/mesenteric 149–153
+anatomy 149
+edema 150
+inflammation 150
+ischemia 710–711
+acute 710
+chronic 710–711
+“misty” 150
+neoplastic infiltration 150
+tumors 151–152
+vasculopathy 709–710
+mesoblastic nephroma 797
+mesothelioma 83
+metabolic arthropathies 358–362
+metabolic bone disease 819
+metanephric blastema 798
+metastases
+adrenal 165
+bone 383
+brain 211, 227, 238
+CNS 211, 227, 238, 242
+endobronchial 82
+esophagus 127
+gallbladder 106
+gastric 133
+liver 95
+mesenteric 152
+pleura 83
+renal 796
+spleen 120
+metatarsal fractures
+fifth 401
+stress 402
+metformin, and iodinated contrast 
+media 841
+methanol poisoning 282
+Michel aplasia 307
+microadenoma, pituitary 234
+microangiopathy 275
+microcolon 778–781
+microscopic polyangiitis 58
+midbrain malformations 835
+middle cerebral artery 249
+miliary nodules 16
+miliary tuberculosis 25
+Milwaukee shoulder 356
+Mirizzi syndrome 470
+“misty” mesentery 150
+mitral valve
+annular calcification 685
+regurgitation 685
+stenosis 685
+mixed epithelial and stromal 
+tumor 171
+molar tooth sign 184–185, 835
+Mondini deformity 307
+Mondor disease 597
+Monod sign 29
+Monteggia fracture–dislocation 456
+Morgagni hernia 72
+Morquio syndrome 811
+moyamoya disease 270
+MR spectroscopy, neuroimaging 208
+MRI
+adrenal gland 161
+breast 639–647
+cardiovascular 678–680
+cervix 195
+focal heating and thermal 
+injuries 857
+hip 430–432
+liver 89
+neuroimaging 206–209
+apparent diffusion coefficient 207
+diffusion weighted imaging 207
+FLAIR 206
+gradient recall echo 208
+spin-echo protein density 207
+spin-echo T1 206
+spin-echo T2 206
+878
+MRI (cont.)
+parenchymal hemorrhage 266
+physics 856–858
+fringe field 856
+noise 856
+quenching 856
+signal to noise ratio 857
+specific absorption ratio 856
+T1 and T2 857–858
+pregnancy 856
+prostate 189–191
+stroke 253
+tendons 400
+uterus and adnexa 192–198,  
+197–198
+mucinous cystic neoplasm 109
+mucocele 294
+mucoepidermoid carcinoma
+salivary gland 297
+tracheobronchial 82
+mucopolysaccharidoses 811
+mucous retention cyst 292
+Mueller–Weiss disease 404
+Müllerian duct cyst 801
+multicentric reticulohistiocytosis 359
+multicystic dysplastic kidney 546, 794
+multilocular cystic nephroma 171,  
+794, 798
+multiple epiphyseal dysplasia 811
+multiple hereditary exostoses 371, 811
+multiple myeloma
+bone 380
+pleural involvement 83
+multiple sclerosis 209, 272–273
+Marburg variant 274
+Murphy’s sign 466
+musculoskeletal imaging 346–463
+clinical applications 577–581
+avascular necrosis 580
+bone tumors 579
+complex regional pain 
+syndrome 581
+fracture 579
+hypertrophic pulmonary 
+osteoarthropathy 580
+insufficiency fracture 580
+osteomyelitis and infection 580
+Paget disease 581
+prosthesis evaluation 580
+shin splints 579–580
+stress fracture 579
+superscan 578
+nuclear imaging 577–581
+radiotracers 577
+pediatric 802–824
+arthritis 820
+bone tumors 815
+child abuse 808
+fractures 802–807
+limp 812–814
+lytic bone lesions 816–819
+metabolic bone disease 819
+mucopolysaccharidoses 811
+osteochondroses 822
+periosteal reaction 824
+physiology 802
+skeletal dysplasias 809–811
+TORCH infections 820
+musculoskeletal infection 385–390
+mycobacteria, atypical 26
+mycotic (infectious) aneurysm 263
+myelofibrosis 397
+myelolipoma, adrenal 163
+myelomeningocele 539
+myocardial bridging 678
+myocardial infarction 683
+myocardial noncompaction 687
+myocarditis 680
+myometrium 512
+myositis ossificans 383
+myxoid degeneration 400
+knee 413
+myxopapillary ependymoma 332
+nasal rhabdomyosarcoma 743
+nasopharynx 123
+navicular osteonecrosis 404
+neck
+anatomy 283
+cystic lesions 285–287
+floor of mouth 285
+mandible 286–287
+solitary parotid region 286
+fascial spaces 323–325
+infection 283–284
+inflammatory 283–284
+lymph nodes 326–327
+necrotizing enterocolitis 770
+necrotizing fasciitis 390
+neonate
+adrenal hemorrhage 800
+bilious emesis 772
+bowel obstruction 776–782
+brain imaging 549
+cholestatic jaundice 784
+hepatitis 784
+respiratory distress 750–752
+see also pediatric imaging
+nephroblastomatosis 797
+nephrocalcinosis
+cortical 178, 492
+medullary 177, 492
+nephrogenic systemic fibrosis 843
+nephrogram, delayed (prolonged) 177
+nephrolithiasis 176
+nephropathy
+contrast-induced 841
+HIV/AIDS 490
+nerve-sheath tumors see neurofibroma; 
+schwannoma
+neurenteric cyst 126
+neuroblastoma 799–800
+neurocysticercosis 278
+neurocytoma, central 223
+neuroendocrine tumor 587
+neurofibroma
+intradural-extramedullary 331
+orbit 317
+neurofibromatosis 628
+renal artery stenosis 713
+type 1 832–833
+type 2 833
+neurogenic thoracic outlet 
+syndrome 734
+neurogenic tumor 73
+neuromyelitis optica 274
+neuropathic arthropathy 361
+nipple, accessory 638
+nitrogen-13 ammonia 562
+nodular subcortical enhancement 210
+non-lymphomatous adenopathy 71
+non-target embolization 698
+non-ossifying fibroma 375
+non-seminomatous germ cell 
+tumor 494
+non-specific interstitial pneumonitis 50
+notochordal lesions 381
+nuchal translucency 530
+nuclear cardiology 560–565
+clinical overview 560–561
+image interpretation 563–564
+imaging protocols 563
+radionuclides 561–562
+sample cases 565
+stress testing 562
+nuclear imaging 553–591
+cerebrovascular 588–589
+gastrointestinal tract 570–574
+kidney 582–584
+musculoskeletal 577–581
+PET-CT 554–559
+physics 861–863
+activity 863
+alpha decay 862
+beta minus decay 862
+879
+beta plus decay 862
+cumulative activity 863
+decay and stability 861
+definitions 861
+effective half life 863
+electron capture 862
+quality control 863
+system resolution 863
+pulmonary 575–577
+thyroid 566–569
+whole-body 584–587
+nutcracker esophagus 128
+nutcracker syndrome 717
+obesity, pancreatic manifestations 112
+obturator hernia 138
+occipital frontal diameter 531
+occupational exposure to 
+radiation 855, 856
+ochronosis 359
+Octreoscan 584–585, 585
+odontoid fracture 436
+oil cyst of breast 622
+olfactory groove meningioma 300
+oligodendrocytes 216
+oligodendroglioma 219
+oligohydramnios 532, 537
+Ollier syndrome 373, 811
+omental caking 152
+omphalocele 544
+oncocytoma 714
+renal 169, 487
+oncotic aneurysm 263
+Onodi cell 292
+optic nerve
+glioma 319
+meningioma 320
+optic neuritis 320
+optic pathway glioma 237
+orbit 314–322
+abscess 315
+anatomy 314
+cellulitis/phlegmon 315
+conal pathology 318
+congenital anomalies 322
+extraconal masses 316–317
+globe 321–322
+infection 315
+intraconal masses 319
+metastatic disease 317
+pseudotumor 318
+sinusitis complications 292
+oreo cookie sign 690
+oriental cholangiohepatitis 105
+oropharynx 123
+os acromiale 442
+Osgood–Schlatter disease 422, 822
+osmotic demyelination 274
+osteitis 385
+osteoarthritis 347
+erosive 350
+foot 348
+hand 348
+hip 349
+knee 348
+sacroiliac joint 350
+shoulder 348
+osteoblastoma 369
+osteochondroma 373
+osteochondromatosis 371, 811
+osteochondrosis dissecans 423
+osteoclastoma 379
+osteogenesis imperfecta 547, 810
+osteoma 367
+osteoid 334, 368
+nuclear imaging 579
+osteomalacia 391
+osteomyelitis 384, 385–389
+chronic 387–389
+chronic recurrent multifocal 818
+contiguous focus 386–387
+hematogenous 385–386
+nuclear imaging 580
+pediatric 817
+sickle cell 396
+spine 333, 818
+subacute 387
+tuberculous 339
+vertebral disc 339
+whole-body imaging 586
+osteopetrosis 395
+osteophytosis 362–363
+osteoporosis 390
+osteosarcoma 334, 369–370, 815
+nuclear imaging 579
+otitis externa 303
+necrotizing/malignant 303
+otospongiosis (otosclerosis) 307–308
+ovary/ovarian 514–518
+anatomy/physiology 514
+cysts 515
+dermoid 518, 801
+hyperstimulation syndrome 516
+tumors 198, 518, 518
+pachymeningeal (dural) 
+enhancement 212
+Page kidney 179
+Paget disease
+of bone 394–395
+juvenile 395
+nuclear imaging 581
+of nipple 595
+Paget–Schroetter syndrome 735
+panacinar (panlobular) emphysema 80
+Pancoast tumor 39
+pancreas 107–116, 483–484
+annular 112
+congenital anomalies 111–112
+systemic disease affecting 112
+tumors 107–110, 484
+cystic epithelial 109–110
+endocrine 110
+solid epithelial 108
+pancreas divisum 111
+pancreatic rest, ectopic 132
+pancreaticobiliary maljunction 112
+pancreatitis 113–116, 483
+acute 114
+autoimmune 115–116
+chronic 115
+groove 116
+panda sign 585
+Panner disease 822
+papillary necrosis 176, 179
+papilloma, endobronchial 82
+paraduodenal hernia 138
+paraesophageal hernia 130
+paragangliomas 312–313
+paralabral cyst 453
+paranasal sinuses 290–294
+air cells 292
+anatomy 290–291
+sinonasal disease 292–294
+paraovarian cyst 516
+parapharyngeal space 325
+paraseptal emphysema 79
+parasitic infection, brain 278–279
+paraspinal abscess 74
+paraspinal lines 67
+parathyroid disease 506
+adenoma 506, 569
+hyperplasia 506
+nuclear imaging 569
+paratracheal stripes 66, 68
+Parinaud syndrome 257
+parotid glands 295
+benign neoplasm 296
+malignant neoplasm 297
+Parsonage–Turner syndrome 454
+patella/patellar
+dislocation 422
+fracture 411
+tendon injury 421
+see also knee
+880
+patent ductus arteriosus 764
+peak systolic velocity 499
+pediatric imaging 741–837
+airways 742
+anatomy 742
+stridor 744–745
+upper airway obstruction 743
+vascular rings/slings 746–749
+cardiac 760–769
+anatomy 761
+congenital heart disease see heart 
+disease, congenital
+plain film 760
+tumors 769
+chest 750–759
+congenital structural thoracic 
+disease 753–756
+mediastinal mass 759
+neonatal respiratory distress  
+750–752
+small airways disease 756–758
+unilateral hyperlucent lung 758
+gastrointestinal 770–790
+anorectal malformations 783
+bowel obstruction 776–782
+congenital gastroesophageal 
+disorders 775
+emergencies 770–774
+hepatobiliary tumors 785
+liver masses 786–542
+genitourinary tract 791–801
+adrenal masses 799–800
+benign masses 797
+cystic pelvic masses 801
+cystic renal lesions 794–795
+hydronephrosis and 
+hydroureter 791–793
+renal tumors 795–796, 798
+solic pelvic masses 801
+musculoskeletal 802–824
+arthritis 820
+bone tumors 815
+child abuse 808
+fractures 802–807
+limp 812–814
+lytic bone lesions 816–819
+metabolic bone disease 819
+mucopolysaccharidoses 811
+osteochondroses 822
+periosteal reaction 824
+physiology 802
+skeletal dysplasias 809–811
+TORCH infections 820
+neuroimaging 825–835
+congenital malformations 825–829
+midbrain malformations 835
+normal development 825
+phakomatoses 832–835
+posterior fossa 
+malformations 830–831
+pelvic anatomy 507
+pelvic apophyseal avulsion injuries 807
+pencil-in-cup erosion 355
+pentalogy of Cantrell 544
+peptic stricture 125
+Percheron’s artery 248
+percutaneous gastrostomy 725
+percutaneous nephrostomy (PCN) 725
+percutaneous transhepatic 
+cholangiography (PTC) 722–723
+percutaneous transluminal angioplasty 
+(PTA) 697
+pericardium
+calcification 690
+congenital absence 691
+cyst 72
+disease 689–691
+effusion 689–690
+periductal mastitis 596
+perilymphatic nodules 15
+perimesencephalic subarachnoid 
+hemorrhage 262
+periosteal bone formation 362–363
+periostitis 385
+peritoneum/peritoneal 149–153
+anatomy 149
+carcinomatosis 152
+diffuse disease 152–153
+occlusion cyst 517
+peritonitis, meconium 790
+peritonsillar abscess 284
+periventricular enhancement 209
+perivertebral space 325
+persistent hyperplastic primary 
+vitreous 322
+Perthes lesion 450
+PET rest-stress myocardial 
+perfusion 563
+PET-CT 554–559
+CT correlation 555
+oncologic indications 556–559
+patient preparation 555
+technical considerations 554
+petrous apex 309–310
+petrous apicitis 309
+Peutz–Jeghers syndrome 132
+phakomatoses 832–835
+pheochromocytoma 160, 164
+extra-adrenal 587
+iodinated contrast media 841
+photoelectric effect 846
+phyllodes tumor 627
+physics of imaging 838–864
+contrast media
+gadolinium-based 842–843
+iodinated 840–842
+treatment of reactions 839
+CT 851
+fluoroscopy 851
+image quality 853
+mammography 849–850
+MRI 856–858
+nuclear medicine 861–863
+radiation exposure 844
+radiography 845–848
+statistics 853
+ultrasound 859–860
+physis 802
+pigmented villonodular synovitis 424
+Pilon fracture 410
+pineal cyst 241
+pineal mass 240–242
+pineoblastoma 241
+pineocytoma 241
+pistol-grip deformity 433
+pituitary mass 234–234
+placenta 533–535
+abnormalities of thickness 533
+abruption 534
+accreta 535
+increta 535
+percreta 535
+previa 534
+single umbilical artery 533
+vasa previa 533
+plasmacytoma
+bone 380
+pleural involvement 83
+vertebral body 334
+pleomorphic adenoma
+parotid gland 296
+carcinoma 297
+pleomorphic xanthoastrocytoma 222
+pleura 83–85
+fibrous tumor 84
+malignancy 83–84
+metastases 83
+pleural effusion 84–85
+exudate 84
+fetus 536
+radiologic presentation 40
+transudate 84
+pneumatocele 19, 22
+pneumobilia 470
+pneumoconioses 15, 56
+881
+Pneumocystis jiroveci
+hepatic 473
+pneumonia 19, 27
+pneumomediastinum 759
+pneumonia 21–23
+clinical classification 21–23
+complications 22
+cryptogenic organizing 51, 757
+idiopathic interstitial 48–55
+immunocompromised patients 21
+neonatal 752
+radiography 21
+see also specific types
+pneumonitis
+hypersensitivity 14, 56
+nonspecific interstitial 50
+pneumothorax 40
+poisoning
+carbon monoxide 282
+methanol 282
+Poland syndrome 638, 758
+polyangiitis, microscopic 58
+polyarteritis nodosa 709
+polycystic kidney disease
+autosomal dominant 173, 490, 795
+autosomal recessive 546, 795
+polycystic liver disease, autosomal 
+dominant 99
+polycystic ovarian syndrome 516
+polyhydramnios 532, 537
+polymicrogyria 825
+polymyositis/dermatomyositis, joint 
+involvement 356
+polyps
+antrochoanal 293
+endometrium 511
+esophagus
+fibrovascular 126
+inflammatory 126
+fibroepithelial 181
+gallbladder 468
+gastric 131–132
+see also specific types
+polysplenia syndrome 116
+polytetrafluoroethylene (PTFE) graft 736
+popcorn appearance 366, 372–373
+popcorn calcifications 608
+popliteal aneurysm 732
+popliteal entrapment syndrome 732
+porcelain gallbladder 103, 467
+portal hypertension 477–480, 718–719
+portal veins 477–481
+thrombosis 480–481
+portal venous gas 481
+portosystemic gradient 718
+post-embolization syndrome 698
+post-transplant lymphoproliferative 
+disorder 476, 491
+posterior cruciate ligament 419
+posterior fossa
+malformations 830–831
+masses 229
+posterior longitudinal ligament, 
+ossification 338
+posterior reversible encephalopathy 
+syndrome 210, 274
+posterior urethral valves 546
+pregnancy
+contrast media
+gadolinium-based 843
+iodinated 842
+dating 520
+early prognosis 521
+ectopic 522–524
+first trimester 519–530
+evaluation of embryo 530
+imaging 519–520
+heterotopic 523
+MRI 856
+multiple gestation see twin 
+pregnancy
+placentation 526–528
+pulmonary embolism 575–576
+retained products of conception 525
+second/third trimesters 531–549
+cervix evaluation 532
+measurements 531
+thyroid imaging 566
+prematurity, chronic lung disease of 751
+preseptal infection 315
+primary biliary cirrhosis 104
+primary sclerosing cholangitis 104
+prion disease 281
+Probst bundles 540, 827
+progressive multifocal 
+leukoencephalopathy 275
+prosencephalon 530
+prostate 189–191
+cancer 189–191
+PET-CT 559
+prostatic utricle 801
+prosthesis, evaluation of 580
+prosthetic heart valves 684
+protrusio deformity 351
+prune belly syndrome 793
+pseudo-pseudohypoparathyroidism  
+393
+pseudoachalasia 128
+pseudoaneurysm 683
+femoral arterial 696
+pseudoangiomatous stromal 
+hyperplasia 626
+pseudocirrhosis 95
+pseudocyst
+spleen
+intrasplenic 118
+post-traumatic 118
+pseudodiverticulosis 129
+pseudohypoparathyroidism 393
+pseudokidney sign 774
+pseudomyxoma peritonei 153
+pseudotumor
+of hemophilia 360
+orbital 318
+renal 170
+splenic inflammatory 119
+psoriatic arthritis 355
+pterygomaxillary fissure 299
+pterygopalatine canal 299
+pterygopalatine fossa 299–301
+anatomy 299–300
+puff of smoke sign 270
+pulmonary alveolar proteinosis 63
+pulmonary angiography, pulmonary 
+artery 701
+pulmonary arteries
+angiography 701
+enlarged 73
+left, anomalous origin 748
+pulmonary arteriovenous 
+malformation 701
+pulmonary artery catheters 33
+pulmonary atresia, with intact 
+ventricular septum 765
+pulmonary edema 31–32
+alveolar 31
+congenital 762
+interstitial 31
+pulmonary embolism 46–47
+PIOPED II imaging 576–577
+pregnancy 575–576
+pulmonary fibrosis 20
+idiopathic 49
+pulmonary gangrene 22
+pulmonary hypertension 43–46
+chronic thromboembolic 45
+classification 43
+hypoxemic lung disease 45
+left-to-right shunt 45
+primary 45
+pulmonary hypoplasia 542
+pulmonary infection 21–26
+Aspergillus 28–30
+atypical mycobacteria 26
+fungal 26
+882
+pulmonary infection (cont.)
+immunocompromised patients  
+27–30
+pneumonia 21–23
+tuberculosis 23–25
+pulmonary interstitial emphysema (PIE)  
+751
+pulmonary nodules 14–17
+centrilobular 14
+miliary 16
+perilymphatic 15
+random 16
+solitary 34, 38
+tree-in-bud 17
+pulmonary sling 748
+pulmonary vascular disease 43–47
+pulmonary vasculitis 57–58
+pulmonary veno-occlusive disease 45
+pulmonary venous hypertension 45
+pulvinar sign 281
+pump bumps 410
+pyelonephritis 173
+acute diffuse 489
+emphysematous 174, 489
+focal 489
+tuberculous 489
+xanthogranulomatous 175, 490
+pyloric stenosis, hypertrophic 771
+pylorospasm 771
+pyogenic abscess
+brain 277
+liver 472
+spleen 119
+pyonephrosis 174, 490
+pyosalpinx 517
+quadriceps tendon tear 421
+quadrigeminal plate lipoma 242
+quadrilateral space sydnrome 453
+rachitic rosary 819
+radial buckle fracture 806
+radial head fracture 455
+radiation
+biology 854–856
+background radiation 856
+cancer 855
+death by radiation 854
+deterministic effects 854
+DNA damage 854
+dose limits 856
+dose to general public 856
+fetal effects and dose 855
+hereditary effects 854
+occupational/iatrogenic 
+exposure 855, 856
+radiosensitivities 855
+stochastic effects 855
+syndromes 854
+dosimetry 852
+doubling dose 854
+effective dose 844
+equivalent dose 844
+exposure 844
+units 844
+radiation enteritis 143
+radiation injury
+lung 59
+white matter 276
+radiation necrosis 211
+radiation stricture of esophagus 125
+radiography 845–848
+beam quality and half-value 
+layer 847
+cardiovascular 681–685, 760
+digital detectors 848
+film optical density 848
+heel effect 845
+linear attenuation coefficient 847
+scatter and grids 847
+X-ray generator 845
+X-ray interactions with matter 846
+radionuclide cystography 584, 791
+radiotracers
+cerebrovascular imaging 588
+gastrointestinal bleeding 571
+hepatobiliary imaging 572
+liver-spleen imaging 570
+musculoskeletal imaging 577
+nuclear cardiology 561–562
+parathyroid disease 569
+PET-CT 554
+pulmonary disease 575
+renal imaging 582
+thyroid imaging 566
+uptake quantification 554
+see also specific radiotracers
+random pulmonary nodules 16
+ranula 285
+Rathke’s cleft cyst 234, 236
+Raynaud disease 738
+reactive arthropathy 355
+Recklinghausen disease of bone 392
+rectal duplication cyst 801
+reflex sympathetic dystrophy 581
+reflux (peptic) esophagitis 124
+regadenoson stress test 562
+Reiter disease 355
+relapsing polychondritis 75
+renal abscess 171, 174
+renal arteries 713–715
+fibromuscular dysplasia 713
+stenosis 501–502
+atherosclerotic 501, 713
+neurofibromatosis 713
+renal arteriovenous fistula 715
+renal arteriovenous malformation  
+169, 715
+renal cell carcinoma 167, 488, 714
+pediatric 796
+PET-CT 559
+renal cortical imaging 584
+renal cysts 171–172
+Bosniak classification 172
+hemorrhagic 171
+pediatric 794
+renal osteodystrophy 393
+renal resistive index 486
+renogram 582
+ACE inhibitor 583
+lasix 584
+respiratory bronchiolitis-interstitial lung 
+disease 14, 52
+respiratory distress syndrome 751
+restrictive cardiomyopathy 688
+retained products of conception 525
+rete testis, tubular ectasia 496
+retinoblastoma 321
+retinopathy of prematurity 321
+retroperitoneal fibrosis 159
+retroperitoneum 158–159
+anatomy 158
+disease 159
+retropharyngeal abscess 284
+pediatric 744
+retropharyngeal space 283
+retrosternal clear space 67
+reverse halo sign 757
+reversible cerebral vasoconstriction 
+syndrome 263
+rhabdoid tumor 796
+rhabdomyoma 769
+rhabdomyosarcoma
+anterior skull base 301
+nasal 743
+pelvic 801
+rheumatoid arthritis 350–352
+elbow 352
+foot 351
+hand/wrist 351
+hip 351
+knee 352
+shoulder 352
+spine 352
+rhombencephalon 530
+883
+rickets 819
+oncogenic 819
+right atrial enlargement 681
+right ventricular enlargement 681
+ring and arc appearance 366, 372–373
+ring enhancement 211
+ring of fire sign 524
+Roadrunner wire 699
+ROC curve 853
+Rokitansky nodule 197, 518
+Rolando fracture 461
+Romanus lesion 354
+Rosen wire 699
+Rosenthal’s basal vein 264
+rotator cuff 442–446
+atrophy 445
+tear
+full-thickness 445
+partial-thickness 444
+round atalectasis 7
+round pneumonia 21
+Roux-en-Y surgery see gastric bypass 
+surgery
+rubidium-82, nuclear cardiology 561
+rugger jersey spine 394–395
+saccular aneurysm 263
+sacrococcygeal teratoma 547, 801
+sacroiliac joint, osteoarthritis 350
+sacroiliitis 353
+sail sign 455, 759
+salivary glands 295–298
+anatomy 295
+benign parotid neoplasm 296
+inflammatory disease 297–298
+malignant parotid neoplasm 297
+saprophytic aspergillosis 29
+sarcoidosis 60–61, 362
+airway involvement 77
+cardiac involvement 679, 680
+perilymphatic nodules 15
+pulmonary fibrosis 20
+salivary gland involvement 297
+splenic involvement 119
+testicular involvement 495
+sarcoma
+clear cell 796
+embryonal, undifferentiated 788
+Ewing 379, 579, 815
+see also specific types
+SATCHMO mnemonic 235–239
+sausage digit 355
+scaphoid fracture 459
+scapholunate ligament injury 459
+Scheuermann kyphosis 822
+schizencephaly 828
+Schmorl’s node 337
+Schatzki ring 123
+Schwachman-Diamond syndrome 112
+schwannoma 230
+facial nerve 304
+intradural-extramedullary 331
+orbit 317
+petrous apex 309
+sciatic artery, persistent 728
+scimitar syndrome 756
+scleroderma 130
+joint involvement 356
+small bowel involvement 142
+sclerosing cholangitis 723
+sclerosing mesenteritis 152
+scrotum
+anatomy 493
+infection 498
+trauma 497
+ultrasound 493–498
+scurvy 391
+seizures 588
+sella 233
+seminoma 70
+testis 493
+septate uterus 196, 509
+septic arthritis 389
+hip 812
+septo-optic dysplasia 322
+sequestration 542
+pediatric 755
+sequestrum 385
+seronegative spondyloarthropathies  
+353
+serous cystadenoma, pancreas 109
+sesamoid fracture 402
+Sever disease 822
+sex-cord stromal tumors 494–495
+shepherd’s crook deformity 338
+shin splints 579–580
+shiny corner lesion 354
+shish kebab esophagus 128
+shoulder 438–454
+acromioclavicular joint 438
+anatomy 438
+bursae 441
+coracoacromial arch and 
+impingement syndrome  
+441–442
+entrapment neuropathies 453
+glenohumeral dislocation 438–440
+instability 448–449
+associated lesions 450–452
+posterior 452
+ligaments and rotator interval 446
+Milwaukee 356
+osteoarthritis 348
+rheumatoid arthritis 352
+rotator cuff 442–446
+sialadenitis, obstructive 297
+sialolithiasis 297
+sickle cell disease 396
+sigmoid arteries 706
+signet ring sign 78, 176, 758
+silicosis 56
+simple pulmonary eosinophilia 57
+sinonasal disease 292–294
+sinus tract 385
+sinusitis
+acute 292
+bony complications 292
+chronic 292
+fungal
+acute invasive 293
+chronic allergic 293
+intracranial complications 292
+orbital complications 292
+Sjögren syndrome 298
+skeletal dysplasias 809–811
+skier’s thumb 460
+slipped capital femoral epiphysis 813
+small bowel 136–143
+anatomy 136
+obstruction 136–139
+small cell carcinoma, lung 37
+soap-bubble lucencies 779
+soft tissue
+infections 389–390
+rim sign 176
+swelling 364
+solid and papillary epithelial 
+neoplasm 109
+solitary pulmonary nodule 34
+PET-CT 556
+radiologic presentation 38
+somatostatinoma 110
+space of Retzius 507
+speed kidney 709
+spermatocele 496
+Spetzler–Martin scale 257
+sphenoid wing dysplasia 322
+sphenopalatine foramen 299
+spin-echo proton density 207
+spine
+cervical 435–437
+congenital anomalies 340–341
+degenerative disease 333, 334,  
+335–338, 349
+general changes 337
+884
+spine (cont.)
+high intensity zone 338
+Modic changes 337
+fetus 538–541
+infection 339
+lesion localization 328
+lumbar/thoracic 434
+postoperative 338
+rheumatoid arthritis 352
+tumors 328–334
+extradural 333–334
+intradural-extramedullary  
+330–332
+intramedullary 328–330
+vascular disease 340
+spinnaker sign 759
+spleen 116–122
+accessory 116
+congenital anomalies 116
+infarct 121
+infection 119
+intrapancreatic accessory 113
+nuclear imaging 571
+lesions
+benign cystic 118
+benign non-cystic 117
+inflammatory 119
+malignant 120
+nuclear imaging 570
+trauma 122
+ultrasound 485
+wandering 116
+splenic artery aneurysm 710
+splenule 116
+spokewheel appearance 714
+spondylolysis 434
+sprue 142
+squamous cell carcinoma
+airways 80
+anterior skull base 301
+esophagus 127
+lung 36
+salivary gland 297
+staging, lung cancer 40–42
+steatocystoma multiplex 628
+steeple sign 744
+stents 697
+sternalis muscle 638
+Still disease 360
+stippled epiphyses 811
+stomach 131–135
+polyps 131–132
+thickened gastric folds 131
+tumors
+benign 132
+malignant 133
+ulcers 133
+see also entries under gastric
+strawberry gallbladder 467
+strawberry sign 548
+stress fracture 579
+stress testing 562
+stridor 744–745
+string of pearls/beads sign 713
+string sign 141
+stroke 252–256
+acute
+CT imaging 253
+MRI imaging 254
+infarction 255
+acute 256
+chronic 256
+early subacute 256
+hemorrhagic transformation 270
+hyperacute 255
+late subacute 256
+Sturge Weber syndrome 834
+subacute sclerosing 
+panencephalitis 276
+subarachnoid hemorrhage 243, 260–263
+complications 261–263
+distribution 261
+grading 261
+perimesencephalic 262
+subclavian arteries 660
+left, aberrant with right-sided aortic 
+arch 747
+right
+aberrant 130
+aberrant with left-sided aortic 
+arch 748
+subclavian steal syndrome 736
+subclavian thoracic outlet 
+syndrome 734
+subdural hematoma 243
+subependymal giant cell 
+astrocytoma 225
+subependymoma 225
+subfalcine herniation 204
+subglottic hemangioma 745
+sublabral foramen 449
+sublingual glands 295
+subluxation 362
+submandibular glands 295
+submandibular/masticator abscess 287
+subperiosteal abscess 315
+subtrochanteric fracture 429
+superficial siderosis 262
+superior labrum anterior posterior 
+(SLAP) tear 452
+superior mesenteric artery 706
+superior mesenteric artery 
+syndrome 717
+superior rectal (hemorrhoidal) 
+artery 706
+superior sulcus tumor 39
+superior vena cava 700
+obstruction 700
+support devices 32–33
+suprasellar mass 235–239
+supracondylar fracture 455
+suprascapular nerve entrapment
+at spinoglenoid notch 454
+at suprascapular notch 453
+surfer’s ear 303
+Swyer–James–MacLeod syndrome 757
+synovial chondromatosis 371
+syphilis 820
+systemic disease, pulmonary 
+involvement 60–62
+systemic lupus erythematosus, joint 
+involvement 356
+Takayasu arteritis 671
+takotsubo cardiomyopathy 686
+talus
+fracture 405
+osteochondral lesion 406
+tamoxifen, effects on uterus 511
+target sign 774
+tarsal coalition 823
+Tc-99m DMSA 582
+renal scintigraphy 791
+Tc-99m DTPA
+cerebrovascular imaging 588
+pulmonary imaging 575
+renal imaging 582
+Tc-99m HMPAO leukocytes 586
+Tc-99m HMPAO/Tc-99m ECD 588
+Tc-99m MAG3 582
+Tc-99m MDP 577
+Tc-99m sestamibi
+gastrointestinal bleeding 571
+hepatobiliary imaging 572
+liver-spleen imaging 570
+nuclear cardiology 561
+parathyroid disease 569
+perfusion study 563
+thyroid imaging 566
+Tc-99m-macro-aggregated albumin 575
+teardrop fracture
+extension 437
+flexion 437
+technetium see Tc
+telephone receiver femurs 809
+885
+telescoping digits 355
+temporal bone 302–313
+fractures 308
+petrous apex 309–310
+see also ear
+tendinosis 400
+shoulder 444
+tendons 400
+tennis leg 425
+tenosynovitis 400
+teratoma 70, 241, 518
+cardiac 769
+sacrococcygeal 547, 801
+Terry Thomas sign 459
+testis/testicular
+contusion 497
+cyst 496
+cystic lesions 495–496
+extra-testicular masses 495
+metastatic disease 494
+microlithiasis 494
+rupture 497
+torsion 497
+tumors 493–495
+benign 494–495
+mimics 495
+ultrasound 493–498
+vascular disease 497
+tethered cord syndrome 340
+tetralogy of Fallot 766
+thalassemia 397
+thallium-201 561
+exercise testing 563
+whole-body imaging 585
+thanatophoric dysplasia 547, 809
+theca-lutein cyst 515
+thoracic angiography 699–702
+bronchial artery 702
+pulmonary artery 701
+superior vena cava 700
+thoracic aortic aneurysm 666
+thoracic imaging 1–86
+airways 75–82
+anatomy 2
+atalectasis 3–7
+diffuse lung disease 48–64
+lung disease see lung disease
+mediastinum 65–74
+pleura 83–85
+pulmonary edema 31–32
+pulmonary fibrosis 20
+pulmonary infection 21–26
+pulmonary nodules 14–17
+pulmonary vascular disease 43–47
+thoracic outlet syndromes 734–735
+neurogenic 734
+subclavian 734
+Thornwaldt cyst 287
+thromboembolic disease 731–732
+hand 738
+thrombosis, cavernous sinus 315
+thrower’s exostosis 452
+thumbprint sign 744
+thymolipoma 70
+thymoma 69
+thymus/thymic
+carcinoid 70
+carcinoma 70
+cyst 70
+thyroglossal duct cyst 285
+thyroid
+ectopic 566
+iodinated contrast media, 
+uptake 841
+lingual 287
+nodule 567
+nuclear imaging 566–569
+diagnostic indications 566–568
+patient preparation 566
+radiotracers 566
+therapeutic indications 568–569
+thyroid cancer
+PET-CT 558
+post-radioiodine therapy 
+imaging 568
+post-thyroidectomy imaging 568
+ultrasound 505–506
+thyroid disease 504–506
+diffuse 504–505
+malignant adenopathy 506
+multinodular gland 505
+treatment 569
+thyroid ophthalmopathy 318
+thyroiditis
+Hashimoto 504, 567
+subacute/De Quervain 505, 568
+tibial plateau fracture 411
+tiger-striped lesion 220
+Tillaux fracture 409
+TNM staging system 40–42
+toddler’s fracture 806
+Tolosa-Hunt syndrome 318
+tombstone iliac wings 809
+TORCH infections 820
+torcular Herophili 264
+torticollis 823
+total anomalous pulmonary venous 
+return 767
+toxoplasmosis 279
+trachea/tracheal
+adenoid cystic carcinoma 81
+amyloidosis 76
+atresia 543
+lymphoma 82
+stenosis/thickening
+focal 77
+multifocal/diffuse 75–77
+pediatric 745
+tuberculosis 76
+tracheitis, exudative (bacterial) 745
+tracheobronchomalacia 745
+tracheobronchopathia 
+osteochondroplastica 75
+tracheoesophageal fistula 775
+tracheostomy, tracheal stenosis 77
+tram-track sign 320
+transient bone marrow edema 432
+transient tachypnea of newborn (TTN)  
+750
+transitional cell carcinoma
+bladder 183
+ureter 180
+transjugular intrahepatic portosystemic 
+shunt (TIPS) 1419(a), 718–719
+transmesenteric hernia 138
+transposition of great arteries 766–767
+transtentorial (uncal) herniation 204
+trauma
+aorta 665
+bile duct 723
+bladder 184–185
+brain 243–245
+elbow/forearm 455–456
+facial fractures 245
+foot/ankle
+ankle 409
+forefoot 401–404
+midfoot/hindfoot 404–406
+hand/wrist 460–461
+hip 427–429
+kidney 179, 715
+knee 411
+larynx 289
+liver 100
+scrotum 497
+spleen 122
+urethra 187
+see also specific traumatic lesions
+traumatic axonal injury 244
+traumatic pseudoaneurysm 263
+tree-in-bud nodules 17
+tricuspid atresia 767
+trigeminal artery, persistent 250
+triplane fracture 409
+triple bubble sign 778
+886
+triquetral fracture 459
+trisomies 548–549
+trisomy 13 548
+trisomy 18 548
+trisomy 21 549
+Trolard’s vein 264
+trough sign 439, 452
+truncus arteriosus 767
+tuberculoma 278
+tuberculosis 23–25
+centrilobular nodules 14
+healed 25
+miliary 25
+primary 23
+reactivation (post-primary) 24
+renal 175
+tracheal 76
+ureteral 181
+tuberculous adenopathy 24
+tuberculous osteomyelitis 339
+tuberculous pyelonephritis 489
+tuberous sclerosis 170, 835
+tubular ectasia 179
+tumors
+adrenal glands
+imaging 161–163
+malignant 164–165
+airways 80–82
+biliary 105–106
+bone 365–366
+benign mimics 383–384
+Lodwick classification 366
+metastatic 383
+morphology 365–366
+pediatric 815
+brain 214–242
+carcinoid see carcinoid tumor
+cardiac 769
+esophageal
+benign 126
+malignant 127
+gallbladder 468
+germ cell 70–72
+hepatobiliary 785–756
+kidney 487–488
+benign 800
+cystic 171–172
+diagnosis 166
+metastatic 796
+pediatric 795–796
+solid 167
+syndromes with 170
+liver
+benign 96–98, 473–474
+malignant 93–95, 475–476
+metastatic 95, 475, 788
+pediatric 786–542
+mesentery 151–152
+neurogenic 73
+ovaries 198, 518
+Pancoast 39
+pancreas 107–110, 484
+cystic epithelial 109–110
+endocrine 110
+solid epithelial 108–109
+pleura 83–84
+spine 328–334
+spleen 120
+stomach
+benign 132
+malignant 133
+superior sulcus 39
+testis 493–495
+ureter
+benign 181
+malignant 180
+see also cancer; and specific tumors
+tunical cyst 496
+turf toe 402
+twin embolization syndrome 529
+twin pregnancy 526–528
+complications 528–529
+conjoined twins 528
+di/di (dichorionic/diamniotic) 
+twins 528
+dizygotic (fraternal) twins 526
+mono/di (monochorionic/diamniotic) 
+twins 528
+mono/mono (monochorionic/
+monoamniotic) twins 528
+monozygotic (identical) twins 527
+twin–twin transfusion syndrome 528
+ulcers
+aorta 664
+stomach 133
+ultrasound 464–552
+breast 617–621
+gallbladder and bile ducts 465–471
+kidney 486–492
+liver 471–476
+Doppler 477–483
+pancreas 483–484
+physics 859–860
+acoustic output index 859
+axial resolution 860
+cavitation 859
+elevational resolution 860
+lateral resolution 860
+mechanical index 859
+near/far field 860
+pulse repetition frequency 860
+refraction 859
+safe energy 859
+sound waves 859
+thermal index 859
+tissue attenuation 859
+wavelength and transducer 
+design 859
+scrotum and testis 493–498
+spleen 485
+thyroid/parathyroid 504–506
+uterus 507–513
+vascular 499–504
+inguinal hernia 782
+unicameral bone cyst 382
+upper extremity angiography 733–738
+anatomy 733
+hand 737–738
+surgical dialysis access 736–737
+thoracic outlet syndromes 734–735
+urachal anomaly 801
+ureter 180–182
+infection/inflammation 181
+structural lesions 182
+tumors
+benign 181
+malignant 180
+ureteral jets 487
+ureteritis cystica 181
+ureterocele 182
+obstruction 793
+ureterolithiasis 176
+ureteropelvic junction obstruction  
+182, 793
+urethra 186–191
+diverticulum 188
+female 188
+male 186–187
+imaging 187
+stricture 187
+trauma 187
+urethral valves, posterior 793
+urothelial papilloma 181
+uterine arteriovenous 
+malformation 513
+uterine artery embolization 730
+uterus 192–198
+anatomy 192
+benign disease 192–193
+congenital anomalies 196
+congenital malformations 509
+fluid/blood-filled 801
+infection 513
+malignant disease 194
+887
+scanning orientation 508
+ultrasound 507–513
+VACTERL association 775
+vagina, fluid/blood-filled 801
+valvular heart disease 683–685
+aortic valve
+regurgitation 685
+stenosis 685
+endocarditis 683
+mitral valve
+annular calcification 685
+regurgitation 685
+stenosis 685
+prosthetic heart valves 684
+right-sided 685
+varicocele 495–496, 721
+vasa previa 533
+vascular disease
+adnexae 517
+bone 378
+liver 99
+lung 43–47
+spine 340
+vascular malformations, central 
+nervous system 257–259
+vascular ultrasound 499–504
+vasculitis
+Churg–Strauss 57
+CNS 270, 275
+pulmonary 57–58
+vasospasm 261
+vein of Galen 264
+aneurysm 242
+malformation 257, 541
+veno-occlusive disease, liver 99
+venous angioma 259
+venous compression syndromes 716–717
+venous thrombosis
+brain 265
+intraparenchymal 
+hemorrhage 269
+ventilator-associated pneumonia 21
+ventral hernia 138
+ventricles, cerebral
+anatomy 202
+intraventricular hemorrhage 244
+intraventricular tumors 228
+ventricles, heart
+left
+aneurysm 683
+enlargement 681
+septal defect 763
+single (“tingle”) 768
+ventriculomegaly 538
+vertebral arteries 660
+vertebral bodies, metastatic 
+disease 333
+vertebral disc
+bulges/herniations 335–337
+discitis 333
+pyogenic 339
+osteomyelitis 339
+vesicoureteral reflux 791
+vidian canal 299
+VIPoma 110
+viral encephalitis 213
+viral infections
+brain 280
+see also specific infections
+visceral abdomino-pelvic compression 
+syndromes 716–717
+vitamin deficiency 391
+vocal cord paralysis 289
+volar plate fracture 461
+volvulus, midgut 772–773
+von Hippel–Lindau disease 170
+pancreatic manifestations 112
+von Meyenburg complexes 99
+von Recklinghausen disease  
+832–833
+Wagstaffe–LeFort fracture 409
+wandering spleen 116
+Warthin tumor 296
+Waterhouse–Friderichssen 
+syndrome 161
+Wegener’s granulomatosis 58
+airway involvement 77
+cavitary lesions 18, 58
+Weigert–Meyer rule 792
+Wernicke encephalopathy 274
+Westermark sign 47
+Whipple disease 143
+white cerebellum sign 282
+white matter disease 272–276
+iatrogenic 276
+idiopathic/autoimmune/
+inflammatory 272–274
+infectious (viral) 275–276
+post-viral 276
+toxic-metabolic 274
+vascular 274–275
+whole-body imaging 584–587
+clinical applications 586–587
+Wilms tumor 795–796
+Wilson disease 91
+Wimberger ring sign 820
+Wimberger sign 820
+windsock deformity 777
+wires 699
+wrist see hand/wrist
+X-rays see radiography
+xanthogranulomatous 
+pyelonephritis 175, 490
+xenon-133 575
+yolk sac 519
+Zenker diverticulum 129
+Zollinger Ellison syndrome 131
+Zuckerguss 221
+zygomaticomaxillary complex 
+fractures 245
+Zygomycetes, sinusitis 293

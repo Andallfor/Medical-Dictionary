@@ -7,6 +7,7 @@ import Word from "./word";
 import FileInput, { fileData } from "./fileInput";
 import FileSearch from "./fileSearch";
 import PhoneticTree from "./phoneticTree";
+import { InferGetStaticPropsType } from "next";
 
 export default function Home() {
   const search = useRef<HTMLInputElement | null>(null);
