@@ -120,10 +120,13 @@ export default function PhoneticTree() {
                 {focused.map((p, i) => 
                     <div key={i} className="flex gap-2 h-8">
                         <span className="w-8 flex justify-center items-center font-semibold text-surface50 flex-shrink-0">{i + 1}</span>
-                        <span className="px-2 flex items-center rounded-sm whitespace-pre-wrap flex-grow min-w-0 bg-surface10 border border-surface20">
-                            <span className="mr-4 font-semibold">{p.word[0].toUpperCase() + p.word.substring(1)}:</span>
-                            <span>{p.pronunciation}</span>
-                        </span>
+                        <button className="px-2 flex items-center justify-between rounded-sm whitespace-pre-wrap flex-grow min-w-0 bg-surface10 border border-surface20 group hover:bg-tonal0" onClick={() => window.dispatchEvent(new CustomEvent('force-set-search', { detail: p.word }))}>
+                            <div>
+                                <span className="mr-4 font-semibold">{p.word[0].toUpperCase() + p.word.substring(1)}:</span>
+                                <span>{p.pronunciation}</span>
+                            </div>
+                            <i className="ri-arrow-right-s-fill ri-lg group-hover:translate-x-2 transition-transform"></i>
+                        </button>
                     </div>
                 )}
             </div>

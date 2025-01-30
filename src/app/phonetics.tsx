@@ -33,7 +33,7 @@ export interface mw {
     shortdef: string[]
 }
 
-export async function getMedicalDef(word: string): Promise<mw[]> {
+export async function getMedicalDef(word: string): Promise<mw[] | undefined> {
     let data = null;
     await axios.get("https://dictionaryapi.com/api/v3/references/medical/json/" + word.toLowerCase(), {
         params: {
@@ -41,10 +41,15 @@ export async function getMedicalDef(word: string): Promise<mw[]> {
         }
     }).then((r) => {data = r.data});
 
-    return data as unknown as mw[];
+    console.log(data);
+
+    if (!data) return undefined;
+
+    if (typeof data[0] == 'string' || (data as string[]).length == 0) return undefined;
+    else return data as mw[];
 }
 
-export async function getCollegiateDef(word: String): Promise<mw[]> {
+export async function getCollegiateDef(word: String): Promise<[mw[] | undefined, string[] | undefined]> {
     let data = null;
     await axios.get("https://dictionaryapi.com/api/v3/references/collegiate/json/" + word.toLowerCase(), {
         params: {
@@ -52,7 +57,10 @@ export async function getCollegiateDef(word: String): Promise<mw[]> {
         }
     }).then((r) => {data = r.data});
 
-    return data as unknown as mw[];
+    if (!data || (data as string[]).length == 0) return [undefined, undefined];
+
+    if (typeof data[0] == 'string') return [undefined, data as string[]];
+    else return [data as mw[], undefined];
 }
 
 export function getAudio(w: prs) {
