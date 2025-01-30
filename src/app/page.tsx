@@ -29,9 +29,24 @@ export default function Home() {
           <PhoneticTree/>
         </div>
         <div className="w-2/3">
-          <div className="ml-32 flex flex-col gap-4">
-            <input className="w-1/3 outline-red-400 outline-1 outline text-2xl p-1" placeholder="Search" type="text" onKeyDown={(k) => k.key == 'Enter' ? handleSearch() : null} ref={search}/>
-            <Word words={words}/>
+          <div className="ml-16 flex flex-col gap-4">
+            <div className="w-full">
+              <div className="flex items-center">
+                <i className="absolute ri-search-line pl-2 ri-lg translate-y-[-1px]"></i>
+                <input className="w-full bg-tonal0 rounded-md px-2 py-1 text-2xl pl-10 placeholder:text-surface30 placeholder:italic" placeholder="Search" type="text" onKeyDown={(k) => k.key == 'Enter' ? handleSearch() : null} ref={search}/>
+              </div>
+              {words.length == 0
+                ? <div></div>
+                : (
+                  <div className="flex mt-2 mb-6">
+                    <div className="bg-surface20 w-[2px] mx-2"></div>
+                    <div className="mt-3 mb-2">
+                      <Word words={words}/>
+                    </div>
+                  </div>
+                )
+              }
+            </div>
             <FileSearch files={files} phrase={words.map(x => x[0].meta.stems[0]).join(' ')}/>
             <FileInput files={files} setFiles={setFiles}/>
           </div>

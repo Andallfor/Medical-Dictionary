@@ -19,17 +19,20 @@ function SingleWord({ words }: { words: mw[] }) {
     <div>
       <div className="text-2xl">
         <span className="capitalize">{words[0].meta.id}</span>
-        <button className="mx-3 border-black border-[1px] hover:bg-gray-200 bg-gray-100 rounded-md px-2"
+        <button className="mx-3 hover:bg-tonal0/70 border border-surface20 bg-tonal0 rounded-md px-2"
           onClick={() => audioPlayer.current ? audioPlayer.current.play() : null}>
           <span>{phonetics}</span>
-          <i className=" ml-2 mr-1 ri-volume-up-fill"></i>
+          <i className=" ml-2 mr-1 ri-volume-up-fill text-primary40"></i>
           <audio src={getAudio(words[0].hwi.prs[0])} ref={audioPlayer}></audio>
         </button>
       </div>
+      <div className="ml-1 mt-1 text-primary40">└<span className="ml-2">{words[0].shortdef}</span></div>
+      {/*
       <div className="text-lg ml-2">
         <div>Related Words:</div>
         {words.slice(1).map((w, ind) => (<div key={ind} className="capitalize">- {w.meta.id}</div>))}
       </div>
+      */}
     </div>
   );
 }

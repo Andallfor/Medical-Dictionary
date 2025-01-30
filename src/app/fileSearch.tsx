@@ -88,18 +88,18 @@ function FileContainer({ file, phrase }: { file: fileData, phrase: string }) {
     setOccurrences(local);
   }, [file.content, phrase])
 
-  if (occurrences.length == 0) return <></>;
+  if (occurrences.length == 0) return <>No file results.</>;
   return (
-    <div>
+    <div className="pb-4">
       <div>{file.name} ({occurrences.length}):</div>
       <div className="h-2"></div>
-      <div className="ml-2 flex flex-col gap-2">
+      <div className="mr-2 flex flex-col gap-2">
         {occurrences.map((o, i) => (
           <div className="flex gap-2 h-8 w-full" key={i}>
-            <span className="outline outline-1 outline-purple-600 w-8 flex justify-center items-center font-semibold rounded-sm bg-gray-100 flex-shrink-0">{i + 1}</span>
-            <span className="outline outline-1 outline-blue-600 px-2 flex items-center rounded-sm whitespace-pre-wrap flex-grow min-w-0">
+            <span className="text-surface50 w-8 flex justify-center items-center flex-shrink-0 font-semibold">{i + 1}</span>
+            <span className="px-2 flex items-center rounded-sm whitespace-pre-wrap flex-grow min-w-0 bg-surface10 border border-surface20">
               <span className="text-nowrap">{o.start}</span>
-              <span className="bg-yellow-200 rounded-sm">{o.phrase}</span>
+              <span className="bg-[#f2e194] rounded-sm font-semibold text-tonal10 px-1">{o.phrase}</span>
               <span className="text-nowrap text-ellipsis overflow-hidden">{o.end}</span>
             </span>
           </div>))}
@@ -110,8 +110,10 @@ function FileContainer({ file, phrase }: { file: fileData, phrase: string }) {
 
 export default function FileSearch({ files, phrase }: { files: fileData[], phrase: string }) {
   return (
-    <div className="w-full outline-green-800 outline-1 outline p-2">
-      {files.map((x, i) => <FileContainer file={x} phrase={phrase} key={i}/>)}
-    </div>
+    files.length == 0
+      ? <div></div>
+      : (<div className="w-full bg-tonal0 px-4 py-2 rounded-lg">
+          {files.map((x, i) => <FileContainer file={x} phrase={phrase} key={i}/>)}
+        </div>)
   );
 }

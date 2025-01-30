@@ -55,12 +55,12 @@ export default function FileInput({ files, setFiles }: { files: fileData[], setF
   }
 
   return (
-    <div className="w-full outline-green-800 outline-1 outline p-2">
+    <div className="w-full p-4 pt-2 bg-tonal0 rounded-lg">
       <div>{files.length == 0 ? "No files have been uploaded." : "Uploaded files: " + files.flatMap(x => x.name).join(', ')}</div>
-      <div className="mt-2">
-        <label className="outline outline-1 outline-purple-600 p-1 hover:bg-gray-200 bg-gray-100 rounded-md px-2 cursor-pointer">
+      <div className="mt-4">
+        <label className="p-1 rounded-md px-2 cursor-pointer border-surface20 border bg-surface10 hover:bg-tonal0">
           <input type='file' multiple accept=".txt,.md" className="hidden" onChange={addFiles}/>
-          <span className="select-none">Add New Text</span>
+          <span className="select-none text-primary0">Add New Text</span>
         </label>
       </div>
     </div>
