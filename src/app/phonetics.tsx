@@ -41,8 +41,6 @@ export async function getMedicalDef(word: string): Promise<mw[] | undefined> {
         }
     }).then((r) => {data = r.data});
 
-    console.log(data);
-
     if (!data) return undefined;
 
     if (typeof data[0] == 'string' || (data as string[]).length == 0) return undefined;
@@ -57,7 +55,11 @@ export async function getCollegiateDef(word: String): Promise<[mw[] | undefined,
         }
     }).then((r) => {data = r.data});
 
+    console.log(data);
+
     if (!data || (data as string[]).length == 0) return [undefined, undefined];
+
+    console.log(data);
 
     if (typeof data[0] == 'string') return [undefined, data as string[]];
     else return [data as mw[], undefined];

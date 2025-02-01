@@ -16,9 +16,60 @@ const vowelToPrint: Record<string, string> = {
     'diphthong': 'Diphthong'
 };
 
+// dont question it
+const VowelOrder: Record<string, number> = {
+    'i': 0,
+    'ɪ': 1,
+    'e': 2,
+    'ɛ': 3,
+    'æ': 4,
+    'ə': 5,
+    'ɚ': 6,
+    'ʌ': 7,
+    'u': 8,
+    'ʊ': 9,
+    'o': 10,
+    'ɔ': 11,
+    'ɑ': 12, 'ɒ': 12,
+    'ɑɪ': 13,
+    'ɑʊ': 14,
+    'ɔɪ': 15,
+};
+
+const ConsonantOrder: Record<string, number> = {
+    'm': 0,
+    'p': 1, 'pl': 1, 'pr': 1,
+    'b': 2, 'bl': 2, 'br': 2,
+    'n': 3, 'ŋ': 3,
+    't': 4, 'tr': 4,
+    'd': 5, 'dr': 5,
+    'k': 6, 'kl': 6, 'kr': 6,
+    'kw': 7, 'kj': 7,
+    'g': 8, 'gl': 8, 'gr': 8,
+    'f': 9, 'fl': 9, 'fr': 9,
+    'v': 10,
+    'l': 11,
+    'r': 12,
+    's': 13, 'sl': 13, 'sp': 13, 'st': 13, 'str': 13, 'sk': 13, 'sw': 13,
+    'z': 14,
+    'x': 15,
+    'ʃ': 16,
+    'ð': 17,
+    'θ': 18,
+    'ʒ': 19,
+    'dʒ': 20,
+    'h': 21,
+    'w': 22,
+    'ʍ': 23,
+    'j': 24,
+    '-': 100 // override for no consonant
+}
+
 interface phonetic {
     word: string,
-    vowelCombo: string[] // is primary stress backwards including only vowels
+    vowelCombo: string[], // is primary stress backwards including only vowels
+    primaryConst: string,
+    tailConst: string,
     pronunciation: string
 }
 
@@ -56,16 +107,21 @@ export default function PhoneticTree() {
             const phonetics: phonetic[] = [];
 
             const matchVowels = new RegExp([...Vowels['diphthong'], ...Vowels['central'], ...Vowels['back'], ...Vowels['front']].join('|'), 'g');
+            const matchConstants = new RegExp(Object.keys(ConsonantOrder).sort((a, b) => b.length - a.length).join('|'), 'g');
 
             lines.forEach((line) => {
                 if (line.length == 0) return;
 
                 const [word, pron] = line.split('=');
                 const primary = pron.includes('ˈ') ? pron.split('ˈ')[1] : pron;
+
+                const pc = [...primary.matchAll(matchConstants)].map(x => x[0] as string);
                 
                 phonetics.push({
                     word: word,
                     vowelCombo: [...primary.matchAll(matchVowels)].map(x => x[0] as string).toReversed(),
+                    primaryConst: pc[0] ?? '-',
+                    tailConst: pc[pc.length - 1] ?? '-',
                     pronunciation: pron
                 });
             });
@@ -86,7 +142,7 @@ export default function PhoneticTree() {
             if (v) pattern.push(v)
         });
 
-        const valid: phonetic[] = [];
+        let valid: phonetic[] = [];
         data.forEach(p => {
             let isValid = true;
             for (let i = 0; i < pattern.length; i++) {
@@ -97,6 +153,26 @@ export default function PhoneticTree() {
             }
 
             if (isValid) valid.push(p);
+        });
+
+        valid.sort((a, b) => {
+            const ra = a.vowelCombo.toReversed(); // im lazy ok
+            const rb = b.vowelCombo.toReversed();
+            for (let i = 0; i < Math.max(ra.length, rb.length); i++) {
+                if (i >= rb.length) return -1;
+                if (i >= ra.length) return 1;
+
+                const va = VowelOrder[ra[i]];
+                const vb = VowelOrder[rb[i]];
+
+                if (va != vb) return va - vb;
+            }
+
+            const pc = ConsonantOrder[a.primaryConst] - ConsonantOrder[b.primaryConst];
+            if (pc != 0) return pc;
+
+            const tc = ConsonantOrder[a.tailConst] - ConsonantOrder[b.tailConst];
+            return tc;
         });
 
         setFocused(valid);
@@ -121,9 +197,14 @@ export default function PhoneticTree() {
                     <div key={i} className="flex gap-2 h-8">
                         <span className="w-8 flex justify-center items-center font-semibold text-surface50 flex-shrink-0">{i + 1}</span>
                         <button className="px-2 flex items-center justify-between rounded-sm whitespace-pre-wrap flex-grow min-w-0 bg-surface10 border border-surface20 group hover:bg-tonal0" onClick={() => window.dispatchEvent(new CustomEvent('force-set-search', { detail: p.word }))}>
-                            <div>
-                                <span className="mr-4 font-semibold">{p.word[0].toUpperCase() + p.word.substring(1)}:</span>
-                                <span>{p.pronunciation}</span>
+                            <div className="flex-grow flex justify-start">
+                                <span className="mr-4 font-semibold min-w-32 text-left">{p.word[0].toUpperCase() + p.word.substring(1)}</span>
+                                <div className="flex justify-between flex-grow">
+                                    <span>/{p.pronunciation}/</span>
+                                    <span>{p.primaryConst}</span>
+                                    <span>{p.vowelCombo.toReversed().join(', ')}</span>
+                                    <span>{p.tailConst}</span>
+                                </div>
                             </div>
                             <i className="ri-arrow-right-s-fill ri-lg group-hover:translate-x-2 transition-transform"></i>
                         </button>

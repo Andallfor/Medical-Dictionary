@@ -33,6 +33,7 @@ export default function Home() {
         setSearchError('');
       } else {
         setSearchError('Unable to find ' + word);
+        setWords([]);
         if (dym) console.log(dym);
       }
     }

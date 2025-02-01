@@ -60,6 +60,8 @@ with open('python/out.txt', 'w', encoding='utf-16') as formatted:
                     continue
                 visited.add(word)
 
+                # for some reason, we are getting repeat words
+
                 try:
                     print(f'Searching for {word}', end='')
                     sanitized = search(word)
