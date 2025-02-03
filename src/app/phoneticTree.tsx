@@ -6,7 +6,7 @@ const Vowels: Record<string, string[]> = {
     'front': ['i', 'ɪ', 'e', 'ɛ', 'æ'],
     'back': ['u', 'ʊ', 'o', 'ɑ', 'ɔ'],
     'central': ['ʌ', 'ə', 'ɚ'],
-    'diphthong': ['ɑɪ', 'ɑʊ', 'ɔɪ']
+    'diphthong': ['aɪ', 'aʊ', 'ɔɪ']
 };
 
 const vowelToPrint: Record<string, string> = {
@@ -30,7 +30,7 @@ const VowelOrder: Record<string, number> = {
     'ʊ': 9,
     'o': 10,
     'ɔ': 11,
-    'ɑ': 12, 'ɒ': 12,
+    'ɑ': 12, 'ɒ': 12, 'a': 12,
     'ɑɪ': 13,
     'ɑʊ': 14,
     'ɔɪ': 15,
@@ -119,7 +119,7 @@ export default function PhoneticTree() {
                 
                 phonetics.push({
                     word: word,
-                    vowelCombo: [...primary.matchAll(matchVowels)].map(x => x[0] as string).toReversed(),
+                    vowelCombo: [...primary.matchAll(matchVowels)].map(x => x[0] as string),
                     primaryConst: pc[0] ?? '-',
                     tailConst: pc[pc.length - 1] ?? '-',
                     pronunciation: pron
@@ -155,6 +155,8 @@ export default function PhoneticTree() {
             if (isValid) valid.push(p);
         });
 
+        console.log(valid);
+
         valid.sort((a, b) => {
             const ra = a.vowelCombo.toReversed(); // im lazy ok
             const rb = b.vowelCombo.toReversed();
@@ -179,7 +181,8 @@ export default function PhoneticTree() {
     }
 
     function formatSearch() {
-        return vowels.toReversed().map((v) => v == undefined ? '' : ` * ${v}`);
+        let out = vowels.map((v) => v == undefined ? '' : ` * ${v}`).join('');
+        return out.length != 0 ? ("'" + out) : "";
     }
 
     return (
@@ -202,7 +205,7 @@ export default function PhoneticTree() {
                                 <div className="flex justify-between flex-grow">
                                     <span>/{p.pronunciation}/</span>
                                     <span>{p.primaryConst}</span>
-                                    <span>{p.vowelCombo.toReversed().join(', ')}</span>
+                                    <span>{p.vowelCombo.join(', ')}</span>
                                     <span>{p.tailConst}</span>
                                 </div>
                             </div>
