@@ -75,18 +75,15 @@ interface phonetic {
 
 export function VowelCombo({ vowel, setVowel }: { vowel: string | undefined, setVowel: (s: string | undefined) => void }) {
     return (
-        <div className="bg-tonal0 rounded-sm grid-cols-2 grid">
-            {Object.entries(Vowels).map(([key, v], i) => 
-                <div key={i} className="flex">
-                    <span className="mx-2 font-semibold">{vowelToPrint[key]}:</span>
-                    {v.map((c, j) => 
-                        <button key={j}
-                            className={"flex-grow cursor-pointer flex justify-center rounded-sm " + (vowel == c ? 'bg-[#79bd92] text-tonal10 font-semibold' : '')}
-                            onClick={() => setVowel(vowel == c ? undefined : c)}>
-                            <p>{c}</p>
-                        </button>
-                    )}
-                </div>
+        <div className="bg-tonal0 rounded-sm flex flex-col w-10">
+            {Object.entries(Vowels).map(([key, v], i) => {
+                return (v.map((c, j) => 
+                    <button key={j}
+                        className={"cursor-pointer rounded-sm py-0.5 " + (vowel == c ? 'bg-[#79bd92] text-tonal10 font-semibold' : 'hover:bg-surface20')}
+                        onClick={() => setVowel(vowel == c ? undefined : c)}>
+                        <p>{c}</p>
+                    </button>
+                ))}
             )}
         </div>
     );
@@ -155,19 +152,13 @@ export default function PhoneticTree() {
             if (isValid) valid.push(p);
         });
 
-        console.log(valid);
-
         valid.sort((a, b) => {
-            const ra = a.vowelCombo.toReversed(); // im lazy ok
-            const rb = b.vowelCombo.toReversed();
-            for (let i = 0; i < Math.max(ra.length, rb.length); i++) {
-                if (i >= rb.length) return -1;
-                if (i >= ra.length) return 1;
-
-                const va = VowelOrder[ra[i]];
-                const vb = VowelOrder[rb[i]];
-
-                if (va != vb) return va - vb;
+            for (let i = 0; i < Math.max(a.vowelCombo.length, b.vowelCombo.length); i++) {
+                // TODO: currently we prioritize exact matches
+                const ac = i >= a.vowelCombo.length ? -1 : VowelOrder[a.vowelCombo[i]];
+                const bc = i >= b.vowelCombo.length ? -1 : VowelOrder[b.vowelCombo[i]];
+                
+                if (ac - bc != 0) return ac - bc;
             }
 
             const pc = ConsonantOrder[a.primaryConst] - ConsonantOrder[b.primaryConst];
@@ -186,14 +177,14 @@ export default function PhoneticTree() {
     }
 
     return (
-        <div className="flex flex-col gap-2">
+        <div className="flex gap-2 justify-between">
             <VowelCombo vowel={vowels[0]} setVowel={(s) => updateCombo(0, s)}/>
-            <VowelCombo vowel={vowels[1]} setVowel={(s) => updateCombo(1, s)}/>
+            {/* <VowelCombo vowel={vowels[1]} setVowel={(s) => updateCombo(1, s)}/>
             <VowelCombo vowel={vowels[2]} setVowel={(s) => updateCombo(2, s)}/>
             <button className="w-full rounded-md mb-3 text-lg bg-tonal0 hover:bg-tonal0/70 border border-surface20" onClick={search}>
                 <span>Search: </span>
                 <span className="font-semibold">{formatSearch()}</span>
-            </button>
+            </button>*/}
             <div className="flex flex-col gap-2 py-3 pl-2 pr-5 bg-tonal0 rounded-lg">
                 <div className="ml-1">{focused.length == 0 ? 'No Results.' : `${focused.length} Results:`}</div>
                 {focused.map((p, i) => 
@@ -202,12 +193,7 @@ export default function PhoneticTree() {
                         <button className="px-2 flex items-center justify-between rounded-sm whitespace-pre-wrap flex-grow min-w-0 bg-surface10 border border-surface20 group hover:bg-tonal0" onClick={() => window.dispatchEvent(new CustomEvent('force-set-search', { detail: p.word }))}>
                             <div className="flex-grow flex justify-start">
                                 <span className="mr-4 font-semibold min-w-32 text-left">{p.word[0].toUpperCase() + p.word.substring(1)}</span>
-                                <div className="flex justify-between flex-grow">
-                                    <span>/{p.pronunciation}/</span>
-                                    <span>{p.primaryConst}</span>
-                                    <span>{p.vowelCombo.join(', ')}</span>
-                                    <span>{p.tailConst}</span>
-                                </div>
+                                <span>/{p.pronunciation}/</span>
                             </div>
                             <i className="ri-arrow-right-s-fill ri-lg group-hover:translate-x-2 transition-transform"></i>
                         </button>
