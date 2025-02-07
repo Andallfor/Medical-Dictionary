@@ -1,22 +1,7 @@
 import { InferGetStaticPropsType } from "next";
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 
-// https://tfcs.baruch.cuny.edu/introduction-to-vowels/
-const Vowels: Record<string, string[]> = {
-    'front': ['i', 'ɪ', 'e', 'ɛ', 'æ'],
-    'back': ['u', 'ʊ', 'o', 'ɑ', 'ɔ'],
-    'central': ['ʌ', 'ə', 'ɚ'],
-    'diphthong': ['aɪ', 'aʊ', 'ɔɪ']
-};
-
-const vowelToPrint: Record<string, string> = {
-    'front': 'Front',
-    'back': 'Back',
-    'central': 'Central',
-    'diphthong': 'Diphthong'
-};
-
-// dont question it
+// all vowels and consonants are IPA (unless otherwise noted)
 const VowelOrder: Record<string, number> = {
     'i': 0,
     'ɪ': 1,
@@ -24,26 +9,58 @@ const VowelOrder: Record<string, number> = {
     'ɛ': 3,
     'æ': 4,
     'ə': 5,
-    'ɚ': 6,
-    'ʌ': 7,
+    'ʌ': 6,
+    'ɚ': 7,
     'u': 8,
     'ʊ': 9,
     'o': 10,
     'ɔ': 11,
-    'ɑ': 12, 'ɒ': 12, 'a': 12,
-    'ɑɪ': 13,
-    'ɑʊ': 14,
-    'ɔɪ': 15,
+    'ɔr': 12,
+    'a': 13,
+    'ar': 14,
+    'aɪ': 15,
+    'ɔɪ': 16,
+    'aʊ': 17,
+    'iər': 18,
+    'ɛər': 19,
+    'ʊər': 20,
+};
+
+// empty string means same
+const oedToIpa: Record<string, string> = {
+    'ɪ(ə)r': 'iər',
+    'ɛ(ə)r': 'ɛər',
+    'ʊ(ə)r': 'ʊər',
+    'eɪ': 'e',
+    'ər': 'ɚ',
+    'oʊ': 'o',
+    'ɑr': 'ar',
+    'kl': 'cl',
+    'kr': 'cr',
+    'kj': 'ky',
+    'tʃ': 'ch',
+    'dʒ': 'j',
+    'ɑ': 'a',
+    'ɑ̃': 'an',
+    'æ̃': 'n',
+    'ᵻ': 'ɪ',
+    'ᵿ': 'ə',
+    'ŋ': 'ng',
+    'x': 'k',
+    'ʃ': 'sh',
+    'ð': 'th',
+    'θ': 'th',
+    'ʒ': 'zh',
 };
 
 const ConsonantOrder: Record<string, number> = {
     'm': 0,
     'p': 1, 'pl': 1, 'pr': 1,
     'b': 2, 'bl': 2, 'br': 2,
-    'n': 3, 'ŋ': 3,
+    'n': 3, 'ng': 3,
     't': 4, 'tr': 4,
     'd': 5, 'dr': 5,
-    'k': 6, 'kl': 6, 'kr': 6,
+    'k': 6, 'cl': 6, 'cr': 6,
     'kw': 7, 'kj': 7,
     'g': 8, 'gl': 8, 'gr': 8,
     'f': 9, 'fl': 9, 'fr': 9,
@@ -52,17 +69,32 @@ const ConsonantOrder: Record<string, number> = {
     'r': 12,
     's': 13, 'sl': 13, 'sp': 13, 'st': 13, 'str': 13, 'sk': 13, 'sw': 13,
     'z': 14,
-    'x': 15,
-    'ʃ': 16,
-    'ð': 17,
-    'θ': 18,
-    'ʒ': 19,
-    'dʒ': 20,
-    'h': 21,
-    'w': 22,
-    'ʍ': 23,
-    'j': 24,
+    'sh': 15,
+    'ch': 16,
+    'th': 17,
+    'zh': 18,
+    'j': 19,
+    'h': 20,
+    'w': 21,
+    'wh': 22,
+    'y': 23,
     '-': 100 // override for no consonant
+}
+
+function toIpa(oed: string, v: RegExp) {
+    // special case: all stressed ə should become ʌ
+    Object.entries(oedToIpa).forEach(([k, v]) => oed = oed.replaceAll(k, v));
+    const parts: string[] = [];
+    const ind = [...oed.matchAll(new RegExp(/ˈ|ˌ/g))].map(x => x.index!).concat([oed.length]);
+    for (let i = 0; i < ind.length - 1; i++) {
+        let p = oed.substring(ind[i], ind[i + 1]);
+        const m = p.match(v);
+        if (m && m[0] == 'ə') p = p.replace('ə', 'ʌ');
+        parts.push(p);
+    }
+
+    if (parts.length == 0) return oed;
+    return oed.substring(0, ind[0]) + parts.join('');
 }
 
 interface phonetic {
@@ -76,14 +108,12 @@ interface phonetic {
 export function VowelCombo({ vowel, setVowel }: { vowel: string | undefined, setVowel: (s: string | undefined) => void }) {
     return (
         <div className="bg-tonal0 rounded-sm flex flex-col w-10">
-            {Object.entries(Vowels).map(([key, v], i) => {
-                return (v.map((c, j) => 
-                    <button key={j}
-                        className={"cursor-pointer rounded-sm py-0.5 " + (vowel == c ? 'bg-[#79bd92] text-tonal10 font-semibold' : 'hover:bg-surface20')}
-                        onClick={() => setVowel(vowel == c ? undefined : c)}>
-                        <p>{c}</p>
-                    </button>
-                ))}
+            {Object.keys(VowelOrder).map((v, k) =>
+                <button key={k}
+                    className={"cursor-pointer rounded-sm py-0.5 " + (vowel == v ? 'bg-[#79bd92] text-tonal10 font-semibold' : 'hover:bg-surface20')}
+                    onClick={() => setVowel(vowel == v ? undefined : v)}>
+                    <p>{v}</p>
+                </button>
             )}
         </div>
     );
@@ -103,17 +133,19 @@ export default function PhoneticTree() {
             const lines = new TextDecoder('utf-16le').decode(buffer).substring(1).split('\n'); // skip bom
             const phonetics: phonetic[] = [];
 
-            const matchVowels = new RegExp([...Vowels['diphthong'], ...Vowels['central'], ...Vowels['back'], ...Vowels['front']].join('|'), 'g');
+            const matchVowels = new RegExp([...Object.keys(VowelOrder)].join('|'), 'g');
             const matchConstants = new RegExp(Object.keys(ConsonantOrder).sort((a, b) => b.length - a.length).join('|'), 'g');
 
             lines.forEach((line) => {
                 if (line.length == 0) return;
 
-                const [word, pron] = line.split('=');
+                let [word, pron] = line.split('=');
+                pron = toIpa(pron, matchVowels); // expects input from oed
+
                 const primary = pron.includes('ˈ') ? pron.split('ˈ')[1] : pron;
 
                 const pc = [...primary.matchAll(matchConstants)].map(x => x[0] as string);
-                
+
                 phonetics.push({
                     word: word,
                     vowelCombo: [...primary.matchAll(matchVowels)].map(x => x[0] as string),
@@ -178,13 +210,17 @@ export default function PhoneticTree() {
 
     return (
         <div className="flex gap-2 justify-between">
-            <VowelCombo vowel={vowels[0]} setVowel={(s) => updateCombo(0, s)}/>
-            {/* <VowelCombo vowel={vowels[1]} setVowel={(s) => updateCombo(1, s)}/>
-            <VowelCombo vowel={vowels[2]} setVowel={(s) => updateCombo(2, s)}/>
-            <button className="w-full rounded-md mb-3 text-lg bg-tonal0 hover:bg-tonal0/70 border border-surface20" onClick={search}>
-                <span>Search: </span>
-                <span className="font-semibold">{formatSearch()}</span>
-            </button>*/}
+            <div>
+                <div className="flex gap-2 mb-4">
+                    <VowelCombo vowel={vowels[0]} setVowel={(s) => updateCombo(0, s)}/>
+                    <VowelCombo vowel={vowels[1]} setVowel={(s) => updateCombo(1, s)}/>
+                    <VowelCombo vowel={vowels[2]} setVowel={(s) => updateCombo(2, s)}/>
+                </div>
+                <button className="w-full rounded-md mb-3 text-lg bg-tonal0 hover:bg-tonal0/70 border border-surface20" onClick={search}>
+                    <span>Search: </span>
+                    <span className="font-semibold">{formatSearch()}</span>
+                </button>
+            </div>
             <div className="flex flex-col gap-2 py-3 pl-2 pr-5 bg-tonal0 rounded-lg">
                 <div className="ml-1">{focused.length == 0 ? 'No Results.' : `${focused.length} Results:`}</div>
                 {focused.map((p, i) => 
