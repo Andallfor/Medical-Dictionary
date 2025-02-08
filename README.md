@@ -6,7 +6,7 @@ This is a commissioned tool to aid in the pronunciation of English words, especi
     b. [Diagnostic Imaging: Head and Neck](https://www.sciencedirect.com/book/9780323443012/diagnostic-imaging-head-and-neck)  
     c. [Diagnostic Imaging: Brain](https://www.sciencedirect.com/book/9780323377546/diagnostic-imaging-brain)  
     d. [Diagnostic Imaging: Spine](https://www.sciencedirect.com/book/9780323377058/diagnostic-imaging-spine)  
-    e. [Diagnostic Imaging: Pediatric Neurology](https://www.us.elsevierhealth.com/diagnostic-imaging-pediatric-neuroradiology-9780443234927.html)  
+    e. [Diagnostic Imaging: Pediatric Neuroradiology](https://www.us.elsevierhealth.com/diagnostic-imaging-pediatric-neuroradiology-9780443234927.html)  
 2. **General English**  
     a. [Google 10000 words](https://github.com/first20hours/google-10000-english)
 3. **Definitions**  
