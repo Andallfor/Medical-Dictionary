@@ -16,6 +16,22 @@ class PDF_TYPE:
 FOLDER_INPUT = 'pdfs'
 FOLDER_OUTPUT = 'out'
 
+def join(pdfs, fileLoc):
+    visited = set()
+    combinedTotal = 0
+    with open(fileLoc, 'w', encoding='utf-16') as out:
+        for pdf in pdfs:
+            data = pdf.loadRead()
+            combinedTotal += len(data)
+            for (key, val) in data:
+                if key in visited:
+                    continue
+                visited.add(key)
+
+                out.write(f'{key}={val}')
+    
+    print(f'Filtered {combinedTotal} lines in {len(pdfs)} files into {len(visited)} lines ({combinedTotal - len(visited)} duplicates)')
+
 class PDF:
     def __init__(self):
         dn = os.path.dirname(__file__)
@@ -142,6 +158,18 @@ class PDF:
                 ignore.add(key)
         
         return ignore
+    
+    def loadRead(self):
+        if (not os.path.exists(self.pron)):
+            return set()
+        
+        out = set()
+        with open(self.pron, encoding='utf-16') as file:
+            for line in file:
+                key, pron = line.split('=')
+                out.add((key, pron))
+        
+        return out
 
 class PDF_CORE_RAD(PDF):
     def __init__(self):
@@ -204,11 +232,13 @@ class PDF_DIA_HEAD(PDF):
 
 opt = Options()
 opt.add_argument('--headless')
-driver = webdriver.Firefox(options=opt)
+# driver = webdriver.Firefox(options=opt)
 
 core_rad = PDF_CORE_RAD()
 # ignore = core_rad.run(driver)
 
 
 dia_head = PDF_DIA_HEAD()
-dia_head.run(driver, ignore=core_rad.loadIgnore())
+# dia_head.run(driver, ignore=core_rad.loadIgnore())
+
+join([core_rad, dia_head], os.path.join(os.path.dirname(__file__), FOLDER_OUTPUT, 'processed.txt'))
