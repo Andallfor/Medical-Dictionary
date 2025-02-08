@@ -105,13 +105,49 @@ interface phonetic {
     pronunciation: string
 }
 
-export function VowelCombo({ vowel, setVowel }: { vowel: string | undefined, setVowel: (s: string | undefined) => void }) {
+interface comboState {
+    ind: number;
+    active: boolean;
+    autoSearch: boolean;
+    shouldSearch: boolean;
+    vowel: string | undefined;
+}
+
+export function VowelCombo({ state, setVowel, notifySearch }: { state: comboState, setVowel: (s: string | undefined) => void, notifySearch: () => void }) {
+    const [clicks, setClicks] = useState(0);
+
+    function handleClick(v: string) {
+        if (state.autoSearch) {
+            setVowel(v == state.vowel ? undefined : v);
+            notifySearch();
+        } else {
+            setTimeout(() => setClicks(0), 250);
+            if (clicks == 0) {
+                setClicks(1);
+                setVowel(v == state.vowel ? undefined : v);
+            } else {
+                if (v != state.vowel) setVowel(v);
+                notifySearch();
+            }
+        }
+    }
+
+    function buttonStyle(v: string) {
+        if (state.active) {
+            return state.vowel == v
+            ? 'text-tonal10 font-semibold ' + (state.shouldSearch ? 'bg-red-500' : 'bg-[#79bd92]')
+            : 'hover:bg-surface20';
+        } else {
+            return 'pointer-events-none';
+        }
+    }
+
     return (
-        <div className="bg-tonal0 rounded-sm flex flex-col w-10">
+        <div className={"rounded-sm flex flex-col w-10 " + (state.active ? 'bg-tonal0' : 'bg-surface10 text-tonal20')}>
             {Object.keys(VowelOrder).map((v, k) =>
                 <button key={k}
-                    className={"cursor-pointer rounded-sm py-0.5 " + (vowel == v ? 'bg-[#79bd92] text-tonal10 font-semibold' : 'hover:bg-surface20')}
-                    onClick={() => setVowel(vowel == v ? undefined : v)}>
+                    className={"cursor-pointer rounded-sm py-0.5 " + buttonStyle(v)}
+                    onClick={() => handleClick(v)}>
                     <p>{v}</p>
                 </button>
             )}
@@ -124,45 +160,86 @@ export default function PhoneticTree() {
     const [data, setData] = useState<phonetic[]>([]);
     const [loaded, setLoaded] = useState(false);
     const [focused, setFocused] = useState<phonetic[]>([]);
+    const [vowelState, setVowelStates] = useState<comboState[]>([]);
 
     useEffect(() => {
-        if (loaded) return;
-        setLoaded(false);
-        // https://observablehq.com/@mbostock/fetch-utf-16
-        fetch('/data.txt').then(response => response.arrayBuffer()).then(buffer => {
-            const lines = new TextDecoder('utf-16le').decode(buffer).substring(1).split('\n'); // skip bom
-            const phonetics: phonetic[] = [];
-
-            const matchVowels = new RegExp([...Object.keys(VowelOrder)].join('|'), 'g');
-            const matchConstants = new RegExp(Object.keys(ConsonantOrder).sort((a, b) => b.length - a.length).join('|'), 'g');
-
-            lines.forEach((line) => {
-                if (line.length == 0) return;
-
-                let [word, pron] = line.split('=');
-                pron = toIpa(pron, matchVowels); // expects input from oed
-
-                const primary = pron.includes('ˈ') ? pron.split('ˈ')[1] : pron;
-
-                const pc = [...primary.matchAll(matchConstants)].map(x => x[0] as string);
-
-                phonetics.push({
-                    word: word,
-                    vowelCombo: [...primary.matchAll(matchVowels)].map(x => x[0] as string),
-                    primaryConst: pc[0] ?? '-',
-                    tailConst: pc[pc.length - 1] ?? '-',
-                    pronunciation: pron
+        if (vowelState.length != 3) {
+            const state: comboState[] = [];
+            for (let i = 0; i < 3; i++) {
+                state.push({
+                    active: i == 0,
+                    autoSearch: i == 2,
+                    shouldSearch: false,
+                    ind: i,
+                    vowel: undefined,
                 });
-            });
+            }
 
-            setData(phonetics);
-        });
+            setVowelStates(state);
+        }
+
+        if (!loaded) {
+            setLoaded(false);
+            // https://observablehq.com/@mbostock/fetch-utf-16
+            fetch('/data.txt').then(response => response.arrayBuffer()).then(buffer => {
+                const lines = new TextDecoder('utf-16le').decode(buffer).substring(1).split('\n'); // skip bom
+                const phonetics: phonetic[] = [];
+
+                const matchVowels = new RegExp([...Object.keys(VowelOrder)].join('|'), 'g');
+                const matchConstants = new RegExp(Object.keys(ConsonantOrder).sort((a, b) => b.length - a.length).join('|'), 'g');
+
+                lines.forEach((line) => {
+                    if (line.length == 0) return;
+
+                    let [word, pron] = line.split('=');
+                    pron = toIpa(pron, matchVowels); // expects input from oed
+
+                    const primary = pron.includes('ˈ') ? pron.split('ˈ')[1] : pron;
+
+                    const pc = [...primary.matchAll(matchConstants)].map(x => x[0] as string);
+
+                    phonetics.push({
+                        word: word,
+                        vowelCombo: [...primary.matchAll(matchVowels)].map(x => x[0] as string),
+                        primaryConst: pc[0] ?? '-',
+                        tailConst: pc[pc.length - 1] ?? '-',
+                        pronunciation: pron
+                    });
+                });
+
+                setData(phonetics);
+            });
+        }
     }, [])
 
     function updateCombo(ind: number, s: string | undefined) {
-        const c = [...vowels];
-        c[ind] = s;
-        setVowels(c);
+        const state = [...vowelState];
+        state[ind].vowel = s;
+        state[ind].shouldSearch = false;
+
+        if (!s) {
+            for (let i = ind + 1; i < state.length; i++) {
+                state[i].active = false;
+                state[i].vowel = undefined;
+            }
+        } else {
+            if (ind + 1 < state.length) state[ind + 1].active = true;
+            for (let i = 0; i < ind; i++) state[i].shouldSearch = false;
+        }
+
+        setVowelStates(state);
+    }
+
+    function notifySearch(ind: number) {
+        const state = [...vowelState];
+        for (let i = 0; i < state.length; i++) {
+            if (i != ind) state[i].shouldSearch = false;
+            if (i > ind) state[i].vowel = undefined;
+        }
+
+        state[ind].shouldSearch = true;
+
+        setVowelStates(state);
     }
 
     function search() {
@@ -203,25 +280,18 @@ export default function PhoneticTree() {
         setFocused(valid);
     }
 
-    function formatSearch() {
-        let out = vowels.map((v) => v == undefined ? '' : ` * ${v}`).join('');
-        return out.length != 0 ? ("'" + out) : "";
-    }
-
     return (
-        <div className="flex gap-2 justify-between">
+        <div className="flex gap-6">
             <div>
-                <div className="flex gap-2 mb-4">
-                    <VowelCombo vowel={vowels[0]} setVowel={(s) => updateCombo(0, s)}/>
-                    <VowelCombo vowel={vowels[1]} setVowel={(s) => updateCombo(1, s)}/>
-                    <VowelCombo vowel={vowels[2]} setVowel={(s) => updateCombo(2, s)}/>
+                <div className="flex gap-2">
+                    {vowelState.length == 3 ? <>
+                        <VowelCombo state={vowelState[0]} setVowel={(s) => updateCombo(0, s)} notifySearch={() => notifySearch(0)}/>
+                        <VowelCombo state={vowelState[1]} setVowel={(s) => updateCombo(1, s)} notifySearch={() => notifySearch(1)}/>
+                        <VowelCombo state={vowelState[2]} setVowel={(s) => updateCombo(2, s)} notifySearch={() => notifySearch(2)}/>
+                    </> : <></>}
                 </div>
-                <button className="w-full rounded-md mb-3 text-lg bg-tonal0 hover:bg-tonal0/70 border border-surface20" onClick={search}>
-                    <span>Search: </span>
-                    <span className="font-semibold">{formatSearch()}</span>
-                </button>
             </div>
-            <div className="flex flex-col gap-2 py-3 pl-2 pr-5 bg-tonal0 rounded-lg">
+            <div className="flex flex-col gap-2 py-3 pl-2 pr-5 bg-tonal0 rounded-lg flex-grow">
                 <div className="ml-1">{focused.length == 0 ? 'No Results.' : `${focused.length} Results:`}</div>
                 {focused.map((p, i) => 
                     <div key={i} className="flex gap-2 h-8">
