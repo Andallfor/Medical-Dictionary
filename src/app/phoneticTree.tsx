@@ -117,18 +117,15 @@ export function VowelCombo({ state, setVowel, notifySearch }: { state: comboStat
     const [clicks, setClicks] = useState(0);
 
     function handleClick(v: string) {
-        if (state.autoSearch) {
+        setTimeout(() => setClicks(0), 250);
+        if (clicks == 0) {
+            setClicks(1);
             setVowel(v == state.vowel ? undefined : v);
-            notifySearch();
+
+            if (state.autoSearch) notifySearch();
         } else {
-            setTimeout(() => setClicks(0), 250);
-            if (clicks == 0) {
-                setClicks(1);
-                setVowel(v == state.vowel ? undefined : v);
-            } else {
-                if (v != state.vowel) setVowel(v);
-                notifySearch();
-            }
+            if (v != state.vowel) setVowel(v);
+            if (!state.autoSearch || !state.shouldSearch) notifySearch(); // dont retrigger
         }
     }
 
@@ -156,11 +153,11 @@ export function VowelCombo({ state, setVowel, notifySearch }: { state: comboStat
 }
 
 export default function PhoneticTree() {
-    const [vowels, setVowels] = useState<(string | undefined)[]>([]);
     const [data, setData] = useState<phonetic[]>([]);
     const [loaded, setLoaded] = useState(false);
     const [focused, setFocused] = useState<phonetic[]>([]);
     const [vowelState, setVowelStates] = useState<comboState[]>([]);
+    const [searchStr, setSearchStr] = useState<string[]>([]);
 
     useEffect(() => {
         if (vowelState.length != 3) {
@@ -240,13 +237,30 @@ export default function PhoneticTree() {
         state[ind].shouldSearch = true;
 
         setVowelStates(state);
+        search();
+    }
+
+    function formatSearch() {
+        let out = searchStr.map((s) => '* ' + s).join(' ');
+        return out.length != 0 ? ("'" + out) : "";
     }
 
     function search() {
         const pattern: string[] = [];
-        vowels.forEach(v => {
-            if (v) pattern.push(v)
+        vowelState.forEach(v => {
+            if (v.vowel) pattern.push(v.vowel)
         });
+
+        if (pattern.length == searchStr.length) {
+            let isSame = true;
+            for (let i = 0; i < pattern.length; i++) {
+                if (pattern[i] != searchStr[i]) isSame = false;
+            }
+
+            if (isSame) return;
+        }
+
+        setSearchStr(pattern);
 
         let valid: phonetic[] = [];
         data.forEach(p => {
@@ -292,7 +306,10 @@ export default function PhoneticTree() {
                 </div>
             </div>
             <div className="flex flex-col gap-2 py-3 pl-2 pr-5 bg-tonal0 rounded-lg flex-grow">
-                <div className="ml-1">{focused.length == 0 ? 'No Results.' : `${focused.length} Results:`}</div>
+                <div className="ml-1">{
+                    searchStr.length == 0 ? 'No query.' :
+                        <span>Found {focused.length} matches for <span className="font-semibold">/{formatSearch()}/:</span></span>
+                }</div>
                 {focused.map((p, i) => 
                     <div key={i} className="flex gap-2 h-8">
                         <span className="w-8 flex justify-center items-center font-semibold text-surface50 flex-shrink-0">{i + 1}</span>

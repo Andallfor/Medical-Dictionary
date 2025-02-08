@@ -91,7 +91,7 @@ function FileContainer({ file, phrase }: { file: fileData, phrase: string }) {
   if (occurrences.length == 0) return <>No file results.</>;
   return (
     <div className="pb-4">
-      <div>{file.name} ({occurrences.length}):</div>
+      <div>Found {occurrences.length} matches in {file.name}:</div>
       <div className="h-2"></div>
       <div className="mr-2 flex flex-col gap-2">
         {occurrences.map((o, i) => (
