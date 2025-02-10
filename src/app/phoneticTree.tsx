@@ -291,6 +291,8 @@ export default function PhoneticTree() {
             return tc;
         });
 
+        valid = valid.slice(0, 200);
+
         setFocused(valid);
     }
 
@@ -308,7 +310,7 @@ export default function PhoneticTree() {
             <div className="flex flex-col gap-2 py-3 pl-2 pr-5 bg-tonal0 rounded-lg flex-grow">
                 <div className="ml-1">{
                     searchStr.length == 0 ? 'No query.' :
-                        <span>Found {focused.length} matches for <span className="font-semibold">/{formatSearch()}/:</span></span>
+                        <span>Found {focused.length}{focused.length >= 200 ? '+' : ''} matches for <span className="font-semibold">/{formatSearch()}/:</span></span>
                 }</div>
                 {focused.map((p, i) => 
                     <div key={i} className="flex gap-2 h-8">

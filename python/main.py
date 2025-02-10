@@ -5,6 +5,11 @@ import re
 from selenium import webdriver
 from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.common.by import By
+from selenium.common.exceptions import TimeoutException
+from retry import retry
+import time
+import datetime
+import math
 
 class PDF_TYPE:
     CORE_RADIOLOGY = 0
@@ -64,7 +69,8 @@ class PDF:
                     lines.append(line)
 
         return lines
-    
+
+    @retry(TimeoutException, tries=3, delay=2)
     def get(self, t: str, driver):
         driver.get(f'https://www.oed.com/dictionary/{t}?tab=pronunciation')
         try:
@@ -78,7 +84,7 @@ class PDF:
             data = [t.split('_')[0], '']
             header = group.find_elements(By.CLASS_NAME, 'header')
 
-            if (header):
+            if (header and 'In sense' not in header[0].text):
                 data[0] = header[0].text.split(' ')[-1]
             
             pron = group.find_elements(By.CLASS_NAME, 'regional-pronunciation')
@@ -93,6 +99,7 @@ class PDF:
         
         return out
 
+    @retry(TimeoutException, tries=3, delay=2)
     def search(self, t: str, driver):
         driver.get(f'https://www.oed.com/search/dictionary/?scope=Entries&q={t}')
         
@@ -109,6 +116,8 @@ class PDF:
         raise NotImplementedError('Get index is not implemented')
     
     def write(self, driver, words, skip = 0, count = -1):
+        words = sorted(words) # since we need them to be stable
+        start = time.time()
         with open(self.pron, 'w', encoding='utf-16') as out:
             written = 0
             l = len(words)
@@ -141,7 +150,15 @@ class PDF:
                 
                 if (i % 50 == 0):
                     out.flush()
-                    print(f'\033[96mCheckpoint: word {i}\033[0m')
+                    elapsed = time.time() - start
+                    spw = elapsed / max(written, 1)
+                    remaining = spw * (l - i)
+
+                    a = datetime.timedelta(seconds=math.floor(remaining))
+                    b = math.floor(1000 * spw)
+                    c = datetime.timedelta(seconds=math.floor(elapsed))
+
+                    print(f'\033[96mCheckpoint: word {i}\033[0m ({a}/{b}ms/{c})')
 
     def run(self, driver, ignore=set()):
         self.toTxt()
@@ -230,15 +247,141 @@ class PDF_DIA_HEAD(PDF):
         
         return text
 
+class PDF_DIA_BRAIN(PDF):
+    def __init__(self):
+        self.FILE_PDF_NAME = 'Diagnostic Imaging Brain Index.pdf'
+        self.FILE_TXT_NAME = 'dia_brain.txt'
+        self.FILE_OUT_NAME = '_out_dia_brain.txt'
+        self.INDEX_LINE = 4
+
+        super().__init__()
+    
+    def process(self, driver, ignore=set(), skip = 0):
+        LINES = super()._getIndex()
+
+        text = set()
+        for line in LINES:
+            line = re.sub(r'vs.|\"|[0-9]|\(|\)|- |&|1st|2nd|3rd|\.', '', line)
+            words = re.split(r' |,|/', line)
+
+            for word in words:
+                word = word.strip()
+                if len(word) < 3:
+                    continue
+                    
+                if word in ignore:
+                    continue
+
+                text.add(word.lower())
+
+        super().write(driver, text)
+        
+        return text
+
+class PDF_DIA_SPINE(PDF):
+    def __init__(self):
+        self.FILE_PDF_NAME = 'Diagnostic Imaging Spine Index.pdf'
+        self.FILE_TXT_NAME = 'dia_spine.txt'
+        self.FILE_OUT_NAME = '_out_dia_spine.txt'
+        self.INDEX_LINE = 4
+
+        super().__init__()
+    
+    def process(self, driver, ignore=set(), skip = 0):
+        LINES = super()._getIndex()
+
+        text = set()
+        for line in LINES:
+            line = re.sub(r'vs.|\"|[0-9]|\(|\)|- |&|1st|2nd|3rd|\.', '', line)
+            words = re.split(r' |,|/', line)
+
+            for word in words:
+                word = word.strip()
+                if len(word) < 3:
+                    continue
+                    
+                if word in ignore:
+                    continue
+
+                text.add(word.lower())
+
+        super().write(driver, text)
+        
+        return text
+
+class PDF_DIA_PED(PDF):
+    def __init__(self):
+        self.FILE_PDF_NAME = 'Diagnostic Imaging Pediatric Neuroradiology (Kevin R. Moore).pdf'
+        self.FILE_TXT_NAME = 'dia_ped.txt'
+        self.FILE_OUT_NAME = '_out_dia_ped.txt'
+        self.INDEX_LINE = 90976
+
+        super().__init__()
+    
+    def process(self, driver, ignore=set(), skip = 0):
+        LINES = super()._getIndex()
+
+        text = set()
+        for line in LINES:
+            line = re.sub(r'vs.|\"|[0-9]|\(|\)|- |&|1st|2nd|3rd|\.', '', line)
+            words = re.split(r' |,|/', line)
+
+            for word in words:
+                word = word.strip()
+                if len(word) < 3:
+                    continue
+                    
+                if word in ignore:
+                    continue
+
+                text.add(word.lower())
+
+        super().write(driver, text)
+        
+        return text
+
+class PDF_COMMON(PDF):
+    def __init__(self):
+        self.FILE_PDF_NAME = 'google-10000-english-usa.txt'
+        self.FILE_TXT_NAME = 'google-10000-english-usa.txt'
+        self.FILE_OUT_NAME = '_out_common.txt'
+        self.INDEX_LINE = 0
+
+        super().__init__()
+    
+    def process(self, driver, ignore=set(), skip = 0):
+        LINES = super()._getIndex()
+
+        text = set()
+        for word in LINES:
+            word = word.strip()
+            if word in ignore:
+                continue
+
+            if len(word) < 3:
+                continue
+
+            text.add(word.lower())
+
+        super().write(driver, text)
+        
+        return text
+
+
 opt = Options()
 opt.add_argument('--headless')
-# driver = webdriver.Firefox(options=opt)
+driver = webdriver.Firefox(options=opt)
+driver.set_page_load_timeout(10)
 
 core_rad = PDF_CORE_RAD()
-# ignore = core_rad.run(driver)
-
-
 dia_head = PDF_DIA_HEAD()
-# dia_head.run(driver, ignore=core_rad.loadIgnore())
+dia_brain = PDF_DIA_BRAIN()
+dia_spine = PDF_DIA_SPINE()
+dia_ped = PDF_DIA_PED()
 
-join([core_rad, dia_head], os.path.join(os.path.dirname(__file__), FOLDER_OUTPUT, 'processed.txt'))
+common_words = PDF_COMMON()
+ignore = core_rad.loadIgnore() | dia_head.loadIgnore() | dia_brain.loadIgnore() | dia_spine.loadIgnore() | dia_ped.loadIgnore()
+
+common_words.run(driver, ignore=ignore)
+
+join([core_rad, dia_head, dia_brain, dia_spine, dia_ped, common_words], os.path.join(os.path.dirname(__file__), FOLDER_OUTPUT, 'processed.txt'))
