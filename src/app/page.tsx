@@ -2,11 +2,11 @@
 
 import { useState } from "react";
 import 'remixicon/fonts/remixicon.css'
-import FileInput, { fileData } from "./fileInput";
-import FileSearch from "./fileSearch";
-import PhoneticTree from "./phoneticTree";
-import { Search } from "./search";
-import { mw } from "./phoneticConstants";
+import FileInput, { fileData } from "./fileSearch/input";
+import FileSearch from "./fileSearch/search";
+import PhoneticTree from "./phoneticTree/tree";
+import { Search } from "./search/search";
+import { mw } from "./phoneticTree/constants";
 
 export default function Home() {
     const [words, setWords] = useState<mw[][]>([]);

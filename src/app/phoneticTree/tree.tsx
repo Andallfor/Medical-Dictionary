@@ -1,7 +1,6 @@
-import { InferGetStaticPropsType } from "next";
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
-import { ConsonantOrder, ConsonantSearch, VowelOrder, branchState, oedToIpa, phoneme } from "./phoneticConstants";
-import { PhoneticSearchController } from "./phoneticSearch";
+import { ConsonantOrder, ConsonantSearch, VowelOrder, branchState, oedToIpa, phoneme } from "./constants";
+import { PhoneticSearchController } from "./search";
 
 function toIpa(oed: string, v: RegExp) {
     // special case: all stressed ə should become ʌ

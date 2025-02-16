@@ -1,5 +1,5 @@
 import { use, useEffect, useState } from "react";
-import { fileData } from "./fileInput";
+import { fileData } from "./input";
 
 interface occurrence {
   start: string,

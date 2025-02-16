@@ -1,6 +1,7 @@
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import Word from "./word";
-import { getCollegiateDef, getMedicalDef, mw } from "./phoneticApi";
+import { getCollegiateDef, getMedicalDef } from "./api";
+import { mw } from "../phoneticTree/constants";
 
 export function Search({ words, setWords }: { words: mw[][], setWords: Dispatch<SetStateAction<mw[][]>> }) {
     const [searchError, setSearchError] = useState('');

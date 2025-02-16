@@ -51,6 +51,11 @@ export interface branchState {
     phonemeList: string[];
 }
 
+export interface replacement {
+    to: string;
+    stress?: boolean; // undefined is any stress
+}
+
 // all vowels and consonants are IPA (unless otherwise noted)
 export const VowelOrder: Record<string, number> = {
     'i': 0,

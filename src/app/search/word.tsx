@@ -1,4 +1,5 @@
-import { getAudio, getCollegiateDef, mw } from "./phoneticApi";
+import { mw } from "../phoneticTree/constants";
+import { getAudio, getCollegiateDef } from "./api";
 import { useEffect, useRef, useState } from "react";
 
 function SingleWord({ words }: { words: mw[] }) {

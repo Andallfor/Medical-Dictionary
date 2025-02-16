@@ -1,5 +1,5 @@
 import axios from "axios";
-import { mw, prs } from "./phoneticConstants";
+import { mw, prs } from "../phoneticTree/constants";
 
 export async function getMedicalDef(word: string): Promise<mw[] | undefined> {
     let data = null;
