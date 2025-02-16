@@ -51,9 +51,9 @@ export interface branchState {
     phonemeList: string[];
 }
 
-export interface replacement {
+export interface replacement { // these are assumed to be vowels
     to: string;
-    stress?: boolean; // undefined is any stress
+    whenStress: boolean;
 }
 
 // all vowels and consonants are IPA (unless otherwise noted)
@@ -160,3 +160,56 @@ export const oedToIpa: Record<string, string> = {
     'θ': 'th̬',
     'ʒ': 'zh',
 };
+
+// note that the standard we use is a custom modified IPA
+export const toStandardized: Record<string, string | replacement[]> = {
+    // oed
+    'ɪ(ə)r': 'iɚ',
+    'ɛ(ə)r': 'ɛɚ',
+    'ʊ(ə)r': 'ʊɚ',
+    'eɪ': 'e',
+    'ər': 'ɚ',
+    'oʊ': 'o',
+    'ɑr': 'ar',
+    'kl': 'cl',
+    'kr': 'cr',
+    'kj': 'ky',
+    'tʃ': 'ch',
+    'dʒ': 'j',
+    '(h)w': 'wh̤',
+    'ɑ': 'a',
+    'ɑ̃': 'an',
+    'æ̃': 'n',
+    'ᵻ': 'ɪ',
+    'ᵿ': 'ə',
+    'ŋ': 'ng',
+    'x': 'k',
+    'ʃ': 'sh',
+    'ð': 'th̥',
+    'θ': 'th̬',
+    'ʒ': 'zh',
+    'ə': [{to: 'ʌ', whenStress: true}],
+
+    // mw
+    'ē': [{to: 'i', whenStress: true},
+          {to: 'ɪ', whenStress: false}],
+    'i': 'ɪ',
+    'ā': 'e',
+    'e': 'ɛ',
+    'a': 'æ',
+    // ə -> ʌ when stressed, matched in oed section
+    // ər -> ɚ, matched in oed section
+    'ü': 'u',
+    'u̇': 'ʊ',
+    'ō': 'o',
+    'ȯ': 'ɔ',
+    'ȯr': 'ɔr', // this is tech redundant
+    'ä': 'a',
+    'är': 'ar', // similarly redundant
+    'ī': 'aɪ',
+    'ȯi': 'ɔi',
+    'au̇': 'au',
+    'ir': 'iɚ',
+    'er': 'ɛɚ',
+    'u̇r': 'ʊɚ',
+}

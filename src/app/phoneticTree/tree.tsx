@@ -1,21 +1,56 @@
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
-import { ConsonantOrder, ConsonantSearch, VowelOrder, branchState, oedToIpa, phoneme } from "./constants";
+import { ConsonantOrder, ConsonantSearch, VowelOrder, branchState, oedToIpa, phoneme, replacement, toStandardized } from "./constants";
 import { PhoneticSearchController } from "./search";
 
-function toIpa(oed: string, v: RegExp) {
-    // special case: all stressed ə should become ʌ
-    Object.entries(oedToIpa).forEach(([k, v]) => oed = oed.replaceAll(k, v));
-    const parts: string[] = [];
-    const ind = [...oed.matchAll(new RegExp(/ˈ|ˌ/g))].map(x => x.index!).concat([oed.length]);
-    for (let i = 0; i < ind.length - 1; i++) {
-        let p = oed.substring(ind[i], ind[i + 1]);
-        const m = p.match(v);
-        if (m && m[0] == 'ə') p = p.replace('ə', 'ʌ');
-        parts.push(p);
+function toIpa(str: string, base: RegExp, rep: Record<string, replacement[]>, joinedReg: RegExp) {
+    str = str.replaceAll(base, (v) => toStandardized[v] as string);
+
+    const ind = [...str.matchAll(new RegExp([...Object.keys(rep)].join('|'), 'g'))];
+    const stressUnits = [...str.matchAll(/ˈ|ˌ/g)].map(x => x.index!);
+
+    if (ind.length > 0) {
+        // for each of these vowels, check if they are stressed or not
+        // specifically, within the current stress unit find the first vowel and check if the index is the current
+        ind.forEach((match) => {
+            let isStressed = false;
+
+            if (stressUnits.length == 0 || match.index! < stressUnits[0]) isStressed = false;    
+            else {
+                stressUnits.push(str.length - 1);
+                for (let i = 1; i < stressUnits.length; i++) {
+                    if (stressUnits[i] > match.index!) {
+                        let ind = i - 1;
+                        let found = str.substring(stressUnits[ind]).match(joinedReg)!.index!;
+                        isStressed = found + stressUnits[ind] == match.index!
+                        break;
+                    }
+                }
+            }
+
+            rep[match[0]].forEach(x => {
+                if (x.whenStress == isStressed) {
+                    str = str.substring(0, match.index!) + x.to + str.substring(match.index! + match[0].length);
+                }
+            });
+        })
     }
 
-    if (parts.length == 0) return oed;
-    return oed.substring(0, ind[0]) + parts.join('');
+    return str;
+}
+
+function formatConversion() {
+    const keys = Object.keys(toStandardized).sort((a, b) => a.length - b.length);
+    const base: Record<string, string> = {};
+    const rep: Record<string, replacement[]> = {};
+
+    keys.forEach(k => {
+        if (typeof toStandardized[k] == 'string') base[k] = toStandardized[k] as string;
+        else rep[k] = toStandardized[k] as replacement[];
+    });
+
+    const reg = new RegExp([...Object.keys(base)].sort((a, b) => b.length - a.length).join('|'), 'g');
+    const joinedReg = new RegExp([...Object.keys(VowelOrder), ...Object.keys(rep)].sort((a, b) => b.length - a.length).join('|'));
+    return [reg, rep, joinedReg];
 }
 
 function readRegex(r: RegExpMatchArray | null, rm = '') {
@@ -55,12 +90,14 @@ export default function PhoneticTree() {
                 const r_stress_c = new RegExp(`^(${formattedConsonants})`); // note that lead and primary stressed const are the same
                 const r_sec_c = new RegExp(`ˌ(${formattedConsonants})`, 'g');
 
+                const [reg, rep, joinedReg] = formatConversion();
+
                 lines.forEach((line) => {
                     if (line.length == 0) return;
                     line = line.trim();
 
                     let [word, pron] = line.split('=');
-                    pron = toIpa(pron, r_vowel); // expects input from oed
+                    pron = toIpa(pron, reg as RegExp, rep as Record<string, replacement[]>, joinedReg as RegExp);
 
                     const primary = pron.includes('ˈ') ? pron.split('ˈ')[1] : pron;
                     const stressedConst = readRegex(primary.match(r_stress_c));
