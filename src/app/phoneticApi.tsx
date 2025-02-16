@@ -1,37 +1,5 @@
 import axios from "axios";
-import { JSX } from "react";
-
-// https://dictionaryapi.com/products/json
-
-interface sense_def {
-    sn: string,
-    dt: [string, string][]
-}
-
-type sense = [string, sense_def]
-
-interface prs {
-    mw: string,
-    sound: {
-        audio: string
-    }
-}
-
-export interface mw {
-    meta: {
-        id: string,
-        stems: string[]
-    },
-    hwi: {
-        hw: string,
-        prs: prs[]
-    },
-    fl: string,
-    def: {
-        sseq: sense[][]
-    }[],
-    shortdef: string[]
-}
+import { mw, prs } from "./phoneticConstants";
 
 export async function getMedicalDef(word: string): Promise<mw[] | undefined> {
     let data = null;
