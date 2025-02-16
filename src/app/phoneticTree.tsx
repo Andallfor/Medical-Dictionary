@@ -1,6 +1,6 @@
 import { InferGetStaticPropsType } from "next";
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
-import { ConsonantOrder, VowelOrder, branchState, oedToIpa, phonetic } from "./phoneticConstants";
+import { ConsonantOrder, ConsonantSearch, VowelOrder, branchState, oedToIpa, phoneme } from "./phoneticConstants";
 import { PhoneticSearchController } from "./phoneticSearch";
 
 function toIpa(oed: string, v: RegExp) {
@@ -19,113 +19,148 @@ function toIpa(oed: string, v: RegExp) {
     return oed.substring(0, ind[0]) + parts.join('');
 }
 
+function readRegex(r: RegExpMatchArray | null, rm = '') {
+    if (r) {
+        if (rm != '') return r[0].replace(rm, '');
+        else return r[0];
+    } else return '';
+}
+
 export default function PhoneticTree() {
-    const [data, setData] = useState<phonetic[]>([]);
+    // internal dictionary
     const [loaded, setLoaded] = useState(false);
-    const [focused, setFocused] = useState<phonetic[]>([]);
+    const [data, setData] = useState<phoneme[]>([]);
+    
+    // search results
+    const [focused, setFocused] = useState<phoneme[]>([]);
+    const [searchStr, setSearchStr] = useState<(string | undefined)[]>([]);
+
+    // tree state
     const [vowelState, setVowelStates] = useState<branchState[]>([]);
-    const [searchStr, setSearchStr] = useState<string[]>([]);
+    const [consonantState, setConsonantState] = useState<branchState[]>([]);
 
     useEffect(() => {
+        // load internal dictionary
         if (!loaded) {
             setLoaded(false);
             // https://observablehq.com/@mbostock/fetch-utf-16
             fetch('/data.txt').then(response => response.arrayBuffer()).then(buffer => {
                 const lines = new TextDecoder('utf-16le').decode(buffer).substring(1).split('\n'); // skip bom
-                const phonetics: phonetic[] = [];
+                const phonetics: phoneme[] = [];
 
-                const matchVowels = new RegExp([...Object.keys(VowelOrder)].join('|'), 'g');
-                const matchConstants = new RegExp(Object.keys(ConsonantOrder).sort((a, b) => b.length - a.length).join('|'), 'g');
+                // regex to match each phoneme, e.g. /ie|a|i|e|.../ with longest phonemes first
+                const r_vowel = new RegExp([...Object.keys(VowelOrder)].join('|'), 'g');
+
+                const formattedConsonants = Object.keys(ConsonantOrder).sort((a, b) => b.length - a.length).join('|');
+                const r_tail_c = new RegExp(`(${formattedConsonants})$`);
+                const r_stress_c = new RegExp(`^(${formattedConsonants})`); // note that lead and primary stressed const are the same
+                const r_sec_c = new RegExp(`ˌ(${formattedConsonants})`, 'g');
 
                 lines.forEach((line) => {
                     if (line.length == 0) return;
+                    line = line.trim();
 
                     let [word, pron] = line.split('=');
-                    pron = toIpa(pron, matchVowels); // expects input from oed
+                    pron = toIpa(pron, r_vowel); // expects input from oed
 
                     const primary = pron.includes('ˈ') ? pron.split('ˈ')[1] : pron;
-
-                    const pc = [...primary.matchAll(matchConstants)].map(x => x[0] as string);
+                    const stressedConst = readRegex(primary.match(r_stress_c));
 
                     phonetics.push({
                         word: word,
-                        vowelCombo: [...primary.matchAll(matchVowels)].map(x => x[0] as string),
-                        primaryConst: pc[0] ?? '-',
-                        tailConst: pc[pc.length - 1] ?? '-',
-                        pronunciation: pron
+                        pronunciation: pron,
+                        primary: {
+                            vowels: [...primary.matchAll(r_vowel)].map(x => x[0] as string),
+                            consonants: {
+                                stressed: [
+                                    stressedConst,
+                                    // dont question it
+                                    ...([...primary.matchAll(r_sec_c)].map(x => readRegex(x, 'ˌ')))
+                                ],
+                                leading: stressedConst,
+                                tail: readRegex(primary.match(r_tail_c))
+                            }
+                        }
                     });
                 });
 
                 setData(phonetics);
+                console.log(phonetics.splice(0, 200));
             });
         }
     }, [])
 
     function formatSearch() {
-        let out = searchStr.map((s) => '* ' + s).join(' ');
+        let out = searchStr.map((s) => s ? ('* ' + s) : '').join(' ');
         return out.length != 0 ? ("'" + out) : "";
     }
 
     function search() {
-        const pattern: string[] = [];
-        vowelState.forEach(v => {
-            if (v.phoneme) pattern.push(v.phoneme)
-        });
+        // [vowels... consonant?]
+        const pattern: (string | undefined)[] = [];
+        vowelState.forEach(v => { if (v.phoneme) pattern.push(v.phoneme) });
+        pattern.push(consonantState[0].phoneme == 'None' ? '' : consonantState[0].phoneme);
 
-        if (pattern.length == searchStr.length) {
-            let isSame = true;
-            for (let i = 0; i < pattern.length; i++) {
-                if (pattern[i] != searchStr[i]) isSame = false;
-            }
-
-            if (isSame) return;
-        }
-
+        // ensure we pattern is different
+        if (pattern.length == searchStr.length && pattern.reduce((a, x, i) => a && (x == searchStr[i]), true)) return;
         setSearchStr(pattern);
 
-        let valid: phonetic[] = [];
+        // find all matching words
+        let valid: phoneme[] = [];
         data.forEach(p => {
-            let isValid = true;
-            for (let i = 0; i < pattern.length; i++) {
-                if (p.vowelCombo[i] != pattern[i]) {
-                    isValid = false;
-                    break;
-                }
-            }
+            // word has enough vowels && vowels and const match
+            let isValid = p.primary.vowels.length >= pattern.length - 1 && 
+                pattern.reduce((a, x, i) => a && ((i == pattern.length - 1)
+                    ? (x == undefined) || (x == p.primary.consonants.tail) // undefined = match all
+                    : x == p.primary.vowels[i]),
+                true);
 
             if (isValid) valid.push(p);
         });
 
         valid.sort((a, b) => {
-            for (let i = 0; i < Math.max(a.vowelCombo.length, b.vowelCombo.length); i++) {
+            const av = a.primary.vowels;
+            const bv  = b.primary.vowels;
+
+            for (let i = 0; i < Math.max(av.length, bv.length); i++) {
                 // TODO: currently we prioritize exact matches
-                const ac = i >= a.vowelCombo.length ? -1 : VowelOrder[a.vowelCombo[i]];
-                const bc = i >= b.vowelCombo.length ? -1 : VowelOrder[b.vowelCombo[i]];
+                const ac = i >= av.length ? -1 : VowelOrder[av[i]];
+                const bc = i >= bv.length ? -1 : VowelOrder[bv[i]];
                 
                 if (ac - bc != 0) return ac - bc;
             }
 
-            const pc = ConsonantOrder[a.primaryConst] - ConsonantOrder[b.primaryConst];
+            const pc = ConsonantOrder[a.primary.consonants.leading] - ConsonantOrder[b.primary.consonants.leading];
             if (pc != 0) return pc;
 
-            const tc = ConsonantOrder[a.tailConst] - ConsonantOrder[b.tailConst];
+            const tc = ConsonantOrder[a.primary.consonants.tail] - ConsonantOrder[b.primary.consonants.tail];
             return tc;
         });
 
-        valid = valid.slice(0, 200);
-
-        setFocused(valid);
+        setFocused(valid.slice(0, 200));
     }
 
     return (
         <div className="flex gap-6">
             <div>
-                <PhoneticSearchController num={4} props={{
-                    states: vowelState,
-                    setStates: setVowelStates,
-                    search: search,
-                    list: Object.keys(VowelOrder)
-                }}/>
+                <div className="flex gap-4">
+                    <PhoneticSearchController num={4} props={{
+                        states: vowelState,
+                        setStates: setVowelStates,
+                        search: search,
+                        list: Object.keys(VowelOrder),
+                    }} customization={{
+                        width: 'w-8'
+                    }}/>
+                    <PhoneticSearchController num={1} props={{
+                        states: consonantState,
+                        setStates: setConsonantState,
+                        search: search,
+                        list: ConsonantSearch
+                    }} customization={{
+                        width: 'w-12'
+                    }}/>
+                </div>
             </div>
             <div className="flex flex-col gap-2 py-3 pl-2 pr-5 bg-tonal0 rounded-lg flex-grow">
                 <div className="ml-1">{

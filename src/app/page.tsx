@@ -1,12 +1,12 @@
 "use client"
 
 import { useState } from "react";
-import { mw } from "./phoneticApi";
 import 'remixicon/fonts/remixicon.css'
 import FileInput, { fileData } from "./fileInput";
 import FileSearch from "./fileSearch";
 import PhoneticTree from "./phoneticTree";
 import { Search } from "./search";
+import { mw } from "./phoneticConstants";
 
 export default function Home() {
     const [words, setWords] = useState<mw[][]>([]);
@@ -14,7 +14,7 @@ export default function Home() {
 
     return (
         <div className="m-8">
-            <div className="grid grid-cols-[40%_minmax(0,1fr)] gap-8">
+            <div className="grid grid-cols-[45%_minmax(0,1fr)] gap-8">
                 <div className="flex flex-col gap-4 flex-shrink-0">
                     <PhoneticTree />
                 </div>

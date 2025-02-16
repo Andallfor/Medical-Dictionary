@@ -29,12 +29,17 @@ export interface mw {
     shortdef: string[]
 }
 
-export interface phonetic {
+export interface phoneme {
     word: string,
-    vowelCombo: string[], // is primary stress backwards including only vowels
-    primaryConst: string,
-    tailConst: string,
-    pronunciation: string
+    pronunciation: string,
+    primary: { // information regarding pronunciation after the primary stress to the end of the word
+        vowels: string[],
+        consonants: {
+            stressed: string[], // all consonants immediately following ˈ or ˌ in order. First entry will be the primary stressed or empty string if none
+            leading: string, // empty string if none (i.e. vowel starts instead)
+            tail: string, // empty string if none
+        }
+    }
 }
 
 export interface branchState {
@@ -97,7 +102,7 @@ export const ConsonantOrder: Record<string, number> = {
     'w': 22,
     'wh̤': 23, // with breath
     'y': 24,
-    '-': 100 // override for no consonant
+    '': 100 // override for no consonant
 }
 
 export const ConsonantSearch: string[] = [

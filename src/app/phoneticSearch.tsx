@@ -1,17 +1,22 @@
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { ConsonantSearch, VowelOrder, branchState } from "./phoneticConstants";
 
+interface customizationProps {
+    width: string;
+}
+
 interface phoneticSearchProps {
-    num: number,
+    num: number;
     props: {
-        list: string[],
+        list: string[];
         states: branchState[];
         setStates: Dispatch<SetStateAction<branchState[]>>;
         search: () => void;
-    }
+    };
+    customization: customizationProps;
 }
 
-export function Branch({ state, update }: { state: branchState, update: (i: number, s: string | undefined, search: boolean) => void }) {
+export function Branch({ state, customization, update }: { state: branchState, customization: customizationProps, update: (i: number, s: string | undefined, search: boolean) => void }) {
     const [clicks, setClicks] = useState(0);
 
     function handleClick(v: string) {
@@ -34,7 +39,8 @@ export function Branch({ state, update }: { state: branchState, update: (i: numb
     }
 
     return (
-        <div className={"rounded-sm flex flex-col w-10 " + (state.active ? 'bg-tonal0' : 'bg-surface10 text-tonal20')}>
+        <div className={
+            customization.width + " rounded-sm flex flex-col " + (state.active ? 'bg-tonal0' : 'bg-surface10 text-tonal20')}>
             {state.phonemeList.map((v, k) =>
                 <button key={k}
                     className={"cursor-pointer rounded-sm py-0.5 " + buttonStyle(v)}
@@ -46,7 +52,7 @@ export function Branch({ state, update }: { state: branchState, update: (i: numb
     );
 }
 
-export function PhoneticSearchController({ num, props }: phoneticSearchProps ) {
+export function PhoneticSearchController({ num, props, customization }: phoneticSearchProps ) {
     useEffect(() => {
         const state: branchState[] = [];
         for (let i = 0; i < num; i++) {
@@ -88,7 +94,7 @@ export function PhoneticSearchController({ num, props }: phoneticSearchProps ) {
     return (
         <div className="flex gap-2">
             {props.states.length == num ? 
-                props.states.map((s, i) => <Branch key={i} state={props.states[i]} update={updateBranch}/>)
+                props.states.map((s, i) => <Branch key={i} state={s} customization={customization} update={updateBranch}/>)
                 : ''
             }
         </div>
