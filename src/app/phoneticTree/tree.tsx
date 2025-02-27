@@ -1,8 +1,8 @@
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
-import { ConsonantOrder, ConsonantSearch, VowelOrder, branchState, oedToIpa, phoneme, replacement, toStandardized } from "./constants";
-import { PhoneticSearchController } from "./search";
+import { ConsonantOrder, ConsonantSearch, VowelOrder, branchState, phoneme, r_tail_c, r_vowel, readRegex, replacement, toStandardized } from "./constants";
+import { PhoneticSearchController, PhoneticSearchControllerRef } from "./search";
 
-function toIpa(str: string, base: RegExp, rep: Record<string, replacement[]>, joinedReg: RegExp) {
+export function toIpa(str: string, base: RegExp, rep: Record<string, replacement[]>, joinedReg: RegExp) {
     str = str.replaceAll(base, (v) => toStandardized[v] as string);
 
     const ind = [...str.matchAll(new RegExp([...Object.keys(rep)].join('|'), 'g'))];
@@ -38,7 +38,7 @@ function toIpa(str: string, base: RegExp, rep: Record<string, replacement[]>, jo
     return str;
 }
 
-function formatConversion() {
+export function formatConversion() {
     const keys = Object.keys(toStandardized).sort((a, b) => a.length - b.length);
     const base: Record<string, string> = {};
     const rep: Record<string, replacement[]> = {};
@@ -53,18 +53,7 @@ function formatConversion() {
     return [reg, rep, joinedReg];
 }
 
-function readRegex(r: RegExpMatchArray | null, rm = '') {
-    if (r) {
-        if (rm != '') return r[0].replace(rm, '');
-        else return r[0];
-    } else return '';
-}
-
-export default function PhoneticTree() {
-    // internal dictionary
-    const [loaded, setLoaded] = useState(false);
-    const [data, setData] = useState<phoneme[]>([]);
-    
+export default function PhoneticTree({ data }: { data: phoneme[] }) {
     // search results
     const [focused, setFocused] = useState<phoneme[]>([]);
     const [searchStr, setSearchStr] = useState<(string | undefined)[]>([]);
@@ -72,59 +61,8 @@ export default function PhoneticTree() {
     // tree state
     const [vowelState, setVowelStates] = useState<branchState[]>([]);
     const [consonantState, setConsonantState] = useState<branchState[]>([]);
-
-    useEffect(() => {
-        // load internal dictionary
-        if (!loaded) {
-            setLoaded(false);
-            // https://observablehq.com/@mbostock/fetch-utf-16
-            fetch('/data.txt').then(response => response.arrayBuffer()).then(buffer => {
-                const lines = new TextDecoder('utf-16le').decode(buffer).substring(1).split('\n'); // skip bom
-                const phonetics: phoneme[] = [];
-
-                // regex to match each phoneme, e.g. /ie|a|i|e|.../ with longest phonemes first
-                const r_vowel = new RegExp([...Object.keys(VowelOrder)].join('|'), 'g');
-
-                const formattedConsonants = Object.keys(ConsonantOrder).sort((a, b) => b.length - a.length).join('|');
-                const r_tail_c = new RegExp(`(${formattedConsonants})$`);
-                const r_stress_c = new RegExp(`^(${formattedConsonants})`); // note that lead and primary stressed const are the same
-                const r_sec_c = new RegExp(`ˌ(${formattedConsonants})`, 'g');
-
-                const [reg, rep, joinedReg] = formatConversion();
-
-                lines.forEach((line) => {
-                    if (line.length == 0) return;
-                    line = line.trim();
-
-                    let [word, pron] = line.split('=');
-                    pron = toIpa(pron, reg as RegExp, rep as Record<string, replacement[]>, joinedReg as RegExp);
-
-                    const primary = pron.includes('ˈ') ? pron.split('ˈ')[1] : pron;
-                    const stressedConst = readRegex(primary.match(r_stress_c));
-
-                    phonetics.push({
-                        word: word,
-                        pronunciation: pron,
-                        primary: {
-                            vowels: [...primary.matchAll(r_vowel)].map(x => x[0] as string),
-                            consonants: {
-                                stressed: [
-                                    stressedConst,
-                                    // dont question it
-                                    ...([...primary.matchAll(r_sec_c)].map(x => readRegex(x, 'ˌ')))
-                                ],
-                                leading: stressedConst,
-                                tail: readRegex(primary.match(r_tail_c))
-                            }
-                        }
-                    });
-                });
-
-                setData(phonetics);
-                console.log(phonetics.splice(0, 200));
-            });
-        }
-    }, [])
+    const vowelRef = useRef<PhoneticSearchControllerRef>(null);
+    const consonantRef = useRef<PhoneticSearchControllerRef>(null);
 
     function formatSearch() {
         let out = searchStr.map((s) => s ? ('* ' + s) : '').join(' ');
@@ -176,11 +114,33 @@ export default function PhoneticTree() {
         setFocused(valid.slice(0, 200));
     }
 
+    function handleExternalSearch(e: Event) {
+        if (!vowelRef.current || !consonantRef.current) return;
+
+        const event = e as CustomEvent;
+        const [pron, shouldSearch] = event.detail as [string, boolean];
+
+        // could also pull this info from internal dictionary if it exists
+        const primary = pron.includes('ˈ') ? pron.split('ˈ')[1] : pron;
+        const vowels = [...primary.matchAll(r_vowel)].map(x => x[0] as string);
+        const tailCon = readRegex(primary.match(r_tail_c));
+
+        vowelRef.current.update(vowels);
+        consonantRef.current.update([tailCon.length == 0 ? 'None' : tailCon]);
+
+        if (shouldSearch) search();
+    }
+
+    useEffect(() => {
+        window.addEventListener('phonetic-tree-external-search', handleExternalSearch);
+        return () => window.removeEventListener('phonetic-tree-external-search', handleExternalSearch);
+    }, [consonantState, vowelState, data]);
+
     return (
         <div className="flex gap-6">
             <div>
                 <div className="flex gap-4">
-                    <PhoneticSearchController num={4} props={{
+                    <PhoneticSearchController ref={vowelRef} num={4} props={{
                         states: vowelState,
                         setStates: setVowelStates,
                         search: search,
@@ -188,7 +148,7 @@ export default function PhoneticTree() {
                     }} customization={{
                         width: 'w-8'
                     }}/>
-                    <PhoneticSearchController num={1} props={{
+                    <PhoneticSearchController ref={consonantRef} num={1} props={{
                         states: consonantState,
                         setStates: setConsonantState,
                         search: search,
@@ -206,7 +166,7 @@ export default function PhoneticTree() {
                 {focused.map((p, i) => 
                     <div key={i} className="flex gap-2 h-8">
                         <span className="w-8 flex justify-center items-center font-semibold text-surface50 flex-shrink-0">{i + 1}</span>
-                        <button className="px-2 flex items-center justify-between rounded-sm whitespace-pre-wrap flex-grow min-w-0 bg-surface10 border border-surface20 group hover:bg-tonal0" onClick={() => window.dispatchEvent(new CustomEvent('force-set-search', { detail: p.word }))}>
+                        <button className="px-2 flex items-center justify-between rounded-sm whitespace-pre-wrap flex-grow min-w-0 bg-surface10 border border-surface20 group hover:bg-tonal0" onClick={() => window.dispatchEvent(new CustomEvent('force-set-file-search', { detail: p.word }))}>
                             <div className="flex-grow flex justify-start">
                                 <span className="mr-4 font-semibold min-w-32 text-left">{p.word[0].toUpperCase() + p.word.substring(1)}</span>
                                 <span>/{p.pronunciation}/</span>

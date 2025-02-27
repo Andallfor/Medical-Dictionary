@@ -1,34 +1,30 @@
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
-import Word from "./word";
+import { SingleWord } from "./word";
 import { getCollegiateDef, getMedicalDef } from "./api";
-import { mw } from "../phoneticTree/constants";
+import { mw, phoneme } from "../phoneticTree/constants";
 
-export function Search({ words, setWords }: { words: mw[][], setWords: Dispatch<SetStateAction<mw[][]>> }) {
+export function Search({ words, setWords, dictionary }: { words: mw[][], setWords: Dispatch<SetStateAction<mw[][]>>, dictionary: phoneme[] }) {
     const [searchError, setSearchError] = useState('');
     const [loading, setLoading] = useState('');
+    const [isUserSearch, setIsUserSearch] = useState(false);
     const search = useRef<HTMLInputElement | null>(null);
 
-    async function handleSearch() {
+    async function handleSearch(userSearch: boolean) {
         if (!search.current) return;
+        setIsUserSearch(userSearch);
 
         // TODO: add support for multiple words
         const word = search.current.value.split(' ')[0];
         setLoading(`Searching for ${word}...`)
 
-        const med = await getMedicalDef(word);
-        if (med) {
-            setWords([med as mw[]]);
+        const [col, dym] = await getCollegiateDef(word);
+        if (col) {
+            setWords([col as mw[]]);
             setSearchError('');
         } else {
-            const [col, dym] = await getCollegiateDef(word);
-            if (col) {
-                setWords([col as mw[]]);
-                setSearchError('');
-            } else {
-                setSearchError('Unable to find ' + word);
-                setWords([]);
-                if (dym) console.log(dym);
-            }
+            setSearchError('Unable to find ' + word);
+            setWords([]);
+            if (dym) console.log(dym);
         }
 
         setLoading('');
@@ -40,11 +36,11 @@ export function Search({ words, setWords }: { words: mw[][], setWords: Dispatch<
             if (!search.current) return;
 
             search.current.value = event.detail;
-            handleSearch();
+            handleSearch(false);
         }
 
-        window.addEventListener('force-set-search', overrideSearch);
-        return () => window.removeEventListener('force-set-search', overrideSearch);
+        window.addEventListener('force-set-file-search', overrideSearch);
+        return () => window.removeEventListener('force-set-file-search', overrideSearch);
     }, [])
 
     return (
@@ -52,7 +48,7 @@ export function Search({ words, setWords }: { words: mw[][], setWords: Dispatch<
             <div className="flex items-center">
                 <i className="absolute ri-search-line pl-2 ri-lg translate-y-[-1px]"></i>
                 <input className="w-full bg-tonal0 rounded-md px-2 py-1 text-2xl pl-10 placeholder:text-surface30 placeholder:italic"
-                    placeholder="Search" type="text" onKeyDown={(k) => k.key == 'Enter' ? handleSearch() : null} ref={search} />
+                    placeholder="Search" type="text" onKeyDown={(k) => k.key == 'Enter' ? handleSearch(true) : null} ref={search} />
             </div>
             {loading == '' ? '' : (
                 <div className="flex items-center mt-1">
@@ -66,7 +62,8 @@ export function Search({ words, setWords }: { words: mw[][], setWords: Dispatch<
                     <div className="flex mt-2 mb-6">
                         <div className="bg-surface20 w-[2px] mx-2"></div>
                         <div className="mt-3 mb-2">
-                            <Word words={words} />
+                        { words.length == 0 ? ""
+                            : words.map((word, id) => <SingleWord words={word} key={id} dictionary={dictionary} userSearch={isUserSearch}/>)}
                         </div>
                     </div>
                 )

@@ -1,24 +1,34 @@
-import { mw } from "../phoneticTree/constants";
+import { mw, phoneme, replacement } from "../phoneticTree/constants";
+import { formatConversion, toIpa } from "../phoneticTree/tree";
 import { getAudio, getCollegiateDef } from "./api";
 import { useEffect, useRef, useState } from "react";
 
-function SingleWord({ words }: { words: mw[] }) {
+export function SingleWord({ words, dictionary, userSearch }: { words: mw[], dictionary: phoneme[], userSearch: boolean }) {
   const audioPlayer = useRef<HTMLAudioElement | null>(null);
   const [phonetics, setPhonetics] = useState('');
 
   useEffect(() => {
     if (!words[0].hwi.prs) return;
-    setPhonetics(words[0].hwi.prs[0].mw.trim());
 
-    if (phonetics.startsWith('-')) {
-      // for some reason medical words do not always provide their full pronunciation if it is also provided in the collegiate API
-      setPhonetics('Loading...');
-      getCollegiateDef(words[0].meta.id).then(([a, b]) => {
-        if (a != undefined) {
-          setPhonetics(a[0].hwi.prs[0].mw.trim());
-        }
-      });
+    const word = words[0];
+    const ref = dictionary.find((p) => p.word.toLowerCase() == word.searchTerm);
+    let pron = '';
+    if (ref) {
+      pron = ref.pronunciation;
+      setPhonetics(ref.pronunciation);
+    } else {
+      let str = words[0].hwi.prs[0].mw.trim();
+
+      str = str.replaceAll('-', '');
+      const [a, b, c] = formatConversion();
+      str = toIpa(str, a as RegExp, b as Record<string, replacement[]>, c as RegExp);
+
+      pron = str;
+      setPhonetics('*' + str);
     }
+
+    if (userSearch) window.dispatchEvent(new CustomEvent('phonetic-tree-external-search', { detail: [pron, true] }));
+
   }, [words]);
 
   return (
@@ -34,22 +44,12 @@ function SingleWord({ words }: { words: mw[] }) {
           </button>
         ) : <span className="text-base mx-6">[No audio found]</span>}
         </div>
-      <div className="ml-1 mt-1 text-primary40">└<span className="ml-2">{words[0].shortdef}</span></div>
-      {/*
-      <div className="text-lg ml-2">
-        <div>Related Words:</div>
-        {words.slice(1).map((w, ind) => (<div key={ind} className="capitalize">- {w.meta.id}</div>))}
+      <div className="ml-1 mt-1 text-primary40">
+        <div className="italic">{words[0].fl}</div>
+        {words[0].shortdef.map((s, k) => 
+          <div className="ml-2" key={k}>{k+1}. {s}</div>
+        )}
       </div>
-      */}
     </div>
   );
-}
-
-export default function Word({ words }: { words: mw[][] }) {
-  return (
-    <div>
-      { words.length == 0 ? ""
-        : words.map((word, id) => <SingleWord words={word} key={id}/>)}
-    </div>
-  )
 }

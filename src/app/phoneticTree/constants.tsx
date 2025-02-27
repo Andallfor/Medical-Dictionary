@@ -26,7 +26,8 @@ export interface mw {
     def: {
         sseq: sense[][]
     }[],
-    shortdef: string[]
+    shortdef: string[],
+    searchTerm: string,
 }
 
 export interface phoneme {
@@ -212,4 +213,18 @@ export const toStandardized: Record<string, string | replacement[]> = {
     'ir': 'iɚ',
     'er': 'ɛɚ',
     'u̇r': 'ʊɚ',
+}
+
+// regex to match each phoneme, e.g. /ie|a|i|e|.../ with longest phonemes first
+export const r_vowel = new RegExp([...Object.keys(VowelOrder)].join('|'), 'g');
+export const formattedConsonants = Object.keys(ConsonantOrder).sort((a, b) => b.length - a.length).join('|');
+export const r_tail_c = new RegExp(`(${formattedConsonants})$`);
+export const r_stress_c = new RegExp(`^(${formattedConsonants})`); // note that lead and primary stressed const are the same
+export const r_sec_c = new RegExp(`ˌ(${formattedConsonants})`, 'g');
+
+export function readRegex(r: RegExpMatchArray | null, rm = '') {
+    if (r) {
+        if (rm != '') return r[0].replace(rm, '');
+        else return r[0];
+    } else return '';
 }

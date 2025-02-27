@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { Dispatch, Ref, SetStateAction, useEffect, useImperativeHandle, useState } from "react";
 import { ConsonantSearch, VowelOrder, branchState } from "./constants";
 
 interface customizationProps {
@@ -7,6 +7,7 @@ interface customizationProps {
 
 interface phoneticSearchProps {
     num: number;
+    ref: Ref<PhoneticSearchControllerRef>;
     props: {
         list: string[];
         states: branchState[];
@@ -14,6 +15,10 @@ interface phoneticSearchProps {
         search: () => void;
     };
     customization: customizationProps;
+}
+
+export type PhoneticSearchControllerRef = {
+    update: (symbols: string[]) => void;
 }
 
 export function Branch({ state, customization, update }: { state: branchState, customization: customizationProps, update: (i: number, s: string | undefined, search: boolean) => void }) {
@@ -33,7 +38,7 @@ export function Branch({ state, customization, update }: { state: branchState, c
     function buttonStyle(v: string) {
         if (state.active) {
             return state.phoneme == v
-            ? 'text-tonal10 font-semibold ' + (state.shouldSearch ? 'bg-red-500' : 'bg-[#79bd92]')
+            ? 'text-tonal10 font-semibold ' + ((state.shouldSearch || state.autoSearch) ? 'bg-red-500' : 'bg-[#79bd92]')
             : 'hover:bg-surface20';
         } else return 'pointer-events-none';
     }
@@ -52,7 +57,7 @@ export function Branch({ state, customization, update }: { state: branchState, c
     );
 }
 
-export function PhoneticSearchController({ num, props, customization }: phoneticSearchProps ) {
+export function PhoneticSearchController({ ref, num, props, customization }: phoneticSearchProps ) {
     useEffect(() => {
         const state: branchState[] = [];
         for (let i = 0; i < num; i++) {
@@ -90,6 +95,22 @@ export function PhoneticSearchController({ num, props, customization }: phonetic
         props.setStates(state);
         if (search) props.search();
     }
+
+    useImperativeHandle(ref, () => ({
+        update(symbols) {
+            updateBranch(0, undefined, false);
+
+            let j = 0;
+            symbols.forEach(s => {
+                if (j >= props.states.length) return;
+
+                if (props.list.includes(s)) {
+                    updateBranch(j, s, false);
+                    j++;
+                }
+            })
+        },
+    }));
 
     return (
         <div className="flex gap-2">

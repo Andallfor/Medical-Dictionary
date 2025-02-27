@@ -12,10 +12,15 @@ export async function getMedicalDef(word: string): Promise<mw[] | undefined> {
     if (!data) return undefined;
 
     if (typeof data[0] == 'string' || (data as string[]).length == 0) return undefined;
-    else return data as mw[];
+    else {
+        const d = data as mw[];
+        for (let i = 0; i < d.length; i++) d[i].searchTerm = word;
+
+        return d;
+    }
 }
 
-export async function getCollegiateDef(word: String): Promise<[mw[] | undefined, string[] | undefined]> {
+export async function getCollegiateDef(word: string): Promise<[mw[] | undefined, string[] | undefined]> {
     let data = null;
     await axios.get("https://dictionaryapi.com/api/v3/references/collegiate/json/" + word.toLowerCase(), {
         params: {
@@ -23,14 +28,15 @@ export async function getCollegiateDef(word: String): Promise<[mw[] | undefined,
         }
     }).then((r) => {data = r.data});
 
-    console.log(data);
-
     if (!data || (data as string[]).length == 0) return [undefined, undefined];
 
-    console.log(data);
-
     if (typeof data[0] == 'string') return [undefined, data as string[]];
-    else return [data as mw[], undefined];
+    else {
+        const d = data as mw[];
+        for (let i = 0; i < d.length; i++) d[i].searchTerm = word;
+
+        return [d, undefined];
+    }
 }
 
 export function getAudio(w: prs) {
