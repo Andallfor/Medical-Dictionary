@@ -6,7 +6,7 @@ import FileInput, { fileData } from "./fileSearch/input";
 import FileSearch from "./fileSearch/search";
 import PhoneticTree, { formatConversion, toIpa } from "./phoneticTree/tree";
 import { Search } from "./search/search";
-import { ConsonantOrder, VowelOrder, mw, phoneme, r_sec_c, r_stress_c, r_tail_c, r_vowel, readRegex, replacement } from "./phoneticTree/constants";
+import { mw, phoneme, r_sec_c, r_stress_c, r_tail_c, r_vowel, readRegex, replacement } from "./phoneticTree/constants";
 
 export default function Home() {
     const [words, setWords] = useState<mw[][]>([]);
@@ -56,7 +56,6 @@ export default function Home() {
                 });
 
                 setData(phonetics);
-                console.log(phonetics.splice(0, 200));
             });
         }
     }, [])

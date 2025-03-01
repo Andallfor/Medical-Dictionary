@@ -190,6 +190,8 @@ export const toStandardized: Record<string, string | replacement[]> = {
     'θ': 'th̬',
     'ʒ': 'zh',
     'ə': [{to: 'ʌ', whenStress: true}],
+    'ɡ':'g',
+    'ɒ': 'a',
 
     // mw
     'ē': [{to: 'i', whenStress: true},

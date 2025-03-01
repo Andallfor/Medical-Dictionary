@@ -94,7 +94,7 @@ export default function PhoneticTree({ data }: { data: phoneme[] }) {
 
         valid.sort((a, b) => {
             const av = a.primary.vowels;
-            const bv  = b.primary.vowels;
+            const bv = b.primary.vowels;
 
             for (let i = 0; i < Math.max(av.length, bv.length); i++) {
                 // TODO: currently we prioritize exact matches
@@ -104,7 +104,10 @@ export default function PhoneticTree({ data }: { data: phoneme[] }) {
                 if (ac - bc != 0) return ac - bc;
             }
 
-            const pc = ConsonantOrder[a.primary.consonants.leading] - ConsonantOrder[b.primary.consonants.leading];
+            // prioritize words with no leading consonant
+            const alc = a.primary.consonants.leading.length == 0 ? -1 : ConsonantOrder[a.primary.consonants.leading];
+            const blc = b.primary.consonants.leading.length == 0 ? -1 : ConsonantOrder[b.primary.consonants.leading];
+            const pc = alc - blc;
             if (pc != 0) return pc;
 
             const tc = ConsonantOrder[a.primary.consonants.tail] - ConsonantOrder[b.primary.consonants.tail];

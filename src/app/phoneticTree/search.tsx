@@ -1,5 +1,5 @@
 import { Dispatch, Ref, SetStateAction, useEffect, useImperativeHandle, useState } from "react";
-import { ConsonantSearch, VowelOrder, branchState } from "./constants";
+import { branchState } from "./constants";
 
 interface customizationProps {
     width: string;
