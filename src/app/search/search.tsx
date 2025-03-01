@@ -4,36 +4,47 @@ import { getCollegiateDef, getMedicalDef } from "./api";
 import { mw, phoneme } from "../phoneticTree/constants";
 import { capitalize } from "../util";
 
-export function Search({ words, setWords, dictionary }: { words: mw[][], setWords: Dispatch<SetStateAction<mw[][]>>, dictionary: phoneme[] }) {
-    const [searchError, setSearchError] = useState('');
+export function Search({ setFocused, dictionary }: { setFocused: Dispatch<SetStateAction<string>>, dictionary: phoneme[] }) {
     const [loading, setLoading] = useState('');
     const [isUserSearch, setIsUserSearch] = useState(false);
     const [searchHistory, setSearchHistory] = useState<string[]>([]);
+    const [displayIndex, setDisplayIndex] = useState(0);
+    const [words, setWords] = useState<(mw[] | string)[]>([]);
     const search = useRef<HTMLInputElement | null>(null);
 
     async function handleSearch(userSearch: boolean) {
         if (!search.current) return;
-        setIsUserSearch(userSearch);
         search.current.blur();
+
+        if (search.current.value == '') {
+            setWords([]);
+            setFocused('');
+            return;
+        }
+
+        setIsUserSearch(userSearch);
 
         const history = [search.current.value, ...searchHistory];
         if (history.length > 20) history.pop();
         setSearchHistory(history);
 
-        // TODO: add support for multiple words
-        const word = search.current.value.split(' ')[0];
-        setLoading(`Searching for ${word}...`)
+        setDisplayIndex(0);
+        setLoading(`Searching for ${search.current.value}...`)
+        const w = search.current.value.split(' ');
 
-        const [col, dym] = await getCollegiateDef(word);
-        if (col) {
-            setWords([col as mw[]]);
-            setSearchError('');
-        } else {
-            setSearchError('Unable to find ' + word);
-            setWords([]);
-            if (dym) console.log(dym);
+        const state: (mw[] | string)[] = [];
+        for (let i = 0; i < w.length; i++) {
+            const word = w[i];
+            const [col, dym] = await getCollegiateDef(word); // could be more efficient if we perform requests in parallel but like were requesting up to like 3 words max
+            if (col) state.push(col as mw[]);
+            else {
+                state.push(word);
+                if (dym) console.log(dym);
+            }
         }
 
+        setWords(state);
+        setFocused(search.current.value);
         setLoading('');
     }
 
@@ -73,18 +84,17 @@ export function Search({ words, setWords, dictionary }: { words: mw[][], setWord
                     {loading}
                 </div>
             )}
-            {words.length == 0
-                ? (<div className="text-lg ml-2 mt-1 text-[#d9646c]">{searchError}</div>)
-                : (
-                    <div className="flex mt-2 mb-6">
+            {words.length == 0 ? <></> : (<>
+                {typeof words[displayIndex] == 'string'
+                 ? <div className="text-lg ml-2 mt-1 text-[#d9646c]">Unable to find {words[displayIndex] as string}.</div>
+                 : (<div className="flex mt-2 mb-6">
                         <div className="bg-surface20 w-[2px] mx-2"></div>
                         <div className="mt-3 mb-2">
-                        { words.length == 0 ? ""
-                            : words.map((word, id) => <SingleWord words={word} key={id} dictionary={dictionary} userSearch={isUserSearch}/>)}
+                        <SingleWord words={words[displayIndex] as mw[]} dictionary={dictionary} userSearch={isUserSearch}/>
                         </div>
-                    </div>
-                )
-            }
+                    </div>)
+                }
+            </>)}
         </div>
     )
 }

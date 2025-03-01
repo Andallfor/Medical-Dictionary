@@ -9,6 +9,7 @@ import { Search } from "./search/search";
 import { mw, phoneme, r_sec_c, r_stress_c, r_tail_c, r_vowel, readRegex, replacement } from "./phoneticTree/constants";
 
 export default function Home() {
+    const [focusedWord, setFocusedWord] = useState<string>('');
     const [words, setWords] = useState<mw[][]>([]);
     const [files, setFiles] = useState<fileData[]>([]);
 
@@ -67,8 +68,8 @@ export default function Home() {
                     <PhoneticTree data={data}/>
                 </div>
                 <div className="flex flex-col gap-4">
-                    <Search words={words} setWords={setWords} dictionary={data} />
-                    <FileSearch files={files} phrase={words.map(x => x[0].meta.stems[0]).join(' ')} />
+                    <Search setFocused={setFocusedWord} dictionary={data} />
+                    <FileSearch files={files} phrase={focusedWord} />
                     <FileInput files={files} setFiles={setFiles} />
                 </div>
             </div>
