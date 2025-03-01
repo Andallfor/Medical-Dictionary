@@ -2,16 +2,23 @@ import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import { SingleWord } from "./word";
 import { getCollegiateDef, getMedicalDef } from "./api";
 import { mw, phoneme } from "../phoneticTree/constants";
+import { capitalize } from "../util";
 
 export function Search({ words, setWords, dictionary }: { words: mw[][], setWords: Dispatch<SetStateAction<mw[][]>>, dictionary: phoneme[] }) {
     const [searchError, setSearchError] = useState('');
     const [loading, setLoading] = useState('');
     const [isUserSearch, setIsUserSearch] = useState(false);
+    const [searchHistory, setSearchHistory] = useState<string[]>([]);
     const search = useRef<HTMLInputElement | null>(null);
 
     async function handleSearch(userSearch: boolean) {
         if (!search.current) return;
         setIsUserSearch(userSearch);
+        search.current.blur();
+
+        const history = [search.current.value, ...searchHistory];
+        if (history.length > 20) history.pop();
+        setSearchHistory(history);
 
         // TODO: add support for multiple words
         const word = search.current.value.split(' ')[0];
@@ -35,20 +42,30 @@ export function Search({ words, setWords, dictionary }: { words: mw[][], setWord
             const event = e as CustomEvent;
             if (!search.current) return;
 
-            search.current.value = event.detail;
-            handleSearch(false);
+            const [text, user] = event.detail as [string, boolean];
+            search.current.value = text;
+            handleSearch(user);
         }
 
         window.addEventListener('force-set-file-search', overrideSearch);
         return () => window.removeEventListener('force-set-file-search', overrideSearch);
-    }, [])
+    }, [searchHistory]);
 
     return (
-        <div className="w-full">
-            <div className="flex items-center">
+        <div className="w-full relative">
+            <div className="flex items-center peer">
                 <i className="absolute ri-search-line pl-2 ri-lg translate-y-[-1px]"></i>
                 <input className="w-full bg-tonal0 rounded-md px-2 py-1 text-2xl pl-10 placeholder:text-surface30 placeholder:italic"
                     placeholder="Search" type="text" onKeyDown={(k) => k.key == 'Enter' ? handleSearch(true) : null} ref={search} />
+            </div>
+            <div className="absolute scale-y-0 peer-has-[:focus]:scale-y-100 bg-surface10 mt-2 w-full rounded-md text-base">
+                <div className="mx-2">
+                    {searchHistory.length > 0 ? searchHistory.map((x, k) => <div key={k} className="my-1 pl-2 rounded-md w-full hover:bg-surface20">
+                        <button className="w-full text-left" onMouseDown={() => window.dispatchEvent(new CustomEvent('force-set-file-search', { detail: [x, true] }))}>
+                            {capitalize(x)}
+                        </button>
+                    </div>) : <></>}
+                </div>
             </div>
             {loading == '' ? '' : (
                 <div className="flex items-center mt-1">

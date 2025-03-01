@@ -217,7 +217,7 @@ export const toStandardized: Record<string, string | replacement[]> = {
 
 // regex to match each phoneme, e.g. /ie|a|i|e|.../ with longest phonemes first
 export const r_vowel = new RegExp([...Object.keys(VowelOrder)].join('|'), 'g');
-export const formattedConsonants = Object.keys(ConsonantOrder).sort((a, b) => b.length - a.length).join('|');
+export const formattedConsonants = Object.keys(ConsonantOrder).sort((a, b) => b.length - a.length).join('|') as string;
 export const r_tail_c = new RegExp(`(${formattedConsonants})$`);
 export const r_stress_c = new RegExp(`^(${formattedConsonants})`); // note that lead and primary stressed const are the same
 export const r_sec_c = new RegExp(`ˌ(${formattedConsonants})`, 'g');

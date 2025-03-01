@@ -1,5 +1,6 @@
 import { mw, phoneme, replacement } from "../phoneticTree/constants";
 import { formatConversion, toIpa } from "../phoneticTree/tree";
+import { capitalize } from "../util";
 import { getAudio, getCollegiateDef } from "./api";
 import { useEffect, useRef, useState } from "react";
 
@@ -47,7 +48,10 @@ export function SingleWord({ words, dictionary, userSearch }: { words: mw[], dic
       <div className="ml-1 mt-1 text-primary40">
         <div className="italic">{words[0].fl}</div>
         {words[0].shortdef.map((s, k) => 
-          <div className="ml-2" key={k}>{k+1}. {s}</div>
+          <div key={k} className="ml-2 flex">
+            <div>{k+1}.</div>
+            <div className="ml-1">{capitalize(s)}</div>
+          </div>
         )}
       </div>
     </div>

@@ -166,7 +166,7 @@ export default function PhoneticTree({ data }: { data: phoneme[] }) {
                 {focused.map((p, i) => 
                     <div key={i} className="flex gap-2 h-8">
                         <span className="w-8 flex justify-center items-center font-semibold text-surface50 flex-shrink-0">{i + 1}</span>
-                        <button className="px-2 flex items-center justify-between rounded-sm whitespace-pre-wrap flex-grow min-w-0 bg-surface10 border border-surface20 group hover:bg-tonal0" onClick={() => window.dispatchEvent(new CustomEvent('force-set-file-search', { detail: p.word }))}>
+                        <button className="px-2 flex items-center justify-between rounded-sm whitespace-pre-wrap flex-grow min-w-0 bg-surface10 border border-surface20 group hover:bg-tonal0" onClick={() => window.dispatchEvent(new CustomEvent('force-set-file-search', { detail: [p.word, false] }))}>
                             <div className="flex-grow flex justify-start">
                                 <span className="mr-4 font-semibold min-w-32 text-left">{p.word[0].toUpperCase() + p.word.substring(1)}</span>
                                 <span>/{p.pronunciation}/</span>
