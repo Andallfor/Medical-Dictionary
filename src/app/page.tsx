@@ -10,7 +10,6 @@ import { mw, phoneme, r_sec_c, r_stress_c, r_tail_c, r_vowel, readRegex, replace
 
 export default function Home() {
     const [focusedWord, setFocusedWord] = useState<string>('');
-    const [words, setWords] = useState<mw[][]>([]);
     const [files, setFiles] = useState<fileData[]>([]);
 
     // internal dictionary

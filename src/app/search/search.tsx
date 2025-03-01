@@ -10,12 +10,15 @@ export function Search({ setFocused, dictionary }: { setFocused: Dispatch<SetSta
     const [searchHistory, setSearchHistory] = useState<string[]>([]);
     const [displayIndex, setDisplayIndex] = useState(0);
     const [words, setWords] = useState<(mw[] | string)[]>([]);
+    const [dirty, setDirty] = useState(false);
     const search = useRef<HTMLInputElement | null>(null);
 
     async function handleSearch(userSearch: boolean) {
         if (!search.current) return;
         search.current.blur();
 
+        // due to how we style the input bar we cant handle multiple spaces
+        search.current.value = search.current.value.replace(/ {2}/g, '')
         if (search.current.value == '') {
             setWords([]);
             setFocused('');
@@ -23,6 +26,7 @@ export function Search({ setFocused, dictionary }: { setFocused: Dispatch<SetSta
         }
 
         setIsUserSearch(userSearch);
+        setDirty(false);
 
         const history = [search.current.value, ...searchHistory];
         if (history.length > 20) history.pop();
@@ -48,6 +52,11 @@ export function Search({ setFocused, dictionary }: { setFocused: Dispatch<SetSta
         setLoading('');
     }
 
+    function switchWord(ind: number) {
+        if (displayIndex == ind) return;
+        setDisplayIndex(ind);
+    }
+
     useEffect(() => {
         function overrideSearch(e: Event) {
             const event = e as CustomEvent;
@@ -64,10 +73,22 @@ export function Search({ setFocused, dictionary }: { setFocused: Dispatch<SetSta
 
     return (
         <div className="w-full relative">
-            <div className="flex items-center peer">
+            <div className="flex items-center peer group">
                 <i className="absolute ri-search-line pl-2 ri-lg translate-y-[-1px]"></i>
-                <input className="w-full bg-tonal0 rounded-md px-2 py-1 text-2xl pl-10 placeholder:text-surface30 placeholder:italic"
-                    placeholder="Search" type="text" onKeyDown={(k) => k.key == 'Enter' ? handleSearch(true) : null} ref={search} />
+                <div className="absolute flex translate-y-[calc(100%-4px)x] ml-10 group-has-[:focus]:invisible">
+                    {/* we uh need custom formatted of the input text box text... which isnt possible.
+                      * so replicate the input text below and style on that (just underline and button which is why this is possible)
+                      * something like a contenteditable=true could work but that introduces a lot of potential bugs */}
+                    {!dirty && search.current?.value.split(' ').map((x, k) =>
+                        <button key={k} className="flex text-2xl" onClick={() => switchWord(k)}>
+                            {k == 0 ? <></> : <div>&nbsp;</div>}
+                            <div className={"border-b-[2px] -translate-y-[2px] " + (displayIndex == k ? 'border-[#f2e194]' : 'border-surface40')}>
+                                <span className="invisible">{x}</span>
+                            </div>
+                        </button>)}
+                </div>
+                <input className="w-full bg-tonal0 rounded-md px-2 py-1 text-2xl pl-10 placeholder:text-surface30 placeholder:italic focus:bg-surface10 outline-none"
+                    placeholder="Search" type="text" onKeyDown={(k) => k.key == 'Enter' ? handleSearch(true) : (!dirty ? setDirty(true) : null)} ref={search} />
             </div>
             <div className="absolute scale-y-0 peer-has-[:focus]:scale-y-100 bg-surface10 mt-2 w-full rounded-md text-base">
                 <div className="mx-2">
