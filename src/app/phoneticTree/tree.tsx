@@ -126,6 +126,13 @@ export default function PhoneticTree({ data }: { data: phoneme[] }) {
         if (shouldSearch) search();
     }
 
+    function clear() {
+        setFocused([]);
+        setSearchStr([]);
+        vowelRef.current?.update([]);
+        consonantRef.current?.update([]);
+    }
+
     useEffect(() => {
         window.addEventListener('phonetic-tree-external-search', handleExternalSearch);
         return () => window.removeEventListener('phonetic-tree-external-search', handleExternalSearch);
@@ -156,7 +163,12 @@ export default function PhoneticTree({ data }: { data: phoneme[] }) {
             <div className="flex flex-col gap-2 py-3 pl-2 pr-5 bg-tonal0 rounded-lg flex-grow">
                 <div className="ml-1">{
                     searchStr.length == 0 ? 'No query.' :
-                        <span>Found {focused.length}{focused.length >= 200 ? '+' : ''} matches for <span className="font-semibold">/{formatSearch()}/:</span></span>
+                        <div className="flex justify-between">
+                            <span>Found {focused.length}{focused.length >= 200 ? '+' : ''} matches for <span className="font-semibold">/{formatSearch()}/:</span></span>
+                            <button onClick={clear}>
+                                <i className="ri-close-line border border-surface20 bg-surface10 hover:bg-tonal0 text-primary0 p-1 rounded-md"></i>
+                            </button>
+                        </div>
                 }</div>
                 {focused.map((p, i) => 
                     <div key={i} className="flex gap-2 h-8">
