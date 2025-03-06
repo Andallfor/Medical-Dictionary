@@ -51,3 +51,12 @@ export function getAudio(w: prs) {
 
     return link;
 }
+
+export function hasAudio(w: prs[]) {
+    if (!w) return false;
+    for (let i = 0; i < w.length; i++) {
+        if (w[i].sound) return w[i];
+    }
+
+    return false;
+}

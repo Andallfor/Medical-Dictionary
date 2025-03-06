@@ -1,9 +1,16 @@
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
-import { ConsonantOrder, ConsonantSearch, VowelOrder, branchState, phoneme, r_tail_c, r_vowel, readRegex, replacement, toStandardized } from "./constants";
+import { ConsonantOrder, ConsonantSearch, VowelOrder, branchState, phoneme, r_tail_c, r_vowel, readRegex, replacement, standardize, standardizeType } from "./constants";
 import { PhoneticSearchController, PhoneticSearchControllerRef } from "./search";
 
-export function toIpa(str: string, base: RegExp, rep: Record<string, replacement[]>, joinedReg: RegExp) {
-    str = str.replaceAll(base, (v) => toStandardized[v] as string);
+export function toIpa(str: string, from: standardizeType) {
+    const standard = standardize.get(from);
+    const proc = standardize.getProcessed(from);
+
+    const base = proc.base;
+    const rep = proc.rep
+    const joinedReg = proc.joinedReg;
+
+    str = str.replaceAll(base, (v) => standard[v] as string);
 
     const ind = [...str.matchAll(new RegExp([...Object.keys(rep)].join('|'), 'g'))];
     const stressUnits = [...str.matchAll(/ˈ|ˌ/g)].map(x => x.index!);
@@ -36,21 +43,6 @@ export function toIpa(str: string, base: RegExp, rep: Record<string, replacement
     }
 
     return str;
-}
-
-export function formatConversion() {
-    const keys = Object.keys(toStandardized).sort((a, b) => a.length - b.length);
-    const base: Record<string, string> = {};
-    const rep: Record<string, replacement[]> = {};
-
-    keys.forEach(k => {
-        if (typeof toStandardized[k] == 'string') base[k] = toStandardized[k] as string;
-        else rep[k] = toStandardized[k] as replacement[];
-    });
-
-    const reg = new RegExp([...Object.keys(base)].sort((a, b) => b.length - a.length).join('|'), 'g');
-    const joinedReg = new RegExp([...Object.keys(VowelOrder), ...Object.keys(rep)].sort((a, b) => b.length - a.length).join('|'));
-    return [reg, rep, joinedReg];
 }
 
 export default function PhoneticTree({ data }: { data: phoneme[] }) {

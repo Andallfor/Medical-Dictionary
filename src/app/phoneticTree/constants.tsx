@@ -66,7 +66,7 @@ export const VowelOrder: Record<string, number> = {
     'æ': 4,
     'ə': 5,
     'ʌ': 6,
-    'ɚ': 7,
+    'əː': 7,
     'u': 8,
     'ʊ': 9,
     'o': 10,
@@ -135,90 +135,120 @@ export const ConsonantSearch: string[] = [
     'j'
 ]
 
-export const oedToIpa: Record<string, string> = {
-    'ɪ(ə)r': 'iɚ',
-    'ɛ(ə)r': 'ɛɚ',
-    'ʊ(ə)r': 'ʊɚ',
-    'eɪ': 'e',
-    'ər': 'ɚ',
-    'oʊ': 'o',
-    'ɑr': 'ar',
-    'kl': 'cl',
-    'kr': 'cr',
-    'kj': 'ky',
-    'tʃ': 'ch',
-    'dʒ': 'j',
-    '(h)w': 'wh̤',
-    'ɑ': 'a',
-    'ɑ̃': 'an',
-    'æ̃': 'n',
-    'ᵻ': 'ɪ',
-    'ᵿ': 'ə',
-    'ŋ': 'ng',
-    'x': 'k',
-    'ʃ': 'sh',
-    'ð': 'th̥',
-    'θ': 'th̬',
-    'ʒ': 'zh',
-};
+export type standardizeType = 'OED' | 'MW';
 
-// note that the standard we use is a custom modified IPA
-export const toStandardized: Record<string, string | replacement[]> = {
-    // oed
-    'ɪ(ə)r': 'iɚ',
-    'ɛ(ə)r': 'ɛɚ',
-    'ʊ(ə)r': 'ʊɚ',
-    'eɪ': 'e',
-    'ər': 'ɚ',
-    'oʊ': 'o',
-    'ɑr': 'ar',
-    'kl': 'cl',
-    'kr': 'cr',
-    'kj': 'ky',
-    'tʃ': 'ch',
-    'dʒ': 'j',
-    '(h)w': 'wh̤',
-    'ɑ': 'a',
-    'ɑ̃': 'an',
-    'æ̃': 'n',
-    'ᵻ': 'ɪ',
-    'ᵿ': 'ə',
-    'ŋ': 'ng',
-    'x': 'k',
-    'ʃ': 'sh',
-    'ð': 'th̥',
-    'θ': 'th̬',
-    'ʒ': 'zh',
-    'ə': [{to: 'ʌ', whenStress: true}],
-    'ɡ':'g',
-    'ɒ': 'a',
+type standardizeProcessed = {
+    base: RegExp;
+    rep: Record<string, replacement[]>;
+    joinedReg: RegExp;
+}
 
-    // mw
-    'ē': [{to: 'i', whenStress: true},
-          {to: 'ɪ', whenStress: false}],
-    'i': 'ɪ',
-    'ā': 'e',
-    'e': 'ɛ',
-    'a': 'æ',
-    // ə -> ʌ when stressed, matched in oed section
-    // ər -> ɚ, matched in oed section
-    'ü': 'u',
-    'u̇': 'ʊ',
-    'ō': 'o',
-    'ȯ': 'ɔ',
-    'ȯr': 'ɔr', // this is tech redundant
-    'ä': 'a',
-    'är': 'ar', // similarly redundant
-    'ī': 'aɪ',
-    'ȯi': 'ɔi',
-    'au̇': 'au',
-    'ir': 'iɚ',
-    'er': 'ɛɚ',
-    'u̇r': 'ʊɚ',
+// move into separate file?
+export class standardize {
+    static get(t: standardizeType) {
+        if (t == 'OED') return standardize.fromOed;
+        else return standardize.fromMw;
+    }
+
+    static getProcessed(t: standardizeType) {
+        if (!standardize._p_mw) {
+            const [a, b, c] = standardize._format(standardize.fromMw);
+            standardize._p_mw = {
+                base: a as RegExp,
+                rep: b as Record<string, replacement[]>,
+                joinedReg: c as RegExp,
+            };
+        }
+        if (!standardize._p_oed) {
+            const [a, b, c] = standardize._format(standardize.fromOed);
+            standardize._p_oed = {
+                base: a as RegExp,
+                rep: b as Record<string, replacement[]>,
+                joinedReg: c as RegExp,
+            };
+        }
+
+        if (t == 'OED') return standardize._p_oed!;
+        else return standardize._p_mw!;
+    }
+
+    static fromOed: Record<string, string | replacement[]> = {
+        'ɪ(ə)r': 'iɚ',
+        'ɛ(ə)r': 'ɛɚ',
+        'ʊ(ə)r': 'ʊɚ',
+        'eɪ': 'e',
+        'ər': 'əː',
+        'oʊ': 'o',
+        'ɑr': 'ar',
+        'kl': 'cl',
+        'kr': 'cr',
+        'kj': 'ky',
+        'tʃ': 'ch',
+        'dʒ': 'j',
+        '(h)w': 'wh̤',
+        'ɑ': 'a',
+        'ɑ̃': 'an',
+        'æ̃': 'n',
+        'ᵻ': 'ɪ',
+        'ᵿ': 'ə',
+        'ŋ': 'ng',
+        'x': 'k',
+        'ʃ': 'sh',
+        'ð': 'th̥',
+        'θ': 'th̬',
+        'ʒ': 'zh',
+        'ə': [{to: 'ʌ', whenStress: true}],
+        'ɡ':'g',
+        'ɒ': 'a',
+    };
+    static _p_oed?: standardizeProcessed = undefined;
+
+    static fromMw: Record<string, string | replacement[]> = {
+        'ē': [{to: 'i', whenStress: true},
+              {to: 'ɪ', whenStress: false}],
+        'i': 'ɪ',
+        'ā': 'e',
+        'e': 'ɛ',
+        'a': 'æ',
+        'ə': [{to: 'ʌ', whenStress: true}],
+        'ər': 'əː',
+        'ü': 'u',
+        'u̇': 'ʊ',
+        'ō': 'o',
+        'ȯ': 'ɔ',
+        'ȯr': 'ɔr',
+        'ä': 'a',
+        'är': 'ar',
+        'ī': 'aɪ',
+        'ȯi': 'ɔi',
+        'au̇': 'au',
+        'ir': 'iɚ',
+        'er': 'ɛɚ',
+        'u̇r': 'ʊɚ',
+        'oe': 'eu',
+        'ue': 'iʊ',
+        'ᵊ': '',
+    };
+    static _p_mw?: standardizeProcessed = undefined;
+
+    static _format(r: Record<string, string | replacement[]>) {
+        const keys = Object.keys(r).sort((a, b) => a.length - b.length);
+        const base: Record<string, string> = {};
+        const rep: Record<string, replacement[]> = {};
+
+        keys.forEach(k => {
+            if (typeof r[k] == 'string') base[k] = r[k] as string;
+            else rep[k] = r[k] as replacement[];
+        });
+
+        const reg = new RegExp([...Object.keys(base)].sort((a, b) => b.length - a.length).join('|'), 'g');
+        const joinedReg = new RegExp([...Object.keys(VowelOrder), ...Object.keys(rep)].sort((a, b) => b.length - a.length).join('|'));
+        return [reg, rep, joinedReg];
+    }
 }
 
 // regex to match each phoneme, e.g. /ie|a|i|e|.../ with longest phonemes first
-export const r_vowel = new RegExp([...Object.keys(VowelOrder)].join('|'), 'g');
+export const r_vowel = new RegExp([...Object.keys(VowelOrder).sort((a, b) => b.length - a.length)].join('|'), 'g');
 export const formattedConsonants = Object.keys(ConsonantOrder).sort((a, b) => b.length - a.length).join('|') as string;
 export const r_tail_c = new RegExp(`(${formattedConsonants})$`);
 export const r_stress_c = new RegExp(`^(${formattedConsonants})`); // note that lead and primary stressed const are the same

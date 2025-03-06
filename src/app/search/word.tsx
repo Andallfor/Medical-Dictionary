@@ -1,12 +1,13 @@
 import { mw, phoneme, replacement } from "../phoneticTree/constants";
-import { formatConversion, toIpa } from "../phoneticTree/tree";
+import { toIpa } from "../phoneticTree/tree";
 import { capitalize } from "../util";
-import { getAudio, getCollegiateDef } from "./api";
+import { getAudio, getCollegiateDef, hasAudio } from "./api";
 import { useEffect, useRef, useState } from "react";
 
 export function SingleWord({ words, dictionary, userSearch }: { words: mw[], dictionary: phoneme[], userSearch: boolean }) {
     const audioPlayer = useRef<HTMLAudioElement | null>(null);
     const [phonetics, setPhonetics] = useState('');
+    const [shouldWarn, setShouldWarn] = useState(false);
 
     useEffect(() => {
         if (!words[0].hwi.prs) return;
@@ -17,15 +18,16 @@ export function SingleWord({ words, dictionary, userSearch }: { words: mw[], dic
         if (ref) {
             pron = ref.pronunciation;
             setPhonetics(ref.pronunciation);
+            setShouldWarn(false);
         } else {
             let str = words[0].hwi.prs[0].mw.trim();
 
             str = str.replaceAll('-', '');
-            const [a, b, c] = formatConversion();
-            str = toIpa(str, a as RegExp, b as Record<string, replacement[]>, c as RegExp);
+            str = toIpa(str, 'MW');
 
             pron = str;
-            setPhonetics('*' + str);
+            setPhonetics(str);
+            setShouldWarn(true);
         }
 
         if (userSearch) window.dispatchEvent(new CustomEvent('phonetic-tree-external-search', { detail: [pron, true] }));
@@ -33,19 +35,25 @@ export function SingleWord({ words, dictionary, userSearch }: { words: mw[], dic
     }, [words]);
 
     return (
-        <div>
+        <div className="ml-1">
             <div className="text-2xl flex items-center">
                 <span className="capitalize">{words[0].meta.id}</span>
-                {words[0].hwi.prs ? (
-                    <button className="mx-3 hover:bg-tonal0/70 border border-surface20 bg-tonal0 rounded-md px-2"
-                        onClick={() => audioPlayer.current ? audioPlayer.current.play() : null}>
-                        <span>{phonetics}</span>
-                        <i className=" ml-2 mr-1 ri-volume-up-fill text-primary40"></i>
-                        <audio src={getAudio(words[0].hwi.prs[0])} ref={audioPlayer}></audio>
-                    </button>
-                ) : <span className="text-base mx-6">[No audio found]</span>}
+                {(() => {
+                    const audio = hasAudio(words[0].hwi.prs);
+                    if (audio) {
+                        return (<>
+                            <button className={"ml-3 hover:bg-tonal0/70 border bg-tonal0 rounded-md px-2 text-xl py-0.5 " + (shouldWarn ? 'border-red-500' : 'border-surface20')}
+                                title={shouldWarn ? "Pronunciation was converted from MW and so may not be correct." : undefined}
+                                onClick={() => audioPlayer.current ? audioPlayer.current.play() : null}>
+                                <span>{phonetics}</span>
+                                <i className="ml-2 mr-1 ri-volume-up-fill text-primary40"></i>
+                                <audio src={getAudio(audio)} ref={audioPlayer}></audio>
+                            </button>
+                        </>)
+                    } else return <span className="text-base mx-6">[No audio found]</span>;
+                })()}
             </div>
-            <div className="ml-1 mt-1 text-primary40">
+            <div className="text-primary40">
                 <div className="italic">{words[0].fl}</div>
                 {words[0].shortdef.map((s, k) =>
                     <div key={k} className="ml-2 flex">

@@ -30,7 +30,7 @@ export function Search({ setFocused, dictionary }: { setFocused: Dispatch<SetSta
 
         const history = [search.current.value, ...searchHistory];
         if (history.length > 20) history.pop();
-        setSearchHistory(history);
+        setSearchHistory([...new Set(history)]);
 
         setDisplayIndex(0);
         setLoading(`Searching for ${search.current.value}...`)
@@ -73,6 +73,7 @@ export function Search({ setFocused, dictionary }: { setFocused: Dispatch<SetSta
 
     return (
         <div className="w-full relative">
+            {/* Search bar */}
             <div className="flex items-center peer group">
                 <i className="absolute ri-search-line pl-2 ri-lg translate-y-[-1px]"></i>
                 <div className="absolute flex translate-y-[calc(100%-4px)x] ml-10 group-has-[:focus]:invisible">
@@ -90,6 +91,7 @@ export function Search({ setFocused, dictionary }: { setFocused: Dispatch<SetSta
                 <input className="w-full bg-tonal0 rounded-md px-2 py-1 text-2xl pl-10 placeholder:text-surface30 placeholder:italic focus:bg-surface10 outline-none"
                     placeholder="Search" type="text" onKeyDown={(k) => k.key == 'Enter' ? handleSearch(true) : (!dirty ? setDirty(true) : null)} ref={search} />
             </div>
+            {/* Search history */}
             <div className="absolute scale-y-0 peer-has-[:focus]:scale-y-100 bg-surface10 mt-2 w-full rounded-md text-base">
                 <div className="mx-2">
                     {searchHistory.length > 0 ? searchHistory.map((x, k) => <div key={k} className="my-1 pl-2 rounded-md w-full hover:bg-surface20">
@@ -99,19 +101,21 @@ export function Search({ setFocused, dictionary }: { setFocused: Dispatch<SetSta
                     </div>) : <></>}
                 </div>
             </div>
+            {/* Loading indicator */}
             {loading == '' ? '' : (
                 <div className="flex items-center mt-1">
                     <div className="translate-y-[1px]"><LoadingCircle /></div>
                     {loading}
                 </div>
             )}
+            {/* Definition */}
             {words.length == 0 ? <></> : (<>
                 {typeof words[displayIndex] == 'string'
                  ? <div className="text-lg ml-2 mt-1 text-[#d9646c]">Unable to find {words[displayIndex] as string}.</div>
                  : (<div className="flex mt-2 mb-6">
                         <div className="bg-surface20 w-[2px] mx-2"></div>
-                        <div className="mt-3 mb-2">
-                        <SingleWord words={words[displayIndex] as mw[]} dictionary={dictionary} userSearch={isUserSearch}/>
+                        <div className="mt-1 mb-2">
+                            <SingleWord words={words[displayIndex] as mw[]} dictionary={dictionary} userSearch={isUserSearch}/>
                         </div>
                     </div>)
                 }

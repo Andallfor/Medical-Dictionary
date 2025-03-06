@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import 'remixicon/fonts/remixicon.css'
 import FileInput, { fileData } from "./fileSearch/input";
 import FileSearch from "./fileSearch/search";
-import PhoneticTree, { formatConversion, toIpa } from "./phoneticTree/tree";
+import PhoneticTree, { toIpa } from "./phoneticTree/tree";
 import { Search } from "./search/search";
 import { mw, phoneme, r_sec_c, r_stress_c, r_tail_c, r_vowel, readRegex, replacement } from "./phoneticTree/constants";
 
@@ -25,14 +25,12 @@ export default function Home() {
                 const lines = new TextDecoder('utf-16le').decode(buffer).substring(1).split('\n'); // skip bom
                 const phonetics: phoneme[] = [];
 
-                const [reg, rep, joinedReg] = formatConversion();
-
                 lines.forEach((line) => {
                     if (line.length == 0) return;
                     line = line.trim();
 
                     let [word, pron] = line.split('=');
-                    pron = toIpa(pron, reg as RegExp, rep as Record<string, replacement[]>, joinedReg as RegExp);
+                    pron = toIpa(pron, 'OED');
 
                     const primary = pron.includes('ˈ') ? pron.split('ˈ')[1] : pron;
                     const stressedConst = readRegex(primary.match(r_stress_c));
@@ -58,7 +56,7 @@ export default function Home() {
                 setData(phonetics);
             });
         }
-    }, [])
+    }, []);
 
     return (
         <div className="m-8">
