@@ -18,7 +18,7 @@ function Definition({ word, dictionary, userSearch }: { word: mw, dictionary: ph
     useEffect(() => {
         // check if word is already defined, otherwise generate from mw
         const ref = dictionary.find((p) => p.word == word.searchTerm);
-        const pron = ref ? ref.pronunciation : toIpa(word.hwi.prs[0].mw.trim(), 'MW');
+        const pron = ref  && ref.pronunciation != '' ? ref.pronunciation : toIpa(word.hwi.prs[0].mw.trim(), 'MW');
 
         setPhonetics(pron);
         setShouldWarn(ref == undefined);

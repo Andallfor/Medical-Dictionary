@@ -151,8 +151,6 @@ export default function PhoneticTree({ data }: { data: phoneme[] }) {
             consonantRef.current.update([tailCon.length == 0 ? 'None' : tailCon]);
         } else noPronRef.current?.update(['No Pronunciation']);
 
-        console.log(word, pron);
-
         search(pron == '', word.toLowerCase(), true);
     }
 
