@@ -48,58 +48,63 @@ export function toIpa(str: string, from: standardizeType) {
 export default function PhoneticTree({ data }: { data: phoneme[] }) {
     // search results
     const [focused, setFocused] = useState<phoneme[]>([]);
-    const [searchStr, setSearchStr] = useState<(string | undefined)[]>([]);
+    const [searchStr, setSearchStr] = useState<(string | undefined)[] | undefined>(undefined);
 
     // tree state
     const [vowelState, setVowelStates] = useState<branchState[]>([]);
     const [consonantState, setConsonantState] = useState<branchState[]>([]);
     const [noPronState, setNoPronState] = useState<branchState[]>([]);
+
+    // ref
     const vowelRef = useRef<PhoneticSearchControllerRef>(null);
     const consonantRef = useRef<PhoneticSearchControllerRef>(null);
     const noPronRef = useRef<PhoneticSearchControllerRef>(null);
 
     function formatSearch() {
+        if (!searchStr) return;
+
         let out = searchStr.map((s) => s ? ('* ' + s) : '').join(' ');
         return out.length != 0 ? ("'" + out) : "";
     }
 
     function search(matchNoPron = false, requestExact = "") {
-        let valid: phoneme[] = [];
-
-        if (matchNoPron) { // looking for words with no pronunciation (separate case as searching for "" matches everything)
-            if (searchStr.length == 1 && searchStr[0] == undefined) return;
-
+        // noPron and vowels/consonant should be mutually exclusive
+        if (matchNoPron) {
             vowelRef.current?.update([]);
             consonantRef.current?.update([]);
-            setSearchStr([undefined]);
+        } else noPronRef.current?.update([]);
 
-            valid = data.filter((p) => p.pronunciation.length == 0 || requestExact == p.word);
-        } else {
-            noPronRef.current?.update([]);
-
-            // [vowels... consonant?]
-            const pattern: (string | undefined)[] = [];
+        // pattern: [vowels... consonant | undefined] or [] for noPron
+        const pattern: (string | undefined)[] = [];
+        if (!matchNoPron) {
             vowelState.forEach(v => { if (v.phoneme) pattern.push(v.phoneme) });
-            pattern.push(consonantState[0].phoneme == 'None' ? '' : consonantState[0].phoneme);
-
-            // ensure the pattern is different
-            if (pattern.length == searchStr.length && pattern.reduce((a, x, i) => a && (x == searchStr[i]), true)) return;
-            setSearchStr(pattern);
-
-            console.log(pattern);
-
-            // find all matching words
-
-            valid = data.filter((p) =>
-                p.word == requestExact ||
-                // pronunciation matches
-                (p.primary.vowels.length >= pattern.length - 1 && 
-                 p.pronunciation.length > 0 &&
-                 pattern.reduce((a, x, i) => a && ((i == pattern.length - 1)
-                    ? (x == undefined) || (x == p.primary.consonants.tail) // undefined = match all
-                    : x == p.primary.vowels[i]),
-                 true)));
+            if (consonantState[0].phoneme) {
+                pattern.push(consonantState[0].phoneme == 'None' ? '' : consonantState[0].phoneme);
+            } else pattern.push(undefined);
         }
+
+        const tail = pattern[pattern.length - 1];
+
+        // ensure the pattern is different
+        if (searchStr != undefined && pattern.length == searchStr.length && pattern.reduce((a, x, i) => a && (x == searchStr[i]), true)) return;
+        setSearchStr(pattern);
+
+        // find all matching words
+        const valid = data.filter((p) => {
+            if (p.word == requestExact) return true; // exact match
+
+            if (pattern.length == 0) return p.pronunciation.length == 0; // strict empty
+            else {
+                if (p.pronunciation.length == 0) return false;
+
+                // this can be optimized to make use of short circuit eval
+                const t = tail == undefined ? true : p.primary.consonants.tail == tail;
+                let v = p.primary.vowels.length >= pattern.length - 1;
+                for (let i = 0; i < pattern.length - 1; i++) v &&= p.primary.vowels[i] == pattern[i];
+
+                return t && v;
+            }
+        });
 
         valid.sort((a, b) => {
             // exact match first
@@ -110,16 +115,15 @@ export default function PhoneticTree({ data }: { data: phoneme[] }) {
             const bv = b.primary.vowels;
 
             for (let i = 0; i < Math.max(av.length, bv.length); i++) {
-                // TODO: currently we prioritize exact matches
                 const ac = i >= av.length ? -1 : VowelOrder[av[i]];
                 const bc = i >= bv.length ? -1 : VowelOrder[bv[i]];
-                
+
                 if (ac - bc != 0) return ac - bc;
             }
 
             // prioritize words with no leading consonant
             const alc = a.primary.consonants.leading.length == 0 ? -1 : ConsonantOrder[a.primary.consonants.leading];
-            const blc = b.primary.consonants.leading.length == 0 ? 1 : ConsonantOrder[b.primary.consonants.leading];
+            const blc = b.primary.consonants.leading.length == 0 ? -1 : ConsonantOrder[b.primary.consonants.leading];
             const pc = alc - blc;
             if (pc != 0) return pc;
 
@@ -151,7 +155,7 @@ export default function PhoneticTree({ data }: { data: phoneme[] }) {
 
     function clear() {
         setFocused([]);
-        setSearchStr([]);
+        setSearchStr(undefined);
         vowelRef.current?.update([]);
         consonantRef.current?.update([]);
         noPronRef.current?.update([]);
@@ -192,7 +196,7 @@ export default function PhoneticTree({ data }: { data: phoneme[] }) {
             </div>
             <div className="flex flex-col gap-2 py-3 pl-2 pr-5 bg-tonal0 rounded-lg flex-grow">
                 <div className="ml-1">{
-                    searchStr.length == 0 ? 'No query.' :
+                    searchStr == undefined ? 'No query.' :
                         <div className="flex justify-between">
                             <span>Found {focused.length}{focused.length >= 200 ? '+' : ''} matches for <span className="font-semibold">/{formatSearch()}/:</span></span>
                             <button onClick={clear}>
