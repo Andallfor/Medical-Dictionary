@@ -228,6 +228,7 @@ export class standardize {
         'oe': 'eu',
         'ue': 'iʊ',
         'ᵊ': '',
+        '-': '',
     };
     static _p_mw?: standardizeProcessed = undefined;
 

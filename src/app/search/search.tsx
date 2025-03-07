@@ -1,6 +1,6 @@
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import { SingleWord } from "./word";
-import { getCollegiateDef, getMedicalDef } from "./api";
+import { getCollegiateDef } from "./api";
 import { mw, phoneme } from "../phoneticTree/constants";
 import { capitalize } from "../util";
 
@@ -28,14 +28,17 @@ export function Search({ setFocused, dictionary }: { setFocused: Dispatch<SetSta
         setIsUserSearch(userSearch);
         setDirty(false);
 
+        // update search history
         const history = [search.current.value, ...searchHistory];
         if (history.length > 20) history.pop();
         setSearchHistory([...new Set(history)]);
 
+        // initialize
         setDisplayIndex(0);
         setLoading(`Searching for ${search.current.value}...`)
         const w = search.current.value.split(' ');
 
+        // get the def of each word
         const state: (mw[] | string)[] = [];
         for (let i = 0; i < w.length; i++) {
             const word = w[i];
@@ -47,6 +50,7 @@ export function Search({ setFocused, dictionary }: { setFocused: Dispatch<SetSta
             }
         }
 
+        // apply changes
         setWords(state);
         setFocused(search.current.value);
         setLoading('');
@@ -109,17 +113,7 @@ export function Search({ setFocused, dictionary }: { setFocused: Dispatch<SetSta
                 </div>
             )}
             {/* Definition */}
-            {words.length == 0 ? <></> : (<>
-                {typeof words[displayIndex] == 'string'
-                 ? <div className="text-lg ml-2 mt-1 text-[#d9646c]">Unable to find {words[displayIndex] as string}.</div>
-                 : (<div className="flex mt-2 mb-6">
-                        <div className="bg-surface20 w-[2px] mx-2"></div>
-                        <div className="mt-1 mb-2">
-                            <SingleWord words={words[displayIndex] as mw[]} dictionary={dictionary} userSearch={isUserSearch}/>
-                        </div>
-                    </div>)
-                }
-            </>)}
+            {words.length == 0 ? <></> : <SingleWord words={words[displayIndex]} dictionary={dictionary} userSearch={isUserSearch}/>}
         </div>
     )
 }

@@ -53,38 +53,59 @@ export default function PhoneticTree({ data }: { data: phoneme[] }) {
     // tree state
     const [vowelState, setVowelStates] = useState<branchState[]>([]);
     const [consonantState, setConsonantState] = useState<branchState[]>([]);
+    const [noPronState, setNoPronState] = useState<branchState[]>([]);
     const vowelRef = useRef<PhoneticSearchControllerRef>(null);
     const consonantRef = useRef<PhoneticSearchControllerRef>(null);
+    const noPronRef = useRef<PhoneticSearchControllerRef>(null);
 
     function formatSearch() {
         let out = searchStr.map((s) => s ? ('* ' + s) : '').join(' ');
         return out.length != 0 ? ("'" + out) : "";
     }
 
-    function search() {
-        // [vowels... consonant?]
-        const pattern: (string | undefined)[] = [];
-        vowelState.forEach(v => { if (v.phoneme) pattern.push(v.phoneme) });
-        pattern.push(consonantState[0].phoneme == 'None' ? '' : consonantState[0].phoneme);
-
-        // ensure we pattern is different
-        if (pattern.length == searchStr.length && pattern.reduce((a, x, i) => a && (x == searchStr[i]), true)) return;
-        setSearchStr(pattern);
-
-        // find all matching words
+    function search(matchNoPron = false, requestExact = "") {
         let valid: phoneme[] = [];
-        data.forEach(p => {
-            // word has enough vowels && vowels and const match
-            let isValid = p.primary.vowels.length >= pattern.length - 1 && 
-                pattern.reduce((a, x, i) => a && ((i == pattern.length - 1)
+
+        if (matchNoPron) { // looking for words with no pronunciation (separate case as searching for "" matches everything)
+            if (searchStr.length == 1 && searchStr[0] == undefined) return;
+
+            vowelRef.current?.update([]);
+            consonantRef.current?.update([]);
+            setSearchStr([undefined]);
+
+            valid = data.filter((p) => p.pronunciation.length == 0 || requestExact == p.word);
+        } else {
+            noPronRef.current?.update([]);
+
+            // [vowels... consonant?]
+            const pattern: (string | undefined)[] = [];
+            vowelState.forEach(v => { if (v.phoneme) pattern.push(v.phoneme) });
+            pattern.push(consonantState[0].phoneme == 'None' ? '' : consonantState[0].phoneme);
+
+            // ensure the pattern is different
+            if (pattern.length == searchStr.length && pattern.reduce((a, x, i) => a && (x == searchStr[i]), true)) return;
+            setSearchStr(pattern);
+
+            console.log(pattern);
+
+            // find all matching words
+
+            valid = data.filter((p) =>
+                p.word == requestExact ||
+                // pronunciation matches
+                (p.primary.vowels.length >= pattern.length - 1 && 
+                 p.pronunciation.length > 0 &&
+                 pattern.reduce((a, x, i) => a && ((i == pattern.length - 1)
                     ? (x == undefined) || (x == p.primary.consonants.tail) // undefined = match all
                     : x == p.primary.vowels[i]),
-                true);
-
-            if (isValid) valid.push(p);
-        });
+                 true)));
+        }
 
         valid.sort((a, b) => {
+            // exact match first
+            if (a.word == requestExact) return -1;
+            if (b.word == requestExact) return 1;
+
             const av = a.primary.vowels;
             const bv = b.primary.vowels;
 
@@ -98,7 +119,7 @@ export default function PhoneticTree({ data }: { data: phoneme[] }) {
 
             // prioritize words with no leading consonant
             const alc = a.primary.consonants.leading.length == 0 ? -1 : ConsonantOrder[a.primary.consonants.leading];
-            const blc = b.primary.consonants.leading.length == 0 ? -1 : ConsonantOrder[b.primary.consonants.leading];
+            const blc = b.primary.consonants.leading.length == 0 ? 1 : ConsonantOrder[b.primary.consonants.leading];
             const pc = alc - blc;
             if (pc != 0) return pc;
 
@@ -113,17 +134,19 @@ export default function PhoneticTree({ data }: { data: phoneme[] }) {
         if (!vowelRef.current || !consonantRef.current) return;
 
         const event = e as CustomEvent;
-        const [pron, shouldSearch] = event.detail as [string, boolean];
+        const [word, pron, shouldSearch] = event.detail as [string, string, boolean];
 
-        // could also pull this info from internal dictionary if it exists
-        const primary = pron.includes('ˈ') ? pron.split('ˈ')[1] : pron;
-        const vowels = [...primary.matchAll(r_vowel)].map(x => x[0] as string);
-        const tailCon = readRegex(primary.match(r_tail_c));
+        if (pron != '') {
+            // could also pull this info from internal dictionary if it exists
+            const primary = pron.includes('ˈ') ? pron.split('ˈ')[1] : pron;
+            const vowels = [...primary.matchAll(r_vowel)].map(x => x[0] as string);
+            const tailCon = readRegex(primary.match(r_tail_c));
 
-        vowelRef.current.update(vowels);
-        consonantRef.current.update([tailCon.length == 0 ? 'None' : tailCon]);
+            vowelRef.current.update(vowels);
+            consonantRef.current.update([tailCon.length == 0 ? 'None' : tailCon]);
+        }
 
-        if (shouldSearch) search();
+        if (shouldSearch) search(false, word.toLowerCase());
     }
 
     function clear() {
@@ -131,6 +154,7 @@ export default function PhoneticTree({ data }: { data: phoneme[] }) {
         setSearchStr([]);
         vowelRef.current?.update([]);
         consonantRef.current?.update([]);
+        noPronRef.current?.update([]);
     }
 
     useEffect(() => {
@@ -140,8 +164,14 @@ export default function PhoneticTree({ data }: { data: phoneme[] }) {
 
     return (
         <div className="flex gap-6">
-            <div>
-                <div className="flex gap-4">
+            <div className="flex flex-col gap-2">
+                <PhoneticSearchController ref={noPronRef} num={1} props={{
+                    states: noPronState,
+                    setStates: setNoPronState,
+                    search: () => search(true),
+                    list: ["No Pronunciation"]
+                }} customization={{ width: 'w-full' }}/>
+                <div className="flex gap-2">
                     <PhoneticSearchController ref={vowelRef} num={4} props={{
                         states: vowelState,
                         setStates: setVowelStates,

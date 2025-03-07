@@ -29,14 +29,19 @@ export default function Home() {
                     if (line.length == 0) return;
                     line = line.trim();
 
-                    let [word, pron] = line.split('=');
-                    pron = toIpa(pron, 'OED');
+                    // some words may not have a pron (denoted by either nothing following = or no =)
+                    const split = line.split('=');
+                    let word = "", pron = "";
+                    if (split.length == 2) {
+                        word = split[0];
+                        pron = toIpa(split[1], 'OED');
+                    } else word = line;
 
                     const primary = pron.includes('ˈ') ? pron.split('ˈ')[1] : pron;
                     const stressedConst = readRegex(primary.match(r_stress_c));
 
                     phonetics.push({
-                        word: word,
+                        word: word.toLowerCase(),
                         pronunciation: pron,
                         primary: {
                             vowels: [...primary.matchAll(r_vowel)].map(x => x[0] as string),
