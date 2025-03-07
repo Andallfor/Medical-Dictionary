@@ -19,8 +19,8 @@ export function Search({ setFocused, dictionary }: { setFocused: Dispatch<SetSta
 
         // due to how we style the input bar we cant handle multiple spaces
         search.current.value = search.current.value.replace(/ {2}/g, '')
+        setWords([]); // purposefully clear state to trigger a refresh (for phonetic-tree-external-search event)
         if (search.current.value == '') {
-            setWords([]);
             setFocused('');
             return;
         }

@@ -5,7 +5,7 @@ import { getAudio, hasAudio } from "./api";
 import { useEffect, useRef, useState } from "react";
 
 export function SingleWord({ words, dictionary, userSearch }: { words: mw[] | string, dictionary: phoneme[], userSearch: boolean }) {
-    if (typeof words == 'string') return <Error word={words as string} userSearch={userSearch}/>
+    if (typeof words == 'string') return <Error word={words as string} userSearch={userSearch} dictionary={dictionary}/>
     else return <Definition word={(words as mw[])[0]} dictionary={dictionary} userSearch={userSearch}/>
 }
 
@@ -60,9 +60,13 @@ function Definition({ word, dictionary, userSearch }: { word: mw, dictionary: ph
         </div>);
 }
 
-function Error({ word, userSearch }: { word: string, userSearch: boolean }) {
+function Error({ word, userSearch, dictionary }: { word: string, userSearch: boolean, dictionary: phoneme[] }) {
     useEffect(() => {
-        if (userSearch) window.dispatchEvent(new CustomEvent('phonetic-tree-external-search', { detail: [word, '', true] }));
+        if (userSearch) {
+            const pron = dictionary.find((p) => p.word == word);
+            window.dispatchEvent(new CustomEvent('phonetic-tree-external-search',
+                { detail: [word, pron ? pron.pronunciation : '', true] }));
+        }
     }, [word]);
 
     return <div className="text-lg ml-2 mt-1 text-[#d9646c]">Unable to find {word}.</div>

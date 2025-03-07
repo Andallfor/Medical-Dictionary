@@ -62,12 +62,13 @@ export default function PhoneticTree({ data }: { data: phoneme[] }) {
 
     function formatSearch() {
         if (!searchStr) return;
+        if (searchStr.length == 0) return "no pronunciation";
 
         let out = searchStr.map((s) => s ? ('* ' + s) : '').join(' ');
         return out.length != 0 ? ("'" + out) : "";
     }
 
-    function search(matchNoPron = false, requestExact = "") {
+    function search(matchNoPron = false, requestExact = "", force = false) {
         // noPron and vowels/consonant should be mutually exclusive
         if (matchNoPron) {
             vowelRef.current?.update([]);
@@ -86,7 +87,8 @@ export default function PhoneticTree({ data }: { data: phoneme[] }) {
         const tail = pattern[pattern.length - 1];
 
         // ensure the pattern is different
-        if (searchStr != undefined && pattern.length == searchStr.length && pattern.reduce((a, x, i) => a && (x == searchStr[i]), true)) return;
+        if (!force && searchStr != undefined &&
+            pattern.length == searchStr.length && pattern.reduce((a, x, i) => a && (x == searchStr[i]), true)) return;
         setSearchStr(pattern);
 
         // find all matching words
@@ -138,19 +140,20 @@ export default function PhoneticTree({ data }: { data: phoneme[] }) {
         if (!vowelRef.current || !consonantRef.current) return;
 
         const event = e as CustomEvent;
-        const [word, pron, shouldSearch] = event.detail as [string, string, boolean];
+        const [word, pron] = event.detail as [string, string];
 
         if (pron != '') {
-            // could also pull this info from internal dictionary if it exists
             const primary = pron.includes('ˈ') ? pron.split('ˈ')[1] : pron;
             const vowels = [...primary.matchAll(r_vowel)].map(x => x[0] as string);
             const tailCon = readRegex(primary.match(r_tail_c));
 
             vowelRef.current.update(vowels);
             consonantRef.current.update([tailCon.length == 0 ? 'None' : tailCon]);
-        }
+        } else noPronRef.current?.update(['No Pronunciation']);
 
-        if (shouldSearch) search(false, word.toLowerCase());
+        console.log(word, pron);
+
+        search(pron == '', word.toLowerCase(), true);
     }
 
     function clear() {
