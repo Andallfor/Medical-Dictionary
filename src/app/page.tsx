@@ -7,6 +7,7 @@ import FileSearch from "./fileSearch/search";
 import PhoneticTree, { toIpa } from "./phoneticTree/tree";
 import { Search } from "./search/search";
 import { mw, phoneme, r_sec_c, r_stress_c, r_tail_c, r_vowel, readRegex, replacement } from "./phoneticTree/constants";
+import { Settings } from "./settings/panel";
 
 export default function Home() {
     const [focusedWord, setFocusedWord] = useState<string>('');
@@ -72,7 +73,7 @@ export default function Home() {
                 <div className="flex flex-col gap-4">
                     <Search setFocused={setFocusedWord} dictionary={data} />
                     <FileSearch files={files} phrase={focusedWord} />
-                    <FileInput files={files} setFiles={setFiles} />
+                    <Settings files={files} setFiles={setFiles}/>
                 </div>
             </div>
             <div className="h-16"></div>

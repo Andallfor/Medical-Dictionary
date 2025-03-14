@@ -21,7 +21,7 @@ function Definition({ word, dictionary, userSearch }: { word: mw, dictionary: ph
         const pron = ref  && ref.pronunciation != '' ? ref.pronunciation : toIpa(word.hwi.prs[0].mw.trim(), 'MW');
 
         setPhonetics(pron);
-        setShouldWarn(ref == undefined);
+        setShouldWarn(ref == undefined || ref.pronunciation == '');
 
         if (userSearch) window.dispatchEvent(new CustomEvent('phonetic-tree-external-search', { detail: [word.searchTerm, pron, true] }));
     }, [word]);
@@ -31,7 +31,7 @@ function Definition({ word, dictionary, userSearch }: { word: mw, dictionary: ph
             <div className="bg-surface20 w-[2px] mx-2"></div>
             <div className="ml-1 mt-1 mb-2">
                 <div className="text-2xl flex items-center">
-                    <span className="capitalize">{word.meta.id}</span>
+                    <span className="capitalize">{word.meta.id.split(':')[0]}</span>
                     {(() => {
                         const audio = hasAudio(word.hwi.prs);
                         if (audio) {
