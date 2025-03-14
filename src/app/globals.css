@@ -2,3 +2,17 @@
 @tailwind components;
 @tailwind utilities;
 
+.button {
+    @apply rounded-md w-[1.75rem] h-[1.75rem] border-surface20 border bg-surface10 hover:bg-tonal0 flex items-center justify-center
+}
+.button-text {
+    @apply rounded-md h-[1.75rem] border-surface20 border bg-surface10 hover:bg-tonal0 flex items-center justify-center
+}
+
+.line {
+    @apply px-2 py-0.5 flex items-center justify-between rounded-sm flex-grow min-w-0 bg-surface10 border border-surface20 hover:bg-tonal0
+}
+
+.number {
+    @apply text-surface50 w-8 flex justify-center items-center flex-shrink-0 font-semibold
+}

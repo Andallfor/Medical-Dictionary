@@ -2,12 +2,13 @@
 
 import { useEffect, useState } from "react";
 import 'remixicon/fonts/remixicon.css'
-import FileInput, { fileData } from "./fileSearch/input";
+import { fileData } from "./fileSearch/input";
 import FileSearch from "./fileSearch/search";
-import PhoneticTree, { toIpa } from "./phoneticTree/tree";
+import PhoneticTree from "./phoneticTree/tree";
 import { Search } from "./search/search";
-import { mw, phoneme, r_sec_c, r_stress_c, r_tail_c, r_vowel, readRegex, replacement } from "./phoneticTree/constants";
+import { phoneme } from "./phoneticTree/constants";
 import { Settings } from "./settings/panel";
+import { processDictionary } from "./settings/dictionary";
 
 export default function Home() {
     const [focusedWord, setFocusedWord] = useState<string>('');
@@ -17,6 +18,31 @@ export default function Home() {
     const [loaded, setLoaded] = useState(false);
     const [data, setData] = useState<phoneme[]>([]);
 
+    // TODO: cleanup
+    function upload(e: Event) {
+        const url = (e as CustomEvent).detail as string;
+        fetch(url).then(response => response.arrayBuffer()).then(buffer => {
+            const lines = new TextDecoder('utf-16le').decode(buffer).substring(1).split('\n');
+            const phonetics = processDictionary(lines);
+            // add in the words that we dont already have
+            const filtered: phoneme[] = [...data, ...phonetics.filter(x => data.findIndex((y) => y.word == x.word) == -1)];
+            setData(filtered);
+
+            URL.revokeObjectURL(url);
+        });
+    }
+
+    function replace(e: Event) {
+        const url = (e as CustomEvent).detail as string;
+        fetch(url).then(response => response.arrayBuffer()).then(buffer => {
+            const lines = new TextDecoder('utf-16le').decode(buffer).substring(1).split('\n');
+            const phonetics = processDictionary(lines);
+            setData(phonetics);
+
+            URL.revokeObjectURL(url);
+        });
+    }
+
     useEffect(() => {
         // load internal dictionary
         if (!loaded) {
@@ -24,43 +50,17 @@ export default function Home() {
             // https://observablehq.com/@mbostock/fetch-utf-16
             fetch('/data.txt').then(response => response.arrayBuffer()).then(buffer => {
                 const lines = new TextDecoder('utf-16le').decode(buffer).substring(1).split('\n'); // skip bom
-                const phonetics: phoneme[] = [];
-
-                lines.forEach((line) => {
-                    if (line.length == 0) return;
-                    line = line.trim();
-
-                    // some words may not have a pron (denoted by either nothing following = or no =)
-                    const split = line.split('=');
-                    let word = "", pron = "";
-                    if (split.length == 2) {
-                        word = split[0];
-                        pron = toIpa(split[1], 'OED');
-                    } else word = line;
-
-                    const primary = pron.includes('ˈ') ? pron.split('ˈ')[1] : pron;
-                    const stressedConst = readRegex(primary.match(r_stress_c));
-
-                    phonetics.push({
-                        word: word.toLowerCase(),
-                        pronunciation: pron,
-                        primary: {
-                            vowels: [...primary.matchAll(r_vowel)].map(x => x[0] as string),
-                            consonants: {
-                                stressed: [
-                                    stressedConst,
-                                    // dont question it
-                                    ...([...primary.matchAll(r_sec_c)].map(x => readRegex(x, 'ˌ')))
-                                ],
-                                leading: stressedConst,
-                                tail: readRegex(primary.match(r_tail_c))
-                            }
-                        }
-                    });
-                });
-
+                const phonetics = processDictionary(lines);
                 setData(phonetics);
             });
+        }
+
+        window.addEventListener('internal-dictionary-upload', upload);
+        window.addEventListener('internal-dictionary-replace', replace);
+
+        return () => {
+            window.removeEventListener('internal-dictionary-upload', upload);
+            window.removeEventListener('internal-dictionary-replace', replace);
         }
     }, []);
 
@@ -73,7 +73,7 @@ export default function Home() {
                 <div className="flex flex-col gap-4">
                     <Search setFocused={setFocusedWord} dictionary={data} />
                     <FileSearch files={files} phrase={focusedWord} />
-                    <Settings files={files} setFiles={setFiles}/>
+                    <Settings files={files} setFiles={setFiles} dictionary={data}/>
                 </div>
             </div>
             <div className="h-16"></div>
