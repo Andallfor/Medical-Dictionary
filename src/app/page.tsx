@@ -18,28 +18,29 @@ export default function Home() {
     const [loaded, setLoaded] = useState(false);
     const [data, setData] = useState<phoneme[]>([]);
 
-    // TODO: cleanup
+    async function load(url: string, callback: (s: string[]) => void, revoke = true) {
+        fetch(url).then(response => response.text()).then(text => {
+            const lines = text.split('\n');
+            callback(lines);
+
+            if (revoke) URL.revokeObjectURL(url);
+        });
+    }
+
+    // TODO: figure out how to determine file type
     function upload(e: Event) {
-        const url = (e as CustomEvent).detail as string;
-        fetch(url).then(response => response.arrayBuffer()).then(buffer => {
-            const lines = new TextDecoder('utf-16le').decode(buffer).substring(1).split('\n');
+        load((e as CustomEvent).detail as string, (lines) => {
             const phonetics = processDictionary(lines);
             // add in the words that we dont already have
             const filtered: phoneme[] = [...data, ...phonetics.filter(x => data.findIndex((y) => y.word == x.word) == -1)];
             setData(filtered);
-
-            URL.revokeObjectURL(url);
         });
     }
 
     function replace(e: Event) {
-        const url = (e as CustomEvent).detail as string;
-        fetch(url).then(response => response.arrayBuffer()).then(buffer => {
-            const lines = new TextDecoder('utf-16le').decode(buffer).substring(1).split('\n');
+        load((e as CustomEvent).detail as string, (lines) => {
             const phonetics = processDictionary(lines);
             setData(phonetics);
-
-            URL.revokeObjectURL(url);
         });
     }
 
@@ -47,12 +48,10 @@ export default function Home() {
         // load internal dictionary
         if (!loaded) {
             setLoaded(true);
-            // https://observablehq.com/@mbostock/fetch-utf-16
-            fetch('/data.txt').then(response => response.arrayBuffer()).then(buffer => {
-                const lines = new TextDecoder('utf-16le').decode(buffer).substring(1).split('\n'); // skip bom
+            load('/data.txt', (lines) => {
                 const phonetics = processDictionary(lines);
                 setData(phonetics);
-            });
+            }, false);
         }
 
         window.addEventListener('internal-dictionary-upload', upload);
@@ -62,7 +61,7 @@ export default function Home() {
             window.removeEventListener('internal-dictionary-upload', upload);
             window.removeEventListener('internal-dictionary-replace', replace);
         }
-    }, []);
+    }, [data]);
 
     return (
         <div className="m-8">
