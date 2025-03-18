@@ -27,7 +27,6 @@ export default function Home() {
         });
     }
 
-    // TODO: figure out how to determine file type
     function upload(e: Event) {
         load((e as CustomEvent).detail as string, (lines) => {
             const phonetics = processDictionary(lines);

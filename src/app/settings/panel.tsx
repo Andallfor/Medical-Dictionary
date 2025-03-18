@@ -1,6 +1,6 @@
 import { Dispatch, ReactNode, SetStateAction, useState } from "react";
 import FileInput, { fileData } from "../fileSearch/input";
-import { Editor } from "./editor";
+import { Editor } from "./loader";
 import { phoneme } from "../phoneticTree/constants";
 
 export function Settings({ dictionary, files, setFiles }: { dictionary: phoneme[], files: fileData[], setFiles: Dispatch<SetStateAction<fileData[]>> }) {
