@@ -69,13 +69,15 @@ export default function FileInput({ files, setFiles }: { files: fileData[], setF
     <div className="">
       <div className="flex justify-between">
         <div>Current Files:</div>
-        <div className="text-primary0 flex gap-2 text-lg mb-1">
-          <label className="button cursor-pointer" title="Add new file">
+        <div className="text-primary0 flex gap-2 mb-1">
+          <label className="button-text cursor-pointer px-1" title="Add new file">
             <input type='file' multiple accept=".txt,.md" className="hidden" onChange={addFiles}/>
-            <i className="ri-file-add-line"></i>
+            <i className="ri-file-add-line mr-1 text-lg"></i>
+            Add File
           </label>
-          <button className="button" title="Remove all files" onClick={() => remove()}>
-            <i className="ri-delete-bin-2-line"></i>
+          <button className="button-text px-1" title="Remove all files" onClick={() => remove()}>
+            <i className="ri-delete-bin-2-line text-lg mr-1"></i>
+            Remove All
           </button>
         </div>
       </div>

@@ -15,7 +15,7 @@ function SymbolPicker({ update }: { update: (s: string) => void }) {
     }
 
     return (
-        <div className="mt-2">
+        <div>
             <div className="font-semibold">Vowels</div>
             {map(vowels)}
             <div className="mt-2 font-semibold">Consonants/Misc.</div>
@@ -79,8 +79,8 @@ function Line({ index, data, fn }: { index: number, data: lineData, fn: lineFn }
                     onBlur={() => fn.clearSelected(pronRef.current ?? undefined)}
                 />
             </div>
-            <button className={"ri-file-search-line button outline-1 outline-red-500 " + (searchFailed ? 'outline' : '')} onClick={search}></button>
-            <button className="ri-close-line button" onClick={() => fn.update(index, {word: '', pron: ''})}></button>
+            <button className={"ri-file-search-line button outline-1 outline-red-500 " + (searchFailed ? 'outline' : '')} onClick={search} title="Search for pronunciation."></button>
+            <button className="ri-close-line button" onClick={() => fn.update(index, {word: '', pron: ''})} title="Clear line."></button>
         </div>
     );
 }
@@ -174,12 +174,18 @@ export function DictionaryEditor({ dictionary }: { dictionary: phoneme[] }) {
     return (
         <div className="mt-2">
             <div>Edit Words:</div>
-            <div className="flex">
+            <div className="flex mt-1">
                 <div className="bg-surface20 w-[2px] mx-2"></div>
-                <div className="flex-grow flex flex-col gap-2">
+                <div className="flex-grow flex flex-col gap-2 mt-1">
                     <div className="flex flex-grow-0 gap-2">
-                        <button className="button-text px-2 disabled:bg-tonal0 disabled:cursor-not-allowed" disabled={lines[0].edit.word.length == 0}>Submit Words</button>
-                        <button className="button-text px-2">Clear All</button>
+                        <button className="button-text px-2 disabled:bg-tonal0 disabled:cursor-not-allowed" disabled={lines[0].edit.word.length == 0}>
+                            <i className="ri-file-transfer-line text-lg mr-1"></i>
+                            Upload Words
+                        </button>
+                        <button className="button-text px-2">
+                            <i className="ri-delete-bin-2-line text-lg mr-1"></i>
+                            Clear All
+                        </button>
                     </div>
                     {lines.map((x, k) => {
                         return (<Line key={x.id} index={k} data={x} fn={{
@@ -192,7 +198,9 @@ export function DictionaryEditor({ dictionary }: { dictionary: phoneme[] }) {
                     )}
                 </div>
                 <div className="w-8"></div>
-                <SymbolPicker update={addSymbol}/>
+                <div className="mt-3">
+                    <SymbolPicker update={addSymbol}/>
+                </div>
             </div>
         </div>
     )

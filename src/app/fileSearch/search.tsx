@@ -88,10 +88,10 @@ function FileContainer({ file, phrase }: { file: fileData, phrase: string }) {
     setOccurrences(local);
   }, [file.content, phrase])
 
-  if (occurrences.length == 0) return <div>No matches in <span className="font-semibold">{file.name}</span>.</div>;
+  if (occurrences.length == 0) return <div>No matches for "<span className="font-semibold">{phrase}</span>" in <span className="font-semibold">{file.name}</span>.</div>;
   return (
     <div className="pb-4">
-      <div>Found {occurrences.length} matches in <span className="font-semibold">{file.name}</span>:</div>
+      <div>Found {occurrences.length} matches for "<span className="font-semibold">{phrase}</span>" in <span className="font-semibold">{file.name}</span>:</div>
       <div className="h-2"></div>
       <div className="mr-2 flex flex-col gap-2">
         {occurrences.map((o, i) => (

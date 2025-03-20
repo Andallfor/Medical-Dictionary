@@ -58,13 +58,16 @@ export function Editor({ dictionary }: { dictionary: phoneme[] }) {
                     <div className="flex gap-2">
                         <label className="button-text px-1 cursor-pointer">
                             <input type='file' accept=".txt" className="hidden" onChange={(e) => loadFile(e, true)}/>
+                            <i className="ri-file-add-line text-lg mr-1"></i>
                             Replace
                         </label>
                         <label className="button-text px-1 cursor-pointer">
                             <input type='file' accept=".txt" className="hidden" onChange={(e) => loadFile(e, false)}/>
+                            <i className="ri-file-upload-line text-lg mr-1"></i>
                             Upload
                         </label>
                         <button className="button-text px-1" onClick={download}>
+                            <i className="ri-file-download-line text-lg mr-1"></i>
                             Download
                         </button>
                     </div>
