@@ -77,7 +77,7 @@ export function Editor({ dictionary }: { dictionary: phoneme[] }) {
                     </div>
                 </div>
             </div>
-            <DictionaryEditor />
+            <DictionaryEditor dictionary={dictionary} />
         </div>
     )
 }

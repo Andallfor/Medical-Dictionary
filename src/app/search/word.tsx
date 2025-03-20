@@ -27,25 +27,28 @@ function Definition({ word, dictionary, userSearch }: { word: mw, dictionary: ph
     }, [word]);
 
     return (
-        <div className="flex mt-2 mb-6">
+        <div className="flex mt-2 mb-6 flex-grow">
             <div className="bg-surface20 w-[2px] mx-2"></div>
-            <div className="ml-1 mt-1 mb-2">
-                <div className="text-2xl flex items-center">
-                    <span className="capitalize">{word.meta.id.split(':')[0]}</span>
-                    {(() => {
-                        const audio = hasAudio(word.hwi.prs);
-                        if (audio) {
-                            return (<>
-                                <button className={"ml-3 hover:bg-tonal0/70 border bg-tonal0 rounded-md px-2 text-xl py-0.5 " + (shouldWarn ? 'border-red-500' : 'border-surface20')}
-                                    title={shouldWarn ? "Pronunciation was converted from MW and so may not be correct." : undefined}
-                                    onClick={() => audioPlayer.current ? audioPlayer.current.play() : null}>
-                                    <span>{phonetics}</span>
-                                    <i className="ml-2 mr-1 ri-volume-up-fill text-primary40"></i>
-                                    <audio src={getAudio(audio)} ref={audioPlayer}></audio>
-                                </button>
-                            </>)
-                        } else return <span className="text-base mx-6">[No audio found]</span>;
-                    })()}
+            <div className="ml-1 mt-1 mb-2 w-full">
+                <div className="flex items-center justify-between">
+                    <div className="text-2xl flex items-center">
+                        <span className="capitalize">{word.meta.id.split(':')[0]}</span>
+                        {(() => {
+                            const audio = hasAudio(word.hwi.prs);
+                            if (audio) {
+                                return (<>
+                                    <button className={"ml-3 hover:bg-tonal0/70 border bg-tonal0 rounded-md px-2 text-xl py-0.5 " + (shouldWarn ? 'border-red-500' : 'border-surface20')}
+                                        title={shouldWarn ? "Pronunciation was converted from MW and so may not be correct." : undefined}
+                                        onClick={() => audioPlayer.current ? audioPlayer.current.play() : null}>
+                                        <span>{phonetics}</span>
+                                        <i className="ml-2 mr-1 ri-volume-up-fill text-primary40"></i>
+                                        <audio src={getAudio(audio)} ref={audioPlayer}></audio>
+                                    </button>
+                                </>)
+                            } else return <span className="text-base mx-6">[No audio found]</span>;
+                        })()}
+                    </div>
+                    {shouldWarn ? <button className="button ml-3 ri-file-copy-line text-base" onClick={() => navigator.clipboard.writeText(phonetics)}></button>: <></>}
                 </div>
                 <div className="text-primary40">
                     <div className="italic">{word.fl}</div>
