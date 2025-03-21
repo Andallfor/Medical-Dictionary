@@ -9,6 +9,7 @@ function SymbolPicker({ update }: { update: (s: string) => void }) {
     // const diacritics = [['́', '̃', '̄']] // https://symbl.cc/en/unicode-table/#combining-diacritical-marks
     // support (combining) diacritics is difficult because JS lacks unicode normalization by default
     // which means there is difference between á and á (second one is with combining acute)
+    // TODO: see str.normalize() !
 
     function map(table: string[][]) {
         return table.map((x, i) => 
@@ -59,14 +60,14 @@ function Line({ index, data, fn }: { index: number, data: lineData, fn: lineFn }
             <div className={"line hover:bg-surface10 " + (fn.valid(index) ? '' : 'outline-1 outline-red-500 outline')}>
                 <input className="w-1/2 bg-surface10 outline-none placeholder:italic mr-1"
                     placeholder="Enter Word" ref={wordRef} value={data.edit.word}
-                    onFocus={() => fn.setFocus(index, false)}
+                    onFocus={() => fn.setFocus({inp: wordRef.current!, ind: index, isPron: false})}
                     onChange={wrapWord}
                     onKeyDown={(e) => trySubmit(e, true)}
                     onBlur={() => fn.clearSelected(wordRef.current ?? undefined)}
                 />
                 <input className="w-1/2 bg-surface10 outline-none placeholder:italic"
                     placeholder="Pronunciation" ref={pronRef} value={data.edit.pron}
-                    onFocus={() => fn.setFocus(index, true)}
+                    onFocus={() => fn.setFocus({inp: pronRef.current!, ind: index, isPron: true})}
                     onChange={wrapPron}
                     onKeyDown={trySubmit}
                     onBlur={() => fn.clearSelected(pronRef.current ?? undefined)}
@@ -82,7 +83,7 @@ function Line({ index, data, fn }: { index: number, data: lineData, fn: lineFn }
 interface lineFn {
     update: (index: number, d: lineEditData) => void;
     clearSelected: (s: HTMLInputElement | undefined) => void;
-    setFocus: (index: number, isPron: boolean) => void;
+    setFocus: (s: lineSelection) => void;
     search: (index: number) => boolean;
     valid: (index: number) => boolean;
     toggleDeletion: (index: number) => void;
@@ -100,13 +101,14 @@ export interface lineData {
 }
 
 interface lineSelection {
-    index: number;
+    inp: HTMLInputElement;
+    ind: number;
     isPron: boolean;
 }
 
 export function DictionaryEditor({ dictionary, update }: { dictionary: phoneme[], update: (l: lineData[]) => void }) {
     const [lines, setLines] = useState<lineData[]>([emptyLine()]);
-    const [selected, setSelected] = useState<lineSelection>({index: -1, isPron: false});
+    const [selected, setSelected] = useState<lineSelection | undefined>(undefined);
     const [preventSelectionClear, setPrevention] = useState(false);
 
     function isEmpty(l: lineEditData) { return l.pron == '' && l.word == ''; }
@@ -125,19 +127,24 @@ export function DictionaryEditor({ dictionary, update }: { dictionary: phoneme[]
         if (preventSelectionClear) {
             setPrevention(false);
             setTimeout(() => self?.focus(), 10);
-        } else setSelected({index: -1, isPron: false});
+        } else setSelected(undefined);
     }
 
     function addSymbol(symbol: string) {
-        if (selected.index != -1) {
-            const l = [...lines];
-            if (selected.isPron) l[selected.index].edit.pron += symbol;
-            else l[selected.index].edit.word += symbol;
+        if (selected) {
+            // TODO: if user selects an area of text and then adds a symbol, this symbol should replace that area. this functionality is not currently included
+            const e = lines[selected.ind].edit;
+            const i = selected.inp.selectionStart!;
+            if (selected.isPron) e.pron = e.pron.substring(0, i) + symbol + e.pron.substring(i);
+            else e.word = e.word.substring(0, i) + symbol + e.word.substring(i);
 
-            if (selected.index == lines.length - 1) l.push(emptyLine()); // editing last line should auto add new one
-
+            // when we update lines to match the new text, we refocus input which causes cursor to lose its previous position and move to the end
+            // so move the cursor back to where it originally was
+            const len = i + symbol.length;
+            setTimeout(() => selected.inp.setSelectionRange(len, len), 10);
             setPrevention(true);
-            setLines(l);
+
+            setLine(selected.ind, e);
         }
     }
 
@@ -213,7 +220,7 @@ export function DictionaryEditor({ dictionary, update }: { dictionary: phoneme[]
                         return (<Line key={x.id} index={k} data={x} fn={{
                             update: setLine,
                             clearSelected: clearSelected,
-                            setFocus: (i, p) => setSelected({index: i, isPron: p}),
+                            setFocus: (i) => setSelected(i),
                             search: search,
                             valid: lineIsValid,
                             toggleDeletion: (index: number) => {
