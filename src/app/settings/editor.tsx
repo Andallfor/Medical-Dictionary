@@ -6,10 +6,7 @@ import { phoneme } from "../phoneticTree/constants";
 function SymbolPicker({ update }: { update: (s: string) => void }) {
     const vowels = [['i', 'ɪ', 'e', 'ɛ', 'ə', 'ʌ', 'əː'], ['u', 'ʊ', 'o', 'ɔ', 'ɔr', 'a', 'ar'], ['aɪ', 'ɔɪ', 'aʊ', 'iɚ', 'ɔr', 'ɛɚ', 'ʊɚ']];
     const consonants = [['th̥', 'th̬', 'ɣ', 'ʃ', 'ð', 'ˌ', 'ˈ']];
-    // const diacritics = [['́', '̃', '̄']] // https://symbl.cc/en/unicode-table/#combining-diacritical-marks
-    // support (combining) diacritics is difficult because JS lacks unicode normalization by default
-    // which means there is difference between á and á (second one is with combining acute)
-    // TODO: see str.normalize() !
+    const diacritics = [['́', '̃', '̄']] // https://symbl.cc/en/unicode-table/#combining-diacritical-marks
 
     function map(table: string[][]) {
         return table.map((x, i) => 
@@ -24,6 +21,8 @@ function SymbolPicker({ update }: { update: (s: string) => void }) {
             {map(vowels)}
             <div className="mt-2 font-semibold">Consonants/Misc.</div>
             {map(consonants)}
+            <div className="mt-2 font-semibold">Diacritics</div>
+            {map(diacritics)}
         </div>
     );
 }
@@ -149,7 +148,7 @@ export function DictionaryEditor({ dictionary, update }: { dictionary: phoneme[]
     }
 
     function search(index: number) {
-        const w = lines[index].edit.word.toLowerCase();
+        const w = lines[index].edit.word.toLowerCase().normalize();
         if (w.length != 0) {
             const d = dictionary.find((x) => x.word == w);
             if (d) {

@@ -9,7 +9,7 @@ export function processDictionary(lines: string[]) {
         line = line.trim();
 
         // some words may not have a pron (denoted by either nothing following = or no =)
-        const split = line.split('=');
+        const split = line.split('=').map(x => x.normalize());
         let word = "", pron = "";
         if (split.length == 2) {
             word = split[0];
