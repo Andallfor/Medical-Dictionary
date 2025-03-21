@@ -1,11 +1,14 @@
 import { ChangeEvent, KeyboardEventHandler, use, useEffect, useRef, useState } from "react";
 import { phoneme } from "../phoneticTree/constants";
 
+// look the majority of this code was written at like ~3am across multiple days so excuse the mess
+
 function SymbolPicker({ update }: { update: (s: string) => void }) {
     const vowels = [['i', 'ɪ', 'e', 'ɛ', 'ə', 'ʌ', 'əː'], ['u', 'ʊ', 'o', 'ɔ', 'ɔr', 'a', 'ar'], ['aɪ', 'ɔɪ', 'aʊ', 'iɚ', 'ɔr', 'ɛɚ', 'ʊɚ']];
-    const consonants = [['th̥', 'th̬', 'ˌ', 'ˈ']];
+    const consonants = [['th̥', 'th̬', 'ɣ', 'ʃ', 'ð', 'ˌ', 'ˈ']];
     // const diacritics = [['́', '̃', '̄']] // https://symbl.cc/en/unicode-table/#combining-diacritical-marks
     // support (combining) diacritics is difficult because JS lacks unicode normalization by default
+    // which means there is difference between á and á (second one is with combining acute)
 
     function map(table: string[][]) {
         return table.map((x, i) => 
@@ -30,11 +33,11 @@ function Line({ index, data, fn }: { index: number, data: lineData, fn: lineFn }
     const pronRef = useRef<HTMLInputElement>(null);
 
     function wrapWord(e: ChangeEvent<HTMLInputElement>) {
-        fn.update(index, {word: e.target.value, pron: data.edit.pron}, false);
+        fn.update(index, {word: e.target.value, pron: data.edit.pron});
     }
 
     function wrapPron(e: ChangeEvent<HTMLInputElement>) {
-        fn.update(index, {word: data.edit.word, pron: e.target.value}, true);
+        fn.update(index, {word: data.edit.word, pron: e.target.value});
     }
 
     function trySubmit(k: React.KeyboardEvent<HTMLInputElement>, shouldSearch = false) {
@@ -51,20 +54,10 @@ function Line({ index, data, fn }: { index: number, data: lineData, fn: lineFn }
         setTimeout(() => setSearchFailed(false), 2000);
     }
 
-    function isFilled() {
-        if (!pronRef.current || !wordRef.current) return true;
-
-        const p = pronRef.current.value.trim();
-        const w = wordRef.current.value.trim();
-        
-        if (p.length > 0 && w.length == 0) return false;
-        return true;
-    }
-
     return (
         <div className="flex gap-2 h-7">
-            <div className={"line hover:bg-surface10 " + (isFilled() ? '' : 'outline-1 outline-red-500 outline')}>
-                <input className="w-1/2 bg-surface10 outline-none placeholder:italic"
+            <div className={"line hover:bg-surface10 " + (fn.valid(index) ? '' : 'outline-1 outline-red-500 outline')}>
+                <input className="w-1/2 bg-surface10 outline-none placeholder:italic mr-1"
                     placeholder="Enter Word" ref={wordRef} value={data.edit.word}
                     onFocus={() => fn.setFocus(index, false)}
                     onChange={wrapWord}
@@ -79,27 +72,31 @@ function Line({ index, data, fn }: { index: number, data: lineData, fn: lineFn }
                     onBlur={() => fn.clearSelected(pronRef.current ?? undefined)}
                 />
             </div>
-            <button className={"ri-file-search-line button outline-1 outline-red-500 " + (searchFailed ? 'outline' : '')} onClick={search} title="Search for pronunciation."></button>
-            <button className="ri-close-line button" onClick={() => fn.update(index, {word: '', pron: ''})} title="Clear line."></button>
+            <button className={"ri-file-search-line button outline-1 outline-red-500 " + (searchFailed ? 'outline' : '')} onClick={search} title="Search for pronunciation." />
+            <button className={"button outline-1 outline-red-500 " + (data.shouldDelete ? 'ri-eraser-fill outline' : 'ri-pencil-fill')} onClick={() => fn.toggleDeletion(index)}/>
+            <button className="ri-close-line button" onClick={() => fn.update(index, {word: '', pron: ''})} title="Clear line." />
         </div>
     );
 }
 
 interface lineFn {
-    update: (index: number, d: lineEditData, isPron?: boolean) => void;
+    update: (index: number, d: lineEditData) => void;
     clearSelected: (s: HTMLInputElement | undefined) => void;
     setFocus: (index: number, isPron: boolean) => void;
     search: (index: number) => boolean;
+    valid: (index: number) => boolean;
+    toggleDeletion: (index: number) => void;
 }
 
-interface lineEditData {
+export interface lineEditData {
     word: string;
     pron: string;
 }
 
-interface lineData {
+export interface lineData {
     edit: lineEditData;
     id: number;
+    shouldDelete: boolean;
 }
 
 interface lineSelection {
@@ -107,14 +104,14 @@ interface lineSelection {
     isPron: boolean;
 }
 
-export function DictionaryEditor({ dictionary }: { dictionary: phoneme[] }) {
+export function DictionaryEditor({ dictionary, update }: { dictionary: phoneme[], update: (l: lineData[]) => void }) {
     const [lines, setLines] = useState<lineData[]>([emptyLine()]);
     const [selected, setSelected] = useState<lineSelection>({index: -1, isPron: false});
     const [preventSelectionClear, setPrevention] = useState(false);
 
     function isEmpty(l: lineEditData) { return l.pron == '' && l.word == ''; }
 
-    function setLine(index: number, data: lineEditData, isPron?: boolean) {
+    function setLine(index: number, data: lineEditData) {
         const l = [...lines];
         l[index].edit = data;
 
@@ -122,7 +119,6 @@ export function DictionaryEditor({ dictionary }: { dictionary: phoneme[] }) {
         if (index == lines.length - 1 && !isEmpty(data)) l.push(emptyLine()); // editing last line should auto add new one
 
         setLines(l);
-        if (isPron) setSelected({index: index, isPron: isPron});
     }
 
     function clearSelected(self: HTMLInputElement | undefined) {
@@ -167,8 +163,29 @@ export function DictionaryEditor({ dictionary }: { dictionary: phoneme[] }) {
                 word: '',
                 pron: '',
             },
-            id: Date.now()
+            id: Date.now(),
+            shouldDelete: false,
         };
+    }
+
+    function lineIsValid(index: number) {
+        const line = lines[index];
+
+        const p = line.edit.pron.trim();
+        const w = line.edit.word.trim();
+        
+        if (p.length > 0 && w.length == 0) return false;
+        return true;
+    }
+
+    function canSubmit() {
+        if (lines[0].edit.word.length == 0) return false;
+
+        for (let i = 0; i < lines.length; i++) {
+            if (!lineIsValid(i)) return false;
+        }
+
+        return true;
     }
 
     return (
@@ -178,7 +195,12 @@ export function DictionaryEditor({ dictionary }: { dictionary: phoneme[] }) {
                 <div className="bg-surface20 w-[2px] mx-2"></div>
                 <div className="flex-grow flex flex-col gap-2 mt-1">
                     <div className="flex flex-grow-0 gap-2">
-                        <button className="button-text px-2 disabled:bg-tonal0 disabled:cursor-not-allowed" disabled={lines[0].edit.word.length == 0}>
+                        <button className="button-text px-2 disabled:bg-tonal0 disabled:cursor-not-allowed"
+                            disabled={!canSubmit()}
+                            onClick={() => {
+                                update(lines);
+                                setLines([emptyLine()])
+                            }}>
                             <i className="ri-file-transfer-line text-lg mr-1"></i>
                             Upload Words
                         </button>
@@ -192,7 +214,13 @@ export function DictionaryEditor({ dictionary }: { dictionary: phoneme[] }) {
                             update: setLine,
                             clearSelected: clearSelected,
                             setFocus: (i, p) => setSelected({index: i, isPron: p}),
-                            search: search
+                            search: search,
+                            valid: lineIsValid,
+                            toggleDeletion: (index: number) => {
+                                const l = [...lines];
+                                l[index].shouldDelete = !l[index].shouldDelete;
+                                setLines(l);
+                            }
                         }}/>);
                     }
                     )}

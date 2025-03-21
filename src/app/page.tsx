@@ -28,12 +28,19 @@ export default function Home() {
     }
 
     function upload(e: Event) {
-        load((e as CustomEvent).detail as string, (lines) => {
+        const [str, isFile] = (e as CustomEvent).detail as [string, boolean];
+
+        function process(lines: string[]) {
             const phonetics = processDictionary(lines);
-            // add in the words that we dont already have
-            const filtered: phoneme[] = [...data, ...phonetics.filter(x => data.findIndex((y) => y.word == x.word) == -1)];
-            setData(filtered);
-        });
+            // replace any duplicate words with the new data
+            const filtered: phoneme[] = [...phonetics, ...data.filter(x => phonetics.findIndex((y) => y.word == x.word) == -1)];
+
+            // we signal removal of elements via pronunciation of "DELETE"
+            setData(filtered.filter(x => x.pronunciation != 'DELETE'));
+        }
+
+        if (isFile) load(str, process);
+        else process(str.split('\n'));
     }
 
     function replace(e: Event) {

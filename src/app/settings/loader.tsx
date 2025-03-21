@@ -1,6 +1,6 @@
 import { ChangeEvent, useEffect, useState } from "react";
 import { phoneme } from "../phoneticTree/constants";
-import { DictionaryEditor } from "./editor";
+import { DictionaryEditor, lineData, lineEditData } from "./editor";
 
 export function Editor({ dictionary }: { dictionary: phoneme[] }) {
     const [lenEmpty, setLenEmpty] = useState(0);
@@ -33,7 +33,7 @@ export function Editor({ dictionary }: { dictionary: phoneme[] }) {
         }
     }
 
-    async function loadFile(event: ChangeEvent<HTMLInputElement>, isReplace = false) {
+    function loadFile(event: ChangeEvent<HTMLInputElement>, isReplace = false) {
         if (!isReplace) setIsDirty(true); // modified dictionary, so is dirty
 
         const f = event.target.files!.item(0)!;
@@ -43,7 +43,20 @@ export function Editor({ dictionary }: { dictionary: phoneme[] }) {
         setName(name);
 
         if (isReplace) window.dispatchEvent(new CustomEvent('internal-dictionary-replace', { detail: url }));
-        else window.dispatchEvent(new CustomEvent('internal-dictionary-upload', { detail: url }));
+        else window.dispatchEvent(new CustomEvent('internal-dictionary-upload', { detail: [url, true] }));
+    }
+
+    function updateDictionary(lines: lineData[]) {
+        // last element will always be empty
+        const str = lines
+            .filter(x => x.edit.word.length != 0)
+            .map(x => x.shouldDelete ? `${x.edit.word}=DELETE` : `${x.edit.word}=${x.edit.pron}`) // signal deletion with "DELETE"
+            .join('\n');
+
+        setIsDirty(true);
+        if (name.length == 0) setName('Modified.txt')
+
+        window.dispatchEvent(new CustomEvent('internal-dictionary-upload', {detail: [str, false]}));
     }
 
     return (
@@ -80,7 +93,7 @@ export function Editor({ dictionary }: { dictionary: phoneme[] }) {
                     </div>
                 </div>
             </div>
-            <DictionaryEditor dictionary={dictionary} />
+            <DictionaryEditor dictionary={dictionary} update={updateDictionary}/>
         </div>
     )
 }
