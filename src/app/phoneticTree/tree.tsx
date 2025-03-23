@@ -195,8 +195,8 @@ export default function PhoneticTree({ data }: { data: phoneme[] }) {
                     }}/>
                 </div>
             </div>
-            <div className="flex flex-col gap-2 py-3 pl-2 pr-5 bg-tonal0 rounded-lg flex-grow">
-                <div className="ml-1">{
+            <div className="flex flex-col pl-2 pr-5 bg-tonal0 rounded-lg flex-grow">
+                <div className="pl-1 sticky top-0 bg-tonal0 pt-3 pb-2">{
                     searchStr == undefined ? 'No query.' :
                         <div className="flex justify-between">
                             <span>Found {focused.length}{focused.length >= 200 ? '+' : ''} matches for <span className="font-semibold">/{formatSearch()}/:</span></span>
@@ -205,18 +205,20 @@ export default function PhoneticTree({ data }: { data: phoneme[] }) {
                             </button>
                         </div>
                 }</div>
-                {focused.map((p, i) => 
-                    <div key={i} className="flex gap-2 h-8">
-                        <span className="number">{i + 1}</span>
-                        <button className="line group" onClick={() => window.dispatchEvent(new CustomEvent('force-set-file-search', { detail: [p.word, false] }))}>
-                            <div className="flex-grow flex justify-start">
-                                <span className="mr-4 font-semibold min-w-32 text-left">{p.word[0].toUpperCase() + p.word.substring(1)}</span>
-                                <span>/{p.pronunciation}/</span>
-                            </div>
-                            <i className="ri-arrow-right-s-fill ri-lg group-hover:translate-x-2 transition-transform"></i>
-                        </button>
-                    </div>
-                )}
+                <div className="flex flex-col gap-2 pb-4">
+                    {focused.map((p, i) => 
+                        <div key={i} className="flex gap-2 h-8">
+                            <span className="number">{i + 1}</span>
+                            <button className="line group" onClick={() => window.dispatchEvent(new CustomEvent('force-set-file-search', { detail: [p.word, false] }))}>
+                                <div className="flex-grow flex justify-start">
+                                    <span className="mr-4 font-semibold min-w-32 text-left">{p.word[0].toUpperCase() + p.word.substring(1)}</span>
+                                    <span>/{p.pronunciation}/</span>
+                                </div>
+                                <i className="ri-arrow-right-s-fill ri-lg group-hover:translate-x-2 transition-transform"></i>
+                            </button>
+                        </div>
+                    )}
+                </div>
             </div>
         </div>
     );
