@@ -55,7 +55,7 @@ export default function Home() {
         // load internal dictionary
         if (!loaded) {
             setLoaded(true);
-            load('/data.txt', (lines) => {
+            load('/Medical-Dictionary/data.txt', (lines) => {
                 const phonetics = processDictionary(lines);
                 setData(phonetics);
             }, false);
