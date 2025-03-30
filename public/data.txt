@@ -7874,7 +7874,6 @@ mean=min
 google=ˈɡuɡ(ə)l
 bulletin=ˈbʊlətn
 convergence=kənˈvərdʒ(ə)n(t)s
-mer=mər
 legislative=ˈlɛdʒəˌsleɪdɪv
 gratis=ˈɡreɪtɪs
 emerald=ˈɛm(ə)rəld
