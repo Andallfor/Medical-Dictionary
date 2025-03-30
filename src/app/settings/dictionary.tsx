@@ -37,5 +37,17 @@ export function processDictionary(lines: string[]) {
         });
     });
 
-    return phonetics;
+    // check for duplicates
+    phonetics.sort((a, b) => a.word.localeCompare(b.word));
+    const filtered: phoneme[] = [];
+    let last = "";
+    for (let i = 0; i < phonetics.length; i++) {
+        if (phonetics[i].word == last) console.warn(`Found duplicate ${phonetics[i].word}. Skipping`);    
+        else {
+            last = phonetics[i].word;
+            filtered.push(phonetics[i]);
+        }
+    }
+
+    return filtered;
 }

@@ -7,10 +7,21 @@ This is a commissioned tool to aid in the pronunciation of English words, especi
     c. [Diagnostic Imaging: Brain](https://www.sciencedirect.com/book/9780323377546/diagnostic-imaging-brain)  
     d. [Diagnostic Imaging: Spine](https://www.sciencedirect.com/book/9780323377058/diagnostic-imaging-spine)  
     e. [Diagnostic Imaging: Pediatric Neuroradiology](https://www.us.elsevierhealth.com/diagnostic-imaging-pediatric-neuroradiology-9780443234927.html)  
-2. **General English**  
-    a. [Google 10000 words](https://github.com/first20hours/google-10000-english)
+2. **Other Words**  
+    a. [Google 10000 words](https://github.com/first20hours/google-10000-english) (General English)  
+    b. [Social Security](https://www.ssa.gov/oact/babynames/decades/century.html) (English names)  
+    c. [Wikipedia/Forebears](https://en.wikipedia.org/wiki/List_of_common_Spanish_surnames#Mexico) (Spanish surnames)  
+    d. [Wikipedia/Meiji Yasuda Life Insurance Company](https://en.wikipedia.org/wiki/List_of_common_Japanese_surnames) (Japanese surnames)  
+    e. [Forebears](https://forebears.io/france/surnames) (French surnames)
 3. **Definitions**  
     a. [Merriam-Webster Collegiate API](https://dictionaryapi.com/products/api-collegiate-dictionary)  
     b. [Merriam-Webster Medical API](https://dictionaryapi.com/products/api-medical-dictionary)
 4. **Pronunciations**  
-    a. [Oxford English Dictionary](https://www.oed.com/)
+    a. [Oxford English Dictionary](https://www.oed.com/)  
+    b. Merriam Webster (see above)  
+    c. [To Phonetics](https://tophonetics.com/) (English names)  
+    d. [Forvo](https://forvo.com/) (French)  
+    e. [Spanish Dictionary](https://www.spanishdict.com/) (Spanish)  
+    f. [OpenL](https://openl.io/translate/international-phonetic-alphabet) (Japanese)
+5. **Audio**  
+    a. Merriam Webster (see above)  
