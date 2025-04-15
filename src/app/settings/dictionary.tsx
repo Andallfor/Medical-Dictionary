@@ -1,20 +1,39 @@
 import { phoneme, readRegex, r_stress_c, r_vowel, r_sec_c, r_tail_c } from "../phoneticTree/constants";
 import { toIpa } from "../phoneticTree/tree";
+import { lineData } from "./editor";
 
 export function processDictionary(lines: string[]) {
     const phonetics: phoneme[] = [];
 
     lines.forEach((line) => {
         if (line.length == 0) return;
-        line = line.trim();
+        line = line.trim().normalize();
 
-        // some words may not have a pron (denoted by either nothing following = or no =)
-        const split = line.split('=').map(x => x.normalize());
+        // we expect lines to be in the format (weird delimiters are since user can input whatever text in def and i dont really want to do proper input validation)
+        // anything after = is optional
+        // word=pronunciation<@>part of speech<->def 1<->def 2<->...
+
+        const [a, b] = line.split('<@>');
+        const split = a.split('=').map(x => x.normalize());
         let word = "", pron = "";
         if (split.length == 2) {
             word = split[0];
             pron = toIpa(split[1], 'OED');
         } else word = line;
+
+        const c = b ? b.split('<->') : [];
+        let part = '', def: string[] = [];
+        if (c.length > 0) {
+            part = c[0];
+            if (c.length > 1) {
+                // do not allow any blank lines through
+                def = c.slice(1).reduce<string[]>((acc, x) => {
+                    const y = x.trim();
+                    if (y.length > 0) acc.push(y);
+                    return acc;
+                }, []);
+            }
+        }
 
         const primary = pron.includes('ˈ') ? pron.split('ˈ')[1] : pron;
         const stressedConst = readRegex(primary.match(r_stress_c));
@@ -33,7 +52,9 @@ export function processDictionary(lines: string[]) {
                     leading: stressedConst,
                     tail: readRegex(primary.match(r_tail_c))
                 }
-            }
+            },
+            part: part.length == 0 ? undefined : part,
+            def: def.length == 0 ? undefined : def,
         });
     });
 
@@ -50,4 +71,32 @@ export function processDictionary(lines: string[]) {
     }
 
     return filtered;
+}
+
+export function fmt_ld(x: lineData) {
+    // signal deletion with "DELETE"
+    if (x.shouldDelete) return `${x.edit.word}=DELETE`;
+    else {
+        let base = `${x.edit.word}=${x.edit.pron}`;
+        const hasPart = x.edit.part && x.edit.part.length > 0;
+        const hasDef = x.edit.def && x.edit.def.length > 0;
+        if (hasPart || hasDef) {
+            base += `<@>${hasPart ? x.edit.part : ''}<->`;
+            if (hasDef) base += x.edit.def!.trim().replace(/\r?\n/g, '<->');
+        }
+
+        return base;
+    }
+}
+
+export function fmt_ph(x: phoneme) {
+    let base = `${x.word}=${x.pronunciation}`;
+    const hasPart = x.part && x.part.length > 0;
+    const hasDef = x.def && x.def.length > 0;
+    if (hasPart || hasDef) {
+        base += `<@>${hasPart ? x.part : ''}<->`;
+        if (hasDef) base += x.def!.map(x => x.trim()).join('<->');
+    }
+
+    return base;
 }

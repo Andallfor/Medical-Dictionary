@@ -40,7 +40,18 @@ export interface phoneme {
             leading: string, // empty string if none (i.e. vowel starts instead)
             tail: string, // empty string if none
         }
-    }
+    },
+    part?: string,
+    def?: string[],
+}
+
+export interface wordDefinitionData {
+    word: string,
+    pronunciation?: string,
+    part?: string,
+    def?: string[],
+    audio?: string,
+    shouldWarn: boolean, // if pronunciation was only from MW
 }
 
 export interface branchState {

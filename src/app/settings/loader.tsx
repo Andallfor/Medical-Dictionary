@@ -1,6 +1,7 @@
 import { ChangeEvent, useEffect, useState } from "react";
 import { phoneme } from "../phoneticTree/constants";
 import { DictionaryEditor, lineData, lineEditData } from "./editor";
+import { fmt_ld, fmt_ph } from "./dictionary";
 
 export function Editor({ dictionary }: { dictionary: phoneme[] }) {
     const [lenEmpty, setLenEmpty] = useState(0);
@@ -16,7 +17,7 @@ export function Editor({ dictionary }: { dictionary: phoneme[] }) {
 
         const file = name.length == 0 ? 'dictionary.txt' : name;
         let data = "";
-        dictionary.forEach(x => data += `${x.word}=${x.pronunciation}\n`);
+        dictionary.forEach(x => data += fmt_ph(x) + '\n');
 
         // https://stackoverflow.com/questions/72683352/how-do-i-write-inta-a-file-and-download-the-file-using-javascript
         const blob = new Blob([data], {type: 'text/plain;charset=UTF-8;'});
@@ -48,10 +49,7 @@ export function Editor({ dictionary }: { dictionary: phoneme[] }) {
 
     function updateDictionary(lines: lineData[]) {
         // last element will always be empty
-        const str = lines
-            .filter(x => x.edit.word.length != 0)
-            .map(x => x.shouldDelete ? `${x.edit.word}=DELETE` : `${x.edit.word}=${x.edit.pron}`) // signal deletion with "DELETE"
-            .join('\n');
+        const str = lines.filter(x => x.edit.word.length != 0).map(fmt_ld).join('\n');
 
         setIsDirty(true);
         if (name.length == 0) setName('Modified.txt')
