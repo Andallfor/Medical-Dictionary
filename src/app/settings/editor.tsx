@@ -3,8 +3,8 @@ import { phoneme } from "../phoneticTree/constants";
 
 // look the majority of this code was written at like ~3am across multiple days so excuse the mess
 
-function SymbolPicker({ update }: { update: (s: string) => void }) {
-    const vowels = [['i', 'ɪ', 'e', 'ɛ', 'ə', 'ʌ', 'əː'], ['u', 'ʊ', 'o', 'ɔ', 'ɔr', 'a', 'ar'], ['aɪ', 'ɔɪ', 'aʊ', 'iɚ', 'ɔr', 'ɛɚ', 'ʊɚ']];
+function SymbolPicker({ update, minimized }: { update: (s: string) => void, minimized: boolean }) {
+    const vowels = [['i', 'ɪ', 'e', 'ɛ', 'æ', 'ə', 'ʌ'], ['əː', 'u', 'ʊ', 'o', 'ɔ', 'ɔr', 'a'], ['ar', 'aɪ', 'ɔɪ', 'aʊ', 'iɚ', 'ɛɚ', 'ʊɚ']];
     const consonants = [['th̥', 'th̬', 'ɣ', 'ʃ', 'ð', 'ˌ', 'ˈ']];
     const diacritics = [['́', '̃', '̄']] // https://symbl.cc/en/unicode-table/#combining-diacritical-marks
 
@@ -29,15 +29,32 @@ function SymbolPicker({ update }: { update: (s: string) => void }) {
 
 function Line({ index, data, fn }: { index: number, data: lineData, fn: lineFn }) {
     const [searchFailed, setSearchFailed] = useState(false);
+    const [expanded, setExpanded] = useState(false);
     const wordRef = useRef<HTMLInputElement>(null);
     const pronRef = useRef<HTMLInputElement>(null);
 
     function wrapWord(e: ChangeEvent<HTMLInputElement>) {
-        fn.update(index, {word: e.target.value, pron: data.edit.pron});
+        let t = {...data.edit};
+        t['word'] = e.target.value;
+        fn.update(index, t);
     }
 
     function wrapPron(e: ChangeEvent<HTMLInputElement>) {
-        fn.update(index, {word: data.edit.word, pron: e.target.value});
+        let t = {...data.edit};
+        t['pron'] = e.target.value;
+        fn.update(index, t);
+    }
+
+    function wrapPart(e: ChangeEvent<HTMLInputElement>) {
+        let t = {...data.edit};
+        t['part'] = e.target.value;
+        fn.update(index, t);
+    }
+
+    function wrapDef(e: ChangeEvent<HTMLTextAreaElement>) {
+        let t = {...data.edit};
+        t['def'] = e.target.value;
+        fn.update(index, t);
     }
 
     function trySubmit(k: React.KeyboardEvent<HTMLInputElement>, shouldSearch = false) {
@@ -55,26 +72,39 @@ function Line({ index, data, fn }: { index: number, data: lineData, fn: lineFn }
     }
 
     return (
-        <div className="flex gap-2 h-7">
-            <div className={"line hover:bg-surface10 " + (fn.valid(index) ? '' : 'outline-1 outline-red-500 outline')}>
-                <input className="w-1/2 bg-surface10 outline-none placeholder:italic mr-1"
-                    placeholder="Enter Word" ref={wordRef} value={data.edit.word}
-                    onFocus={() => fn.setFocus({inp: wordRef.current!, ind: index, isPron: false})}
-                    onChange={wrapWord}
-                    onKeyDown={(e) => trySubmit(e, true)}
-                    onBlur={() => fn.clearSelected(wordRef.current ?? undefined)}
-                />
-                <input className="w-1/2 bg-surface10 outline-none placeholder:italic"
-                    placeholder="Pronunciation" ref={pronRef} value={data.edit.pron}
-                    onFocus={() => fn.setFocus({inp: pronRef.current!, ind: index, isPron: true})}
-                    onChange={wrapPron}
-                    onKeyDown={trySubmit}
-                    onBlur={() => fn.clearSelected(pronRef.current ?? undefined)}
-                />
+        <div className="flex gap-1.5">
+            <div className="flex-grow">
+                <div className={"z-50 h-7 line rounded-b-none hover:bg-surface10 " + (fn.valid(index) ? '' : 'outline-1 outline-red-500 outline')}>
+                    <input className="w-1/2 bg-surface10 outline-none placeholder:italic mr-1"
+                        placeholder="Enter Word" ref={wordRef} value={data.edit.word}
+                        onFocus={() => fn.setFocus({inp: wordRef.current!, ind: index, isPron: false})}
+                        onChange={wrapWord}
+                        onKeyDown={(e) => trySubmit(e, true)}
+                        onBlur={() => fn.clearSelected(wordRef.current ?? undefined)}
+                    />
+                    <input className="w-1/2 bg-surface10 outline-none placeholder:italic"
+                        placeholder="Pronunciation" ref={pronRef} value={data.edit.pron}
+                        onFocus={() => fn.setFocus({inp: pronRef.current!, ind: index, isPron: true})}
+                        onChange={wrapPron}
+                        onKeyDown={trySubmit}
+                        onBlur={() => fn.clearSelected(pronRef.current ?? undefined)}
+                    />
+                </div>
+                <div className="flex flex-col">
+                    {expanded ?
+                        <div className="w-full bg-surface10 pt-1 px-1">
+                            <input className="line text-sm border-none placeholder:italic w-full outline-none" placeholder="Part of Speech" value={data.edit.part} onChange={wrapPart}></input>
+                            <textarea className="line text-sm border-none placeholder:italic w-full outline-none" placeholder="Definition" rows={4} value={data.edit.def} onChange={wrapDef}></textarea>
+                        </div>
+                    : <></>}
+                    <button className={"w-full bg-surface10 rounded-b-md " + (expanded ? 'h-5' : 'h-3')} onClick={() => setExpanded(!expanded)}>
+                        <i className={"absolute -translate-y-2 -translate-x-1/2 ri-lg " + (expanded ? 'ri-arrow-drop-up-fill' : 'ri-arrow-drop-down-fill')}></i>
+                    </button>
+                </div>
             </div>
             <button className={"ri-file-search-line button outline-1 outline-red-500 " + (searchFailed ? 'outline' : '')} onClick={search} title="Search for pronunciation." />
-            <button className={"button outline-1 outline-red-500 " + (data.shouldDelete ? 'ri-eraser-fill outline' : 'ri-pencil-fill')} onClick={() => fn.toggleDeletion(index)}/>
-            <button className="ri-close-line button" onClick={() => fn.update(index, {word: '', pron: ''})} title="Clear line." />
+            <button className={"button outline-1 outline-red-500 " + (data.shouldDelete ? 'ri-eraser-fill outline' : 'ri-pencil-fill')} onClick={() => fn.toggleDeletion(index)} title={data.shouldDelete ? 'Delete entry.' : 'Add entry.'}/>
+            <button className="ri-close-line button" onClick={() => fn.update(index, {word: '', pron: '', part: '', def: ''})} title="Clear line." />
         </div>
     );
 }
@@ -91,6 +121,8 @@ interface lineFn {
 export interface lineEditData {
     word: string;
     pron: string;
+    part: string;
+    def: string;
 }
 
 export interface lineData {
@@ -106,9 +138,11 @@ interface lineSelection {
 }
 
 export function DictionaryEditor({ dictionary, update }: { dictionary: phoneme[], update: (l: lineData[]) => void }) {
+    const container = useRef<HTMLDivElement>(null);
     const [lines, setLines] = useState<lineData[]>([emptyLine()]);
     const [selected, setSelected] = useState<lineSelection | undefined>(undefined);
     const [preventSelectionClear, setPrevention] = useState(false);
+    const [minimized, setMinimized] = useState(false);
 
     function isEmpty(l: lineEditData) { return l.pron == '' && l.word == ''; }
 
@@ -168,6 +202,8 @@ export function DictionaryEditor({ dictionary, update }: { dictionary: phoneme[]
             edit: {
                 word: '',
                 pron: '',
+                def: '',
+                part: ''
             },
             id: Date.now(),
             shouldDelete: false,
@@ -194,10 +230,19 @@ export function DictionaryEditor({ dictionary, update }: { dictionary: phoneme[]
         return true;
     }
 
+    useEffect(() => {
+        function handleResize() {
+            if (container.current?.offsetWidth) setMinimized(container.current?.offsetWidth < 770);
+        }
+    
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+      }, []);
+
     return (
-        <div className="mt-2">
+        <div className="mt-2" ref={container}>
             <div>Edit Words:</div>
-            <div className="flex mt-1">
+            <div className={"flex mt-1 " + (minimized ? 'flex-col' : '')}>
                 <div className="bg-surface20 w-[2px] mx-2"></div>
                 <div className="flex-grow flex flex-col gap-2 mt-1">
                     <div className="flex flex-grow-0 gap-2">
@@ -231,9 +276,9 @@ export function DictionaryEditor({ dictionary, update }: { dictionary: phoneme[]
                     }
                     )}
                 </div>
-                <div className="w-8"></div>
+                <div className="w-6"></div>
                 <div className="mt-3">
-                    <SymbolPicker update={addSymbol}/>
+                    <SymbolPicker update={addSymbol} minimized={minimized}/>
                 </div>
             </div>
         </div>
