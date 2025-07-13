@@ -11,8 +11,18 @@ interface fileMetadata {
 
 export interface fileData {
   name: string,
-  content: string,
+  content: string | formattedFileData,
   size: number
+}
+
+export interface formattedFileData {
+  children?: { [key: string]: formattedFileData },
+  val?: formattedBodyData[],
+}
+
+export interface formattedBodyData {
+  body: string;
+  head: string[]; // exact head as was given in file
 }
 
 export default function FileInput({ files, setFiles }: { files: fileData[], setFiles: Dispatch<SetStateAction<fileData[]>> }) {
@@ -21,7 +31,7 @@ export default function FileInput({ files, setFiles }: { files: fileData[], setF
     const f = event.target.files!;
     for (let i = 0; i < f.length; i++) {
       const file = f.item(i)!;
-      
+
       // TODO: replace files if they already exist
 
       metadata.push({
@@ -41,10 +51,64 @@ export default function FileInput({ files, setFiles }: { files: fileData[], setF
         values.forEach((content, ind) => {
           // use the fact that lists are stable, so index here matches metadata index
           const m = metadata[ind];
+
+          // read formatted file
+          let c: string | formattedFileData = content.data as string;
+          if ((content.data as string).startsWith('#!/formatted')) {
+            const lines = (content.data as string).split('\n');
+            const re = /^(?<head>(?:[^a-z]+:)+)(?<body>.*)$/ms;
+            const re_s = /:| /g;
+
+            const entries = [];
+            let isEntry = true;
+            for (let i = 1; i < lines.length; i++) {
+              const line = lines[i];
+              if (line.trim().length == 0) continue;
+
+              if (re.test(line)) {
+                entries.push(line);
+                isEntry = false;
+              } else entries[entries.length - 1] += line;
+            }
+
+            c = {};
+            entries.forEach(x => {
+              const match = re.exec(x);
+              if (!match) {
+                console.error('Could not match ' + x);
+                return;
+              }
+
+              const g = match.groups!;
+              const body = g['body'];
+              // hmmm.....
+              // given the head "A B: C:", split on delimiters (:, space), remove whitespace and empty strings, get uniques, and then sort
+              const head = [...new Set(g['head'].split(re_s).flatMap(y => y.trim().toLowerCase()).filter(x => x.length != 0))].sort();
+
+              // traverse dictionary, where each key is a separate part of the head
+              let cur = c as formattedFileData;
+              head.forEach(y => {
+                if (!cur.children) {
+                  cur.children = {};
+                  cur.children[y] = {};
+                } else if (!(y in cur.children)) cur.children[y] = {};
+                cur = cur.children[y]!;
+              });
+
+              if (!cur.val) cur.val = [];
+              cur.val.push({
+                head: head,
+                body: body.trim(),
+              });
+            });
+
+            console.log(c);
+          }
+
           data.push({
             name: m.name,
             size: m.size,
-            content: content.data
+            content: c
           });
 
           URL.revokeObjectURL(metadata[ind].url);
