@@ -10,10 +10,13 @@ interface fileMetadata {
   size: number
 }
 
+export enum fileType { FORMATTED, TEXT }
+
 export interface fileData {
   name: string,
   content: string | formattedFileData,
-  size: number
+  size: number,
+  type: fileType,
 }
 
 export interface formattedFileData {
@@ -55,9 +58,11 @@ export default function FileInput({ files, setFiles }: { files: fileData[], setF
           // use the fact that lists are stable, so index here matches metadata index
           const m = metadata[ind];
 
+          let c: string | formattedFileData = content.data as string;
+          let type = fileType.TEXT;
+
           // read formatted file
           // see fileSearch/util.tsx for algorithm explanation
-          let c: string | formattedFileData = content.data as string;
           if ((content.data as string).startsWith('#!/formatted')) {
             const lines = (content.data as string).split('\n');
             const re = /^(?<head>(?:[^a-z]+:)+)(?<body>.*)$/ms;
@@ -71,7 +76,7 @@ export default function FileInput({ files, setFiles }: { files: fileData[], setF
               if (line.trim().length == 0) continue;
 
               if (re.test(line)) entries.push(line);
-              else entries[entries.length - 1] += line; // some entries are split across multiple lines
+              else entries[entries.length - 1] += '\n' + line; // some entries are split across multiple lines
             }
 
             // process entries
@@ -104,13 +109,15 @@ export default function FileInput({ files, setFiles }: { files: fileData[], setF
             fc.entries.forEach(x => x.hash = getHash(x.fHead, fc.headMap));
 
             c = fc;
+            type = fileType.FORMATTED;
             console.log(c);
           }
 
           data.push({
             name: m.name,
             size: m.size,
-            content: c
+            content: c,
+            type: type,
           });
 
           URL.revokeObjectURL(metadata[ind].url);
@@ -154,6 +161,9 @@ export default function FileInput({ files, setFiles }: { files: fileData[], setF
             <div className="number">{k + 1}</div>
             <button className="line cursor-pointer" onClick={() => remove(x.name)}>
               <div className="flex">
+                {x.type == fileType.TEXT ?
+                  <i className="ri-file-text-line mr-1"></i> :
+                  <i className="ri-file-code-line mr-1"></i>}
                 <div className="mr-4 font-semibold text-left min-w-32">{x.name}</div>
                 <div>({prettifyFileSize(x.size)})</div>
               </div>

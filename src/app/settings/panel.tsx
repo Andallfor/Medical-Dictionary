@@ -2,6 +2,7 @@ import { Dispatch, ReactNode, SetStateAction, useState } from "react";
 import FileInput, { fileData } from "../fileSearch/input";
 import { Editor } from "./loader";
 import { phoneme } from "../phoneticTree/constants";
+import { Divider } from "../util";
 
 export function Settings({ dictionary, files, setFiles }: { dictionary: phoneme[], files: fileData[], setFiles: Dispatch<SetStateAction<fileData[]>> }) {
     return (
@@ -16,21 +17,4 @@ export function Settings({ dictionary, files, setFiles }: { dictionary: phoneme[
                 </Divider>
             </div>
         </div>);
-}
-
-function Divider({ title, children }: { title: string, children?: ReactNode }) {
-    const [isExpanded, setIsExpanded] = useState(false);
-
-    return (
-        <div>
-            <button className="w-full flex items-center gap-4 group" onClick={() => setIsExpanded(!isExpanded)}>
-                <p className={isExpanded ? 'font-semibold' : ''}>{title}</p>
-                <div className="flex-grow h-[2px] rounded-lg bg-surface30 my-1 group-hover:bg-surface40"></div>
-                <i className={"ri-arrow-down-s-line ri-lg " + (isExpanded ? 'rotate-180' : '')}></i>
-            </button>
-            <div className={isExpanded ? '' : 'hidden'}>
-                {children}
-            </div>
-        </div>
-    )
 }
