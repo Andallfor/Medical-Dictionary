@@ -1,6 +1,7 @@
-import axios, { Axios, AxiosResponse } from "axios";
+import axios, { Axios, AxiosResponse, all } from "axios";
 import { ChangeEvent, Dispatch, SetStateAction } from "react";
 import { prettifyFileSize } from "../util";
+import { getHash } from "./util";
 
 interface fileMetadata {
   name: string,
@@ -16,13 +17,15 @@ export interface fileData {
 }
 
 export interface formattedFileData {
-  children?: { [key: string]: formattedFileData },
-  val?: formattedBodyData[],
+  entries: formattedFileEntry[];
+  headMap: Record<string, number>;
 }
 
-export interface formattedBodyData {
-  body: string;
-  head: string[]; // exact head as was given in file
+export interface formattedFileEntry {
+  hash: number[];
+  head: string;
+  fHead: string[];
+  content: string;
 }
 
 export default function FileInput({ files, setFiles }: { files: fileData[], setFiles: Dispatch<SetStateAction<fileData[]>> }) {
@@ -53,25 +56,26 @@ export default function FileInput({ files, setFiles }: { files: fileData[], setF
           const m = metadata[ind];
 
           // read formatted file
+          // see fileSearch/util.tsx for algorithm explanation
           let c: string | formattedFileData = content.data as string;
           if ((content.data as string).startsWith('#!/formatted')) {
             const lines = (content.data as string).split('\n');
             const re = /^(?<head>(?:[^a-z]+:)+)(?<body>.*)$/ms;
             const re_s = /:| /g;
+            const fc: formattedFileData = { entries: [], headMap: {} };
 
+            // get all entries
             const entries = [];
-            let isEntry = true;
             for (let i = 1; i < lines.length; i++) {
               const line = lines[i];
               if (line.trim().length == 0) continue;
 
-              if (re.test(line)) {
-                entries.push(line);
-                isEntry = false;
-              } else entries[entries.length - 1] += line;
+              if (re.test(line)) entries.push(line);
+              else entries[entries.length - 1] += line; // some entries are split across multiple lines
             }
 
-            c = {};
+            // process entries
+            const allHeads: Set<string> = new Set();
             entries.forEach(x => {
               const match = re.exec(x);
               if (!match) {
@@ -80,28 +84,26 @@ export default function FileInput({ files, setFiles }: { files: fileData[], setF
               }
 
               const g = match.groups!;
-              const body = g['body'];
               // hmmm.....
-              // given the head "A B: C:", split on delimiters (:, space), remove whitespace and empty strings, get uniques, and then sort
-              const head = [...new Set(g['head'].split(re_s).flatMap(y => y.trim().toLowerCase()).filter(x => x.length != 0))].sort();
+              // given the head "A B: C:", split on delimiters (:, space), remove whitespace and empty strings then get uniques
+              const head = new Set(g['head'].split(re_s).flatMap(y => y.trim().toLowerCase()).filter(x => x.length != 0));
+              head.forEach(h => allHeads.add(h));
 
-              // traverse dictionary, where each key is a separate part of the head
-              let cur = c as formattedFileData;
-              head.forEach(y => {
-                if (!cur.children) {
-                  cur.children = {};
-                  cur.children[y] = {};
-                } else if (!(y in cur.children)) cur.children[y] = {};
-                cur = cur.children[y]!;
-              });
+              const entry = {
+                head: g['head'].trim(),
+                content: g['body'].trim(),
+                hash: [],
+                fHead: [...head].sort(),
+              };
 
-              if (!cur.val) cur.val = [];
-              cur.val.push({
-                head: head,
-                body: body.trim(),
-              });
+              fc.entries.push(entry);
             });
 
+            // generate entry hashes
+            [...allHeads].sort().forEach((x, i) => fc.headMap[x] = i);
+            fc.entries.forEach(x => x.hash = getHash(x.fHead, fc.headMap));
+
+            c = fc;
             console.log(c);
           }
 

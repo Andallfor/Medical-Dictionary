@@ -1,5 +1,6 @@
 import { use, useEffect, useState } from "react";
 import { fileData, formattedFileData } from "./input";
+import { formattedMatch, getHash } from "./util";
 
 const MAX_DISPLAY = 400;
 
@@ -22,10 +23,10 @@ function FileContainer({ file, phrase }: { file: fileData, phrase: string }) {
         // ensure only one update (for some reason useEffect triggers twice normally)
         if (file.size == lastFileLength && phrase == lastPhrase) return;
 
-        if (typeof file.content == 'string') {
-            setLastFileLength(file.content.length);
-            setLastPhrase(phrase);
+        setLastFileLength(file.size);
+        setLastPhrase(phrase);
 
+        if (typeof file.content == 'string') {
             console.log(`Searching for occurrences of ${phrase} in ${file.name}`);
 
             // get all occurrences
@@ -93,12 +94,43 @@ function FileContainer({ file, phrase }: { file: fileData, phrase: string }) {
 
             setOccurrences(local.slice(0, MAX_DISPLAY));
         } else {
-            // TODO: formatted file type
-            const matches: formattedFileData[][] = [[], [], []];
-            const splitPhrase = phrase.split(' ');
-            // tier 1 - entire phrase is included in head (in any order)
-            // tier 2 - part of phrase is included in head
-            // tier 3 - phrase is included in body
+            // see fileSearch/util.tsx for algorithm explanation
+            const split = [...new Set(phrase.split(' '))].sort();
+            const search = getHash(split, file.content.headMap);
+
+            // used to determine if search words appears in content
+            const sRe = new RegExp(split.join('|'));
+
+            // index of each match
+            const full: number[] = [];
+            const partial: number[] = [];
+            const content: number[] = [];
+
+            file.content.entries.forEach((entry, index) => {
+                let i = 0, j = 0;
+                let match = formattedMatch.FULL;
+                let isNone = true;
+
+                for (; j < search.length; j++) {
+                    if (i > entry.hash.length - 1) {
+                        if (match == formattedMatch.FULL) match = formattedMatch.PARTIAL;
+                        break;
+                    }
+
+                    if (search[j] < entry.hash[i] && match == formattedMatch.FULL) match = formattedMatch.PARTIAL;
+                    else if (search[j] > entry.hash[i]) { i++; j--; }
+                    else { isNone = false; i++; }
+                }
+
+                if (isNone) {
+                    if (sRe.test(entry.content)) content.push(index);
+                } else if (match == formattedMatch.FULL) full.push(index);
+                else partial.push(index);
+            });
+
+            console.log(full.map(x => (file.content as formattedFileData).entries[x]));
+            console.log(partial.map(x => (file.content as formattedFileData).entries[x]));
+            console.log(content.map(x => (file.content as formattedFileData).entries[x]));
         }
 
     }, [file.content, phrase])
