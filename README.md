@@ -25,3 +25,6 @@ This is a commissioned tool to aid in the pronunciation of English words, especi
     f. [OpenL](https://openl.io/translate/international-phonetic-alphabet) (Japanese)
 5. **Audio**  
     a. Merriam Webster (see above)  
+# Usage
+1. `npm run dev`
+2. Navigate to `localhost:3000/Medical-Dictionary`
