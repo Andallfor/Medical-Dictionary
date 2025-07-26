@@ -31,7 +31,7 @@ function Match({ title, indices, entries, highlight }: { title: string, indices:
                     <div className="bg-surface20 w-[2px] mx-2 shrink-0"></div>
                     <div className="flex gap-2 flex-col">
                         {indices.map((x, i) => (
-                            <div className="ml-2 px-2 rounded-sm flex-grow min-w-0 bg-surface10 border border-surface20 py-0.5 text-ellipsis overflow-hidden whitespace-pre-line" key={i}>
+                            <div className="ml-2 px-2 rounded-sm flex-grow min-w-0 bg-surface10 border border-surface20 py-0.5 text-ellipsis overflow-hidden whitespace-pre-line wrap-anywhere" key={i}>
                                 <div className="italic font-semibold">{applyHighlight(entries[x].head, 'head')}</div>
                                 <div>{applyHighlight(entries[x].content, 'content')}</div>
                             </div>

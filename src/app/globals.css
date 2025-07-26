@@ -16,3 +16,7 @@
 .number {
     @apply text-surface50 w-8 flex justify-center items-center flex-shrink-0 font-semibold
 }
+
+.wrap-anywhere {
+    overflow-wrap: anywhere;
+}
