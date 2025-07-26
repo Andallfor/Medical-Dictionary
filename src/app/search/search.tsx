@@ -87,7 +87,7 @@ export function Search({ setFocused, dictionary }: { setFocused: Dispatch<SetSta
                     {!dirty && search.current?.value.split(' ').map((x, k) =>
                         <button key={k} className="flex text-2xl" onClick={() => switchWord(k)}>
                             {k == 0 ? <></> : <div>&nbsp;</div>}
-                            <div className={"border-b-[2px] -translate-y-[2px] " + (displayIndex == k ? 'border-[#f2e194]' : 'border-surface40')}>
+                            <div className={"border-b-[2px] -translate-y-[2px] " + (displayIndex == k ? 'border-yellow' : 'border-surface40')}>
                                 <span className="invisible">{x}</span>
                             </div>
                         </button>)}

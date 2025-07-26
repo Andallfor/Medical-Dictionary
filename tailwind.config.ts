@@ -29,6 +29,7 @@ export default {
         tonal30: '#626262',
         tonal40: '#7a7a7a',
         tonal50: '#939393',
+        yellow: '#f2e194',
       },
     },
   },

@@ -104,7 +104,7 @@ export function TextFileContainer({ file, phrase }: { file: t_fileData, phrase: 
                         <span className="text-surface50 w-8 flex justify-center items-center flex-shrink-0 font-semibold">{i + 1}</span>
                         <span className="px-2 rounded-sm flex-grow min-w-0 bg-surface10 border border-surface20 py-0.5 text-ellipsis overflow-hidden text-nowrap">
                             {o.start}
-                            <span className="bg-[#f2e194] rounded-sm font-semibold text-tonal10 px-1">{o.phrase}</span>
+                            <span className="underline decoration-yellow decoration-2 underline-offset-2">{o.phrase}</span>
                             {o.end}
                         </span>
                     </div>

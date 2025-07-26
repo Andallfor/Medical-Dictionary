@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { formattedFileData, formattedFileEntry } from "./input";
 import { SEARCH_IGNORE, formattedMatch, getHash } from "./util";
 import { Divider } from "../util";
@@ -9,7 +9,21 @@ export interface f_fileData {
     size: number,
 }
 
-function Match({ title, indices, entries }: { title: string, indices: number[], entries: formattedFileEntry[] }) {
+interface highlightData {
+    re: RegExp;
+    pos: 'content' | 'head'
+}
+
+function Match({ title, indices, entries, highlight }: { title: string, indices: number[], entries: formattedFileEntry[], highlight?: highlightData }) {
+    function applyHighlight(str: string, pos: 'content' | 'head'): ReactNode {
+        if (!highlight || pos != highlight.pos) return str;
+        highlight.re.lastIndex = 0;
+        return (
+            <p dangerouslySetInnerHTML={{
+                __html: str.replace(highlight.re, '<span class="underline decoration-yellow decoration-2 underline-offset-2">$1</span>')
+            }}></p>);
+    }
+
     return (
         <div className="mb-1">
             <Divider title={title} reverse={indices.length < 20}>
@@ -18,8 +32,8 @@ function Match({ title, indices, entries }: { title: string, indices: number[], 
                     <div className="flex gap-2 flex-col">
                         {indices.map((x, i) => (
                             <div className="ml-2 px-2 rounded-sm flex-grow min-w-0 bg-surface10 border border-surface20 py-0.5 text-ellipsis overflow-hidden whitespace-pre-line" key={i}>
-                                <p className="italic font-semibold">{entries[x].head}</p>
-                                <p>{entries[x].content}</p>
+                                <div className="italic font-semibold">{applyHighlight(entries[x].head, 'head')}</div>
+                                <div>{applyHighlight(entries[x].content, 'content')}</div>
                             </div>
                         ))}
                     </div>
@@ -34,6 +48,7 @@ export function FormattedFileContainer({ file, phrase }: { file: f_fileData, phr
     const [full, setFull] = useState<number[]>([]);
     const [partial, setPartial] = useState<number[]>([]);
     const [content, setContent] = useState<number[]>([]);
+    const [highlightRegex, setHighlightRegex] = useState(new RegExp(''));
 
     useEffect(() => {
         if (file.size == lastFileLength && phrase == lastPhrase) return;
@@ -83,6 +98,9 @@ export function FormattedFileContainer({ file, phrase }: { file: f_fileData, phr
         setFull(_full);
         setPartial(_partial);
         setContent(_content);
+
+        const re = new RegExp(`(${split.join('|')})`, 'gi');
+        setHighlightRegex(re);
     });
 
     // TODO: sort matches by how close they are!
@@ -96,9 +114,30 @@ export function FormattedFileContainer({ file, phrase }: { file: f_fileData, phr
         <div>
             <Divider title={title} reverse={true}>
                 <div className="ml-4">
-                    <Match title={`Full Matches (${full.length})`} indices={full} entries={file.content.entries}/>
-                    <Match title={`Partial Matches (${partial.length})`} indices={partial} entries={file.content.entries}/>
-                    <Match title={`Content Matches (${content.length})`} indices={content} entries={file.content.entries}/>
+                    <Match
+                        title={`Full Matches (${full.length})`}
+                        indices={full}
+                        entries={file.content.entries}
+                        highlight={{
+                            re: highlightRegex,
+                            pos: 'head'}
+                        }/>
+                    <Match
+                        title={`Partial Matches (${partial.length})`}
+                        indices={partial}
+                        entries={file.content.entries}
+                        highlight={{
+                            re: highlightRegex,
+                            pos: 'head'}
+                        }/>
+                    <Match
+                        title={`Content Matches (${content.length})`}
+                        indices={content}
+                        entries={file.content.entries}
+                        highlight={{
+                            re: highlightRegex,
+                            pos: 'content'}
+                        }/>
                 </div>
             </Divider>
         </div>
