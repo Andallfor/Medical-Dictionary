@@ -64,14 +64,15 @@ export function FormattedFileContainer({ file, phrase }: { file: f_fileData, phr
         const sRe = new RegExp(split.join('|'));
 
         // index of each match
-        const _full: number[] = [];
-        const _partial: number[] = [];
+        const _full: number[][] = [];
+        const _partial: number[][] = [];
         const _content: number[] = [];
 
         file.content.entries.forEach((entry, index) => {
             let i = 0, j = 0;
             let match = formattedMatch.FULL;
             let isNone = true;
+            let numMatches = 0;
 
             for (; j < search.length; j++) {
                 if (i > entry.hash.length - 1) {
@@ -83,27 +84,32 @@ export function FormattedFileContainer({ file, phrase }: { file: f_fileData, phr
                     if (match == formattedMatch.FULL) match = formattedMatch.PARTIAL;
                 } else {
                     if (search[j] > entry.hash[i]) { i++; j--; }
-                    else { isNone = false; i++; }
+                    else { isNone = false; i++; numMatches++; }
                 }
             }
 
+            const score = entry.hash.length - numMatches;
             if (isNone) {
                 if (split.length > 0 && sRe.test(entry.content)) _content.push(index);
             } else {
-                if (match == formattedMatch.FULL) _full.push(index);
-                else _partial.push(index);
+                if (match == formattedMatch.FULL) _full.push([index, score]);
+                else _partial.push([index, score]);
             }
         });
 
-        setFull(_full);
-        setPartial(_partial);
-        setContent(_content);
+        function sort(a: number[], b: number[]) {
+            const s = a[1] - b[1];
+            return s != 0 ? s : file.content.entries[a[0]].head.localeCompare(file.content.entries[b[0]].head);
+        }
+
+        // sort by score
+        setFull(_full.sort(sort).map(x => x[0]));
+        setPartial(_partial.sort(sort).map(x => x[0]));
+        setContent(_content); // dont sort content
 
         const re = new RegExp(`(${split.join('|')})`, 'gi');
         setHighlightRegex(re);
     });
-
-    // TODO: sort matches by how close they are!
 
     const num = full.length + partial.length + content.length;
     if (num == 0) return <div>No matches for "<span className="font-semibold">{phrase}</span>" in <span className="font-semibold">{file.name}</span>.</div>;

@@ -110,7 +110,6 @@ export default function FileInput({ files, setFiles }: { files: fileData[], setF
 
             c = fc;
             type = fileType.FORMATTED;
-            console.log(c);
           }
 
           data.push({
