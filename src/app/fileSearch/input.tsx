@@ -1,5 +1,5 @@
 import axios, { Axios, AxiosResponse, all } from "axios";
-import { ChangeEvent, Dispatch, SetStateAction, useEffect } from "react";
+import { ChangeEvent, Dispatch, SetStateAction, useEffect, useState } from "react";
 import { prettifyFileSize } from "../util";
 import { getHash } from "./util";
 
@@ -32,6 +32,8 @@ export interface formattedFileEntry {
 }
 
 export default function FileInput({ files, setFiles }: { files: fileData[], setFiles: Dispatch<SetStateAction<fileData[]>> }) {
+    const [dirtyMap, setDirtyMap] = useState<Record<string, boolean>>({});
+
     async function addFiles(event: ChangeEvent<HTMLInputElement>) {
         const metadata: fileMetadata[] = [];
         const f = event.target.files!;
@@ -137,6 +139,33 @@ export default function FileInput({ files, setFiles }: { files: fileData[], setF
         } else setFiles([]);
     }
 
+    function downloadFormatted(filename: string) {
+        const file = files.find(x => x.name == filename)!;
+        if (file.type != fileType.FORMATTED) return;
+
+        let str = "";
+        (file.content as formattedFileData).entries.forEach(x => {
+            str += x.head + '\n' + x.content + '\n\n';
+        });
+
+        const blob = new Blob([str], {type: 'text/plain;charset=UTF-8;'});
+        if ('msSaveOrOpenBlob' in window.navigator) {
+            // @ts-ignore
+            window.navigator.msSaveBlob(blob, filename);
+        } else {
+            const elem = window.document.createElement('a');
+            elem.href = window.URL.createObjectURL(blob);
+            elem.download = filename;
+            document.body.appendChild(elem);
+            elem.click();
+            document.body.removeChild(elem);
+        }
+
+        const copy = {...dirtyMap};
+        copy[filename] = false;
+        setDirtyMap({...copy});
+    }
+
     useEffect(() => {
         const callback = (e: Event) => {
             const [filename, index] = (e as CustomEvent).detail as [string, number];
@@ -146,6 +175,10 @@ export default function FileInput({ files, setFiles }: { files: fileData[], setF
             delete (file.content as formattedFileData).entries[index];
 
             setFiles(copy);
+
+            const dCopy = {...dirtyMap};
+            dCopy[filename] = true;
+            setDirtyMap(dCopy);
         };
 
         document.addEventListener('formatted-file-delete-entry', callback);
@@ -181,11 +214,16 @@ export default function FileInput({ files, setFiles }: { files: fileData[], setF
                                 {x.type == fileType.TEXT ?
                                     <i className="ri-file-text-line mr-1"></i> :
                                     <i className="ri-file-code-line mr-1"></i>}
-                                <div className="mr-4 font-semibold text-left min-w-32">{x.name}</div>
+                                <div className="mr-4 text-left min-w-32">
+                                    <span className="text-red-400">{dirtyMap[x.name] ? '*' : ''}</span>
+                                    <span className={dirtyMap[x.name] ? 'font-semibold' : ''}>{x.name}</span>
+                                </div>
                                 <div>({prettifyFileSize(x.size)})</div>
                             </div>
                         </div>
-                        <button className="button ri-file-download-line ml-1.5" />
+                        {x.type == fileType.FORMATTED ?
+                            <button className="button ri-file-download-line ml-1.5" onClick={() => downloadFormatted(x.name)}/>
+                        : <></>}
                         <button className="button ri-close-line ml-1.5" onClick={() => remove(x.name)} />
                     </div>)}
             </div>
