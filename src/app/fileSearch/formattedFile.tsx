@@ -14,7 +14,9 @@ interface highlightData {
     pos: 'content' | 'head'
 }
 
-function Match({ title, indices, entries, highlight }: { title: string, indices: number[], entries: formattedFileEntry[], highlight?: highlightData }) {
+function MatchEntry({ index, entry, highlight }: { index: [string, number], entry: formattedFileEntry, highlight?: highlightData }) {
+    const [deleteState, setDeleteState] = useState(0);
+
     function applyHighlight(str: string, pos: 'content' | 'head'): ReactNode {
         if (!highlight || pos != highlight.pos) return str;
         highlight.re.lastIndex = 0;
@@ -24,6 +26,41 @@ function Match({ title, indices, entries, highlight }: { title: string, indices:
             }}></p>);
     }
 
+    // when we delete an entry (formatted-file-delete-entry event), entry var becomes null
+    if (!entry) return <></>;
+
+    return (
+        <div className="ml-2 px-2 rounded-sm flex-grow min-w-0 bg-surface10 border border-surface20 py-0.5 text-ellipsis overflow-hidden whitespace-pre-line wrap-anywhere">
+            <div className="flex justify-between mt-1">
+                <div className="italic font-semibold">{applyHighlight(entry.head, 'head')}</div>
+                <div className="flex gap-2">
+                    <button className="button ri-pencil-fill"/>
+                    <button className={"button " + (deleteState == 0 ? 'ri-close-line' : 'ri-check-line outline-1 outline outline-red-500')}
+                        onClick={(e) => {
+                        if (deleteState == 0) {
+                            setDeleteState(1);
+
+                            // click elsewhere; reset deletion
+                            const callback = (y: MouseEvent) => {
+                                if (!(e.target as Node).contains(y.target as Node)) setDeleteState(0);
+                                document.removeEventListener('click', callback);
+                            }
+
+                            document.addEventListener('click', callback);
+                        } else if (deleteState == 1) {
+                            // this calls event in input.tsx (since that is where we set the file state that is shared)
+                            // (only slightly scuffed)
+                            document.dispatchEvent(new CustomEvent('formatted-file-delete-entry', { detail: index }));
+                        }
+                    }}/>
+                </div>
+            </div>
+            <div>{applyHighlight(entry.content, 'content')}</div>
+        </div>
+    );
+}
+
+function Match({ title, filename, indices, entries, highlight }: { title: string, filename: string, indices: number[], entries: formattedFileEntry[], highlight?: highlightData }) {
     return (
         <div className="mb-1">
             <Divider title={title} reverse={indices.length < 20}>
@@ -31,10 +68,7 @@ function Match({ title, indices, entries, highlight }: { title: string, indices:
                     <div className="bg-surface20 w-[2px] mx-2 shrink-0"></div>
                     <div className="flex gap-2 flex-col">
                         {indices.map((x, i) => (
-                            <div className="ml-2 px-2 rounded-sm flex-grow min-w-0 bg-surface10 border border-surface20 py-0.5 text-ellipsis overflow-hidden whitespace-pre-line wrap-anywhere" key={i}>
-                                <div className="italic font-semibold">{applyHighlight(entries[x].head, 'head')}</div>
-                                <div>{applyHighlight(entries[x].content, 'content')}</div>
-                            </div>
+                            <MatchEntry key={i} index={[filename, x]} entry={entries[x]} highlight={highlight}/>
                         ))}
                     </div>
                 </div>
@@ -121,6 +155,7 @@ export function FormattedFileContainer({ file, phrase }: { file: f_fileData, phr
             <Divider title={title} reverse={true}>
                 <div className="ml-4">
                     <Match
+                        filename={file.name}
                         title={`Full Matches (${full.length})`}
                         indices={full}
                         entries={file.content.entries}
@@ -129,6 +164,7 @@ export function FormattedFileContainer({ file, phrase }: { file: f_fileData, phr
                             pos: 'head'}
                         }/>
                     <Match
+                        filename={file.name}
                         title={`Partial Matches (${partial.length})`}
                         indices={partial}
                         entries={file.content.entries}
@@ -137,6 +173,7 @@ export function FormattedFileContainer({ file, phrase }: { file: f_fileData, phr
                             pos: 'head'}
                         }/>
                     <Match
+                        filename={file.name}
                         title={`Content Matches (${content.length})`}
                         indices={content}
                         entries={file.content.entries}

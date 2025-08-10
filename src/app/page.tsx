@@ -83,7 +83,7 @@ export default function Home() {
                 </div>
                 <div className="flex flex-col gap-4">
                     <Search setFocused={setFocusedWord} dictionary={data} />
-                    <Settings files={files} setFiles={setFiles} dictionary={data}/>
+                    <Settings files={files} setFiles={setFiles} dictionary={data} />
                 </div>
             </div>
         </div>
