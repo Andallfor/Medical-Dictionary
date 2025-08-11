@@ -86,7 +86,7 @@ function Definition({ word, userSearch }: { word: wordDefinitionData, userSearch
                                 ? <div className={"ml-3 border bg-tonal0 rounded-md text-2 text-xl py-0.5 px-2 " + (word.shouldWarn ? 'border-red-500' : 'border-surface20')}>{word.pronunciation}</div>
                                 : <span className="text-base mx-6">[No pronunciation found]</span>}
                     </div>
-                    {(word.shouldWarn && word.pronunciation) ? <button className="button ml-3 ri-file-copy-line text-base" onClick={() => navigator.clipboard.writeText(word.pronunciation!)}></button> : <></>}
+                    {(word.pronunciation) ? <button className="button ml-3 ri-file-copy-line text-base" onClick={() => navigator.clipboard.writeText(word.pronunciation!)}></button> : <></>}
                 </div>
                 <div className="text-primary40">
                     <div className="italic">{capitalize((word.part && word.part.length > 0) ? word.part : 'No part of speech')}</div>

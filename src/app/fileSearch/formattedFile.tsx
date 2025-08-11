@@ -2,6 +2,7 @@ import { ReactNode, useEffect, useReducer, useState } from "react";
 import { formattedFileData, formattedFileEntry } from "./input";
 import { SEARCH_IGNORE, formattedMatch, getHash } from "./util";
 import { Divider } from "../util";
+import { readRegex } from "../phoneticTree/constants";
 
 export interface f_fileData {
     name: string,
@@ -81,7 +82,8 @@ export function FormattedFileContainer({ file, phrase }: { file: f_fileData, phr
     const [lastPhrase, setLastPhrase] = useState('');
     const [full, setFull] = useState<number[]>([]);
     const [partial, setPartial] = useState<number[]>([]);
-    const [content, setContent] = useState<number[]>([]);
+    const [fullContent, setFullContent] = useState<number[]>([]);
+    const [partialContent, setPartialContent] = useState<number[]>([]);
     const [highlightRegex, setHighlightRegex] = useState(new RegExp(''));
 
     useState(() => {
@@ -110,12 +112,14 @@ export function FormattedFileContainer({ file, phrase }: { file: f_fileData, phr
         const search = getHash(split, file.content.headMap);
 
         // used to determine if search words appears in content
-        const sRe = new RegExp(split.join('|'));
+        const sRe = new RegExp(split.join('|')); // appears somewhere in text
+        const fRe = new RegExp(`\\b${split.join('|')}\\b`); // match full word
 
         // index of each match
         const _full: number[][] = [];
         const _partial: number[][] = [];
         const _content: number[] = [];
+        const _partial_content: number[] = [];
 
         file.content.entries.forEach((entry, index) => {
             let i = 0, j = 0;
@@ -139,7 +143,10 @@ export function FormattedFileContainer({ file, phrase }: { file: f_fileData, phr
 
             const score = entry.hash.length - numMatches;
             if (isNone) {
-                if (split.length > 0 && sRe.test(entry.content)) _content.push(index);
+                if (split.length > 0) {
+                    if (fRe.test(entry.content)) _content.push(index);
+                    else if (sRe.test(entry.content)) _partial_content.push(index);
+                }
             } else {
                 if (match == formattedMatch.FULL) _full.push([index, score]);
                 else _partial.push([index, score]);
@@ -154,13 +161,14 @@ export function FormattedFileContainer({ file, phrase }: { file: f_fileData, phr
         // sort by score
         setFull(_full.sort(sort).map(x => x[0]));
         setPartial(_partial.sort(sort).map(x => x[0]));
-        setContent(_content); // dont sort content
+        setFullContent(_content); // dont sort content
+        setPartialContent(_partial_content);
 
         const re = new RegExp(`(${split.join('|')})`, 'gi');
         setHighlightRegex(re);
     });
 
-    const num = full.length + partial.length + content.length;
+    const num = full.length + partial.length + fullContent.length;
     if (num == 0) return <div>No matches for "<span className="font-semibold">{phrase}</span>" in <span className="font-semibold">{file.name}</span>.</div>;
 
     const title = <div>Found {num} matches for "<span className="font-semibold">{phrase}</span>" in <span className="font-semibold">{file.name}</span></div>;
@@ -189,8 +197,17 @@ export function FormattedFileContainer({ file, phrase }: { file: f_fileData, phr
                         }/>
                     <Match
                         filename={file.name}
-                        title={`Content Matches (${content.length})`}
-                        indices={content}
+                        title={`Content Matches (${fullContent.length})`}
+                        indices={fullContent}
+                        entries={file.content.entries}
+                        highlight={{
+                            re: highlightRegex,
+                            pos: 'content'}
+                        }/>
+                    <Match
+                        filename={file.name}
+                        title={`Partial Content Matches (${partialContent.length})`}
+                        indices={partialContent}
                         entries={file.content.entries}
                         highlight={{
                             re: highlightRegex,

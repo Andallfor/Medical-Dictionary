@@ -62,7 +62,7 @@ export default function PhoneticTree({ data }: { data: phoneme[] }) {
 
     function formatSearch() {
         if (!searchStr) return;
-        if (searchStr.length == 0) return "no pronunciation";
+        if (searchStr.length == 0) return "sound selection";
 
         let out = searchStr.map((s) => s ? ('* ' + s) : '').join(' ');
         return out.length != 0 ? ("'" + out) : "";
@@ -149,7 +149,7 @@ export default function PhoneticTree({ data }: { data: phoneme[] }) {
 
             vowelRef.current.update(vowels);
             consonantRef.current.update([tailCon.length == 0 ? 'None' : tailCon]);
-        } else noPronRef.current?.update(['No Pronunciation']);
+        } else noPronRef.current?.update(['Sound Selection']);
 
         search(pron == '', word.toLowerCase(), true);
     }
@@ -174,7 +174,7 @@ export default function PhoneticTree({ data }: { data: phoneme[] }) {
                     states: noPronState,
                     setStates: setNoPronState,
                     search: () => search(true),
-                    list: ["No Pronunciation"]
+                    list: ["Sound Selection"]
                 }} customization={{ width: 'w-full' }}/>
                 <div className="flex gap-2">
                     <PhoneticSearchController ref={vowelRef} num={4} props={{

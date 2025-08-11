@@ -36,7 +36,7 @@ export function Search({ setFocused, dictionary }: { setFocused: Dispatch<SetSta
         // initialize
         setDisplayIndex(0);
         setLoading(`Searching for ${search.current.value}...`)
-        const w = search.current.value.split(' ').map(x => x.normalize());
+        const w = search.current.value.toLowerCase().split(' ').map(x => x.normalize());
 
         // get the def of each word
         const state: (mw[] | string)[] = [];
