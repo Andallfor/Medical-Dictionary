@@ -1,6 +1,7 @@
 import { fileData, fileType, formattedFileData } from "./input";
 import { TextFileContainer, t_fileData } from "./textFile";
 import { FormattedFileContainer, f_fileData } from "./formattedFile";
+import { useReducer, useState } from "react";
 
 export default function FileSearch({ files, phrase }: { files: fileData[], phrase: string }) {
     phrase = phrase.trim().toLowerCase();

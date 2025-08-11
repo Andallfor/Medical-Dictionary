@@ -1,7 +1,8 @@
 import axios, { Axios, AxiosResponse, all } from "axios";
 import { ChangeEvent, Dispatch, SetStateAction, useEffect, useState } from "react";
 import { prettifyFileSize } from "../util";
-import { getHash } from "./util";
+import { getHash, readFormattedFile } from "./util";
+import { FormattedFileEditor } from "./editor";
 
 interface fileMetadata {
     name: string,
@@ -60,64 +61,19 @@ export default function FileInput({ files, setFiles }: { files: fileData[], setF
                     // use the fact that lists are stable, so index here matches metadata index
                     const m = metadata[ind];
 
-                    let c: string | formattedFileData = content.data as string;
+                    let con: string | formattedFileData = content.data as string;
                     let type = fileType.TEXT;
 
                     // read formatted file
-                    // see fileSearch/util.tsx for algorithm explanation
                     if ((content.data as string).startsWith('#!/formatted')) {
-                        const lines = (content.data as string).split('\n');
-                        const re = /^(?<head>(?:[^a-z]+:)+)(?<body>.*)$/ms;
-                        const re_s = /:| /g;
-                        const fc: formattedFileData = { entries: [], headMap: {} };
-
-                        // get all entries
-                        const entries = [];
-                        for (let i = 1; i < lines.length; i++) {
-                            const line = lines[i];
-                            if (line.trim().length == 0) continue;
-
-                            if (re.test(line)) entries.push(line);
-                            else entries[entries.length - 1] += '\n' + line; // some entries are split across multiple lines
-                        }
-
-                        // process entries
-                        const allHeads: Set<string> = new Set();
-                        entries.forEach(x => {
-                            const match = re.exec(x);
-                            if (!match) {
-                                console.error('Could not match ' + x);
-                                return;
-                            }
-
-                            const g = match.groups!;
-                            // hmmm.....
-                            // given the head "A B: C:", split on delimiters (:, space), remove whitespace and empty strings then get uniques
-                            const head = new Set(g['head'].split(re_s).flatMap(y => y.trim().toLowerCase()).filter(x => x.length != 0));
-                            head.forEach(h => allHeads.add(h));
-
-                            const entry = {
-                                head: g['head'].trim(),
-                                content: g['body'].trim(),
-                                hash: [],
-                                fHead: [...head].sort(),
-                            };
-
-                            fc.entries.push(entry);
-                        });
-
-                        // generate entry hashes
-                        [...allHeads].sort().forEach((x, i) => fc.headMap[x] = i);
-                        fc.entries.forEach(x => x.hash = getHash(x.fHead, fc.headMap));
-
-                        c = fc;
+                        con = readFormattedFile(content.data as string)!;
                         type = fileType.FORMATTED;
                     }
 
                     data.push({
                         name: m.name,
                         size: m.size,
-                        content: c,
+                        content: con,
                         type: type,
                     });
 
@@ -137,13 +93,15 @@ export default function FileInput({ files, setFiles }: { files: fileData[], setF
                 setFiles([...files]);
             }
         } else setFiles([]);
+
+        document.dispatchEvent(new CustomEvent('file-input-remove-file', { detail: name }));
     }
 
     function downloadFormatted(filename: string) {
         const file = files.find(x => x.name == filename)!;
         if (file.type != fileType.FORMATTED) return;
 
-        let str = "";
+        let str = "#!/formatted\n";
         (file.content as formattedFileData).entries.forEach(x => {
             str += x.head + '\n' + x.content + '\n\n';
         });
@@ -166,6 +124,26 @@ export default function FileInput({ files, setFiles }: { files: fileData[], setF
         setDirtyMap({...copy});
     }
 
+    function addFormattedEntry(e: Event) {
+        const data = (e as CustomEvent).detail as { file: string, head: string, body: string };
+
+        // brute force approach: reconstruct text file then reprocess as new file
+
+        const fIndex = files.findIndex(x => x.name == data.file);
+        const file = files[fIndex];
+        if (file.type != fileType.FORMATTED) return;
+        let str = '#!/formatted\n';
+        (file.content as formattedFileData).entries.forEach(x => str += `${x.head}\n${x.content}\n\n`);
+
+        str += `${data.head}\n${data.body}`;
+
+        const copy = [...files];
+        copy[fIndex].content = readFormattedFile(str)!;
+        copy[fIndex].size += (data.head.length + data.body.length); // assume sizeof(char) = 1, we dont need this to be super accurate
+
+        setFiles(copy);
+    }
+
     useEffect(() => {
         const callback = (e: Event) => {
             const [filename, index] = (e as CustomEvent).detail as [string, number];
@@ -179,12 +157,26 @@ export default function FileInput({ files, setFiles }: { files: fileData[], setF
             const dCopy = {...dirtyMap};
             dCopy[filename] = true;
             setDirtyMap(dCopy);
+
+            document.dispatchEvent(new CustomEvent('formatted-file-force-update', { detail: filename }));
+        };
+
+        const dirtyCallback = (e: Event) => {
+            const file = (e as CustomEvent).detail as string;
+
+            const copy = {...dirtyMap};
+            copy[file] = true;
+            setDirtyMap(copy);
         };
 
         document.addEventListener('formatted-file-delete-entry', callback);
+        document.addEventListener('formatted-file-set-dirty', dirtyCallback);
+        document.addEventListener('formatted-file-force-add-entry', addFormattedEntry);
 
         return () => {
             document.removeEventListener('formatted-file-delete-entry', callback);
+            document.removeEventListener('formatted-file-set-dirty', dirtyCallback);
+            document.removeEventListener('formatted-file-force-add-entry', addFormattedEntry);
         };
     });
 
@@ -221,17 +213,18 @@ export default function FileInput({ files, setFiles }: { files: fileData[], setF
                                 <div>({prettifyFileSize(x.size)})</div>
                             </div>
                         </div>
-                        {x.type == fileType.FORMATTED ?
+                        {x.type == fileType.FORMATTED ? <>
+                            <button className="button ri-add-line ml-1.5" onClick={() => document.dispatchEvent(new CustomEvent('formatted-file-add-entry', { detail: { file: x.name }}))}/>
                             <button className="button ri-file-download-line ml-1.5" onClick={() => downloadFormatted(x.name)}/>
-                        : <></>}
+                        </> : <></>}
                         <button className="button ri-close-line ml-1.5" onClick={() => remove(x.name)} />
                     </div>)}
             </div>
             <div className={files.some(x => x.type == fileType.FORMATTED) ? '' : 'hidden'}>
-                <div>Edit Formatted Files:</div>
+                <div>Edit Formatted Entry:</div>
                 <div className="flex mt-1">
                     <div className="bg-surface20 w-[2px] mx-2"></div>
-                    <div>Please select an entry to edit/add from the file search panel.</div>
+                    <FormattedFileEditor files={files} />
                 </div>
             </div>
         </div>

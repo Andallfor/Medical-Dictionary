@@ -1,3 +1,5 @@
+import { formattedFileData } from "./input";
+
 export enum formattedMatch {
     FULL, PARTIAL, NONE
 } 
@@ -61,6 +63,56 @@ export function getHash(words: string[], headMap: Record<string, number>): numbe
  *            match = none
  *            Check if any search term exists in entry body for content match
  */
+
+export function readFormattedFile(content: string) {
+    if (!content.startsWith('#!/formatted')) return undefined;
+
+    const lines = content.split('\n');
+    const re = /^(?<head>(?:[^a-z]+:)+)(?<body>.*)$/ms;
+    const re_s = /:| /g;
+    const fc: formattedFileData = { entries: [], headMap: {} };
+
+    // get all entries
+    const entries = [];
+    for (let i = 1; i < lines.length; i++) {
+        const line = lines[i];
+        if (line.trim().length == 0) continue;
+
+        if (re.test(line)) entries.push(line);
+        else entries[entries.length - 1] += '\n' + line; // some entries are split across multiple lines
+    }
+
+    // process entries
+    const allHeads: Set<string> = new Set();
+    entries.forEach(x => {
+        const match = re.exec(x);
+        if (!match) {
+            console.error('Could not match ' + x);
+            return;
+        }
+
+        const g = match.groups!;
+        // hmmm.....
+        // given the head "A B: C:", split on delimiters (:, space), remove whitespace and empty strings then get uniques
+        const head = new Set(g['head'].split(re_s).flatMap(y => y.trim().toLowerCase()).filter(x => x.length != 0));
+        head.forEach(h => allHeads.add(h));
+
+        const entry = {
+            head: g['head'].trim(),
+            content: g['body'].trim(),
+            hash: [],
+            fHead: [...head].sort(),
+        };
+
+        fc.entries.push(entry);
+    });
+
+    // generate entry hashes
+    [...allHeads].sort().forEach((x, i) => fc.headMap[x] = i);
+    fc.entries.forEach(x => x.hash = getHash(x.fHead, fc.headMap));
+
+    return fc;
+}
 
 // top 100 most common english words
 export const SEARCH_IGNORE = new Set([

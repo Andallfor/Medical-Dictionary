@@ -1,4 +1,4 @@
-import { ReactNode, useEffect, useState } from "react";
+import { ReactNode, useEffect, useReducer, useState } from "react";
 import { formattedFileData, formattedFileEntry } from "./input";
 import { SEARCH_IGNORE, formattedMatch, getHash } from "./util";
 import { Divider } from "../util";
@@ -34,7 +34,7 @@ function MatchEntry({ index, entry, highlight }: { index: [string, number], entr
             <div className="flex justify-between mt-1">
                 <div className="italic font-semibold">{applyHighlight(entry.head, 'head')}</div>
                 <div className="flex gap-2">
-                    <button className="button ri-pencil-fill"/>
+                    <button className="button ri-pencil-fill" onClick={() => document.dispatchEvent(new CustomEvent('formatted-file-edit-entry', { detail: { file: index[0], index: index[1]} }))}/>
                     <button className={"button " + (deleteState == 0 ? 'ri-close-line' : 'ri-check-line outline-1 outline outline-red-500')}
                         onClick={(e) => {
                         if (deleteState == 0) {
@@ -66,7 +66,7 @@ function Match({ title, filename, indices, entries, highlight }: { title: string
             <Divider title={title} reverse={indices.length < 20}>
                 <div className="flex mt-1">
                     <div className="bg-surface20 w-[2px] mx-2 shrink-0"></div>
-                    <div className="flex gap-2 flex-col">
+                    <div className="flex gap-2 flex-col w-full">
                         {indices.map((x, i) => (
                             <MatchEntry key={i} index={[filename, x]} entry={entries[x]} highlight={highlight}/>
                         ))}
@@ -83,6 +83,21 @@ export function FormattedFileContainer({ file, phrase }: { file: f_fileData, phr
     const [partial, setPartial] = useState<number[]>([]);
     const [content, setContent] = useState<number[]>([]);
     const [highlightRegex, setHighlightRegex] = useState(new RegExp(''));
+
+    useState(() => {
+        function callback(e: Event) {
+            const name = (e as CustomEvent).detail as string;
+            if (name != file.name) return;
+
+            setLastFileLength(-1);
+        }
+
+        document.addEventListener('formatted-file-force-update', callback);
+
+        return () => {
+            document.removeEventListener('formatted-file-force-update', callback);
+        }
+    });
 
     useEffect(() => {
         if (file.size == lastFileLength && phrase == lastPhrase) return;
