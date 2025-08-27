@@ -27,7 +27,7 @@ function MatchEntry({ index, entry, highlight }: { index: [string, number], entr
             }}></p>);
     }
 
-    // when we delete an entry (formatted-file-delete-entry event), entry var becomes null
+    // when we delete an entry (formatted-file-delete-entry event), entry var becomes null due to key issues (i think)
     if (!entry) return <></>;
 
     return (

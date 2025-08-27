@@ -40,3 +40,5 @@ next-env.d.ts
 /python/out
 /python/pdfs
 /python/old
+
+/data
