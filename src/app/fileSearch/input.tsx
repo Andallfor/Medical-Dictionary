@@ -145,7 +145,7 @@ export default function FileInput({ files, setFiles }: { files: fileData[], setF
     }
 
     useEffect(() => {
-        const callback = (e: Event) => {
+        const deleteFormattedEntry = (e: Event) => {
             const [filename, index] = (e as CustomEvent).detail as [string, number];
 
             const copy = [...files];
@@ -161,7 +161,7 @@ export default function FileInput({ files, setFiles }: { files: fileData[], setF
             document.dispatchEvent(new CustomEvent('formatted-file-force-update', { detail: filename }));
         };
 
-        const dirtyCallback = (e: Event) => {
+        const setDirty = (e: Event) => {
             const file = (e as CustomEvent).detail as string;
 
             const copy = {...dirtyMap};
@@ -169,13 +169,13 @@ export default function FileInput({ files, setFiles }: { files: fileData[], setF
             setDirtyMap(copy);
         };
 
-        document.addEventListener('formatted-file-delete-entry', callback);
-        document.addEventListener('formatted-file-set-dirty', dirtyCallback);
+        document.addEventListener('formatted-file-delete-entry', deleteFormattedEntry);
+        document.addEventListener('formatted-file-set-dirty', setDirty);
         document.addEventListener('formatted-file-force-add-entry', addFormattedEntry);
 
         return () => {
-            document.removeEventListener('formatted-file-delete-entry', callback);
-            document.removeEventListener('formatted-file-set-dirty', dirtyCallback);
+            document.removeEventListener('formatted-file-delete-entry', deleteFormattedEntry);
+            document.removeEventListener('formatted-file-set-dirty', setDirty);
             document.removeEventListener('formatted-file-force-add-entry', addFormattedEntry);
         };
     });

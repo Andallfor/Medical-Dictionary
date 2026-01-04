@@ -26,5 +26,5 @@ This is a commissioned tool to aid in the pronunciation of English words, especi
 5. **Audio**  
     a. Merriam Webster (see above)  
 # Usage
-1. `npm run dev`
+1. `npm run dev` (TailwindCSS is started automatically)
 2. Navigate to `localhost:3000/Medical-Dictionary`

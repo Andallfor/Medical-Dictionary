@@ -1,5 +1,5 @@
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
-import { ConsonantOrder, ConsonantSearch, VowelOrder, branchState, phoneme, r_tail_c, r_vowel, readRegex, replacement, standardize, standardizeType } from "./constants";
+import { ConsonantOrder, ConsonantSearch, VowelOrder, branchState, formattedConsonants, phoneme, r_tail_c, r_vowel, readRegex, replacement, standardize, standardizeType } from "./constants";
 import { PhoneticSearchController, PhoneticSearchControllerRef } from "./search";
 
 export function toIpa(str: string, from: standardizeType) {
@@ -64,7 +64,7 @@ export default function PhoneticTree({ data }: { data: phoneme[] }) {
         if (!searchStr) return;
         if (searchStr.length == 0) return "sound selection";
 
-        let out = searchStr.map((s) => s ? ('* ' + s) : '').join(' ');
+        let out = searchStr.map((s) => s == undefined ? '*' : s == '' ? '' : ('* ' + s)).join(' ');
         return out.length != 0 ? ("'" + out) : "";
     }
 
@@ -91,7 +91,18 @@ export default function PhoneticTree({ data }: { data: phoneme[] }) {
             pattern.length == searchStr.length && pattern.reduce((a, x, i) => a && (x == searchStr[i]), true)) return;
         setSearchStr(pattern);
 
-        // find all matching words
+        // given pattern as string array [str1, str2, str3]
+        // the desired regex is * str1 * str2 * str3
+        // where * means any consonant any number of times (no vowels!) 
+        // if the last element is undefined, it means any consonant any number of times and at most one vowel
+        // note that we only match against the primary syllable of the word
+
+        // unfortunately we can't use regex for this because we need a
+        // non-greedy match everything except for vowels expect for the exact vowel we want
+
+        // sort vowels from largest to smallest for matching
+        const sortedVowels = [...Object.keys(VowelOrder).sort((a, b) => b.length - a.length)];
+
         const valid = data.filter((p) => {
             if (p.word == requestExact) return true; // exact match
 
@@ -99,12 +110,50 @@ export default function PhoneticTree({ data }: { data: phoneme[] }) {
             else {
                 if (p.pronunciation.length == 0) return false;
 
-                // this can be optimized to make use of short circuit eval
-                const t = tail == undefined ? true : p.primary.consonants.tail == tail;
-                let v = p.primary.vowels.length >= pattern.length - 1;
-                for (let i = 0; i < pattern.length - 1; i++) v &&= p.primary.vowels[i] == pattern[i];
+                // we match against the actual pronunciation string
+                const split = p.pronunciation.split('ˈ');
+                let primary = split.length == 1 ? split[0] : split[1];
 
-                return t && v;
+                for (let i = 0; i < pattern.length; i++) {
+                    const pat = pattern[i];
+
+                    if (pat == undefined) {
+                        if (primary.length == 0) return true;
+                        // we want undefined to match any number of consonants and at most one vowel
+                        // we also assume that undefined is at the very end
+                        if (i != pattern.length - 1) console.warn(`Phonetic tree pattern ${pattern.join(', ')} has non-terminating undefined`);
+
+                        // consume everything and make sure we see at most one vowel
+                        let vowelAllowance = 1;
+                        while (primary.length != 0) {
+                            for (let j = 0; j < sortedVowels.length; j++) {
+                                if (primary.startsWith(sortedVowels[j]) && vowelAllowance-- == 0) return false;
+                            }
+
+                            primary = primary.substring(1);
+                        }
+
+                        return true;
+                    } else {
+                        if (primary.startsWith(pat)) {
+                            primary = primary.substring(pat.length);
+                            continue;
+                        }
+
+                        if (primary.length == 0) return false;
+
+                        // no match, check if this is a vowel. if not, skip and try again
+                        for (let j = 0; j < sortedVowels.length; j++) {
+                            // hit vowel (necessarily not pat), so * cannot contain this
+                            if (primary.startsWith(sortedVowels[j])) return false;
+                        }
+
+                        primary = primary.substring(1);
+                        i--;
+                    }
+                }
+
+                return primary.length == 0;
             }
         });
 
