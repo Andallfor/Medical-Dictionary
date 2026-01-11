@@ -1,8 +1,8 @@
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
-import { ConsonantOrder, ConsonantSearch, VowelOrder, branchState, formattedConsonants, phoneme, r_tail_c, r_vowel, readRegex, replacement, standardize, standardizeType } from "./constants";
+import { ConsonantOrder, ConsonantSearch, StandardType, Tokenization, VowelOrder, branchState, formattedConsonants, phoneme, r_tail_c, r_vowel, readRegex, replacement, standardize, standardizeType, toRegexOr } from "./constants";
 import { PhoneticSearchController, PhoneticSearchControllerRef } from "./search";
 
-export function toIpa(str: string, from: standardizeType) {
+export function toIpa(str: string, from: standardizeType, debug = false) {
     const standard = standardize.get(from);
     const proc = standardize.getProcessed(from);
 
@@ -12,27 +12,14 @@ export function toIpa(str: string, from: standardizeType) {
 
     str = str.replaceAll(base, (v) => standard[v] as string);
 
-    const ind = [...str.matchAll(new RegExp([...Object.keys(rep)].join('|'), 'g'))];
-    const stressUnits = [...str.matchAll(/ˈ|ˌ/g)].map(x => x.index!);
+    const ind = [...str.matchAll(toRegexOr(Object.keys(rep), 'g'))];
+    const stressUnits = [...str.matchAll(/ˈ|ˌ/g)].map(x => x.index);
 
     if (ind.length > 0) {
         // for each of these vowels, check if they are stressed or not
         // specifically, within the current stress unit find the first vowel and check if the index is the current
         ind.forEach((match) => {
-            let isStressed = false;
-
-            if (stressUnits.length == 0 || match.index! < stressUnits[0]) isStressed = false;    
-            else {
-                stressUnits.push(str.length - 1);
-                for (let i = 1; i < stressUnits.length; i++) {
-                    if (stressUnits[i] > match.index!) {
-                        let ind = i - 1;
-                        let found = str.substring(stressUnits[ind]).match(joinedReg)!.index!;
-                        isStressed = found + stressUnits[ind] == match.index!
-                        break;
-                    }
-                }
-            }
+            let isStressed = stressUnits.length == 0 || match.index > stressUnits[0];
 
             rep[match[0]].forEach(x => {
                 if (x.whenStress == isStressed) {

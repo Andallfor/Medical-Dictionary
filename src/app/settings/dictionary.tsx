@@ -1,4 +1,4 @@
-import { phoneme, readRegex, r_stress_c, r_vowel, r_sec_c, r_tail_c } from "../phoneticTree/constants";
+import { phoneme, readRegex, r_stress_c, r_vowel, r_sec_c, r_tail_c, Tokenization, StandardType } from "../phoneticTree/constants";
 import { toIpa } from "../phoneticTree/tree";
 import { lineData } from "./editor";
 

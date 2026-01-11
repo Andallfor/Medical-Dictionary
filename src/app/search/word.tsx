@@ -1,4 +1,4 @@
-import { mw, phoneme, wordDefinitionData } from "../phoneticTree/constants";
+import { mw, phoneme, StandardType, Tokenization, wordDefinitionData } from "../phoneticTree/constants";
 import { toIpa } from "../phoneticTree/tree";
 import { capitalize } from "../util";
 import { getAudio, hasAudio } from "./api";
