@@ -6,9 +6,9 @@ import { fileData } from "./fileSearch/input";
 import FileSearch from "./fileSearch/search";
 import PhoneticTree from "./phoneticTree/tree";
 import { Search } from "./search/search";
-import { phoneme } from "./phoneticTree/constants";
+import { phoneme, Word } from "./phoneticTree/constants";
 import { Settings } from "./settings/panel";
-import { processDictionary } from "./settings/dictionary";
+import { processDictionary, readInternalDictionary } from "./settings/dictionary";
 
 export default function Home() {
     const [focusedWord, setFocusedWord] = useState<string>('');
@@ -17,7 +17,7 @@ export default function Home() {
 
     // internal dictionary
     const [loaded, setLoaded] = useState(false);
-    const [data, setData] = useState<phoneme[]>([]);
+    const [data, setData] = useState<Word[]>([]);
 
     async function load(url: string, callback: (s: string[]) => void, revoke = true) {
         fetch(url).then(response => response.text()).then(text => {
@@ -32,12 +32,18 @@ export default function Home() {
         const [str, isFile] = (e as CustomEvent).detail as [string, boolean];
 
         function process(lines: string[]) {
-            const phonetics = processDictionary(lines);
-            // replace any duplicate words with the new data
-            const filtered: phoneme[] = [...phonetics, ...data.filter(x => phonetics.findIndex((y) => y.word == x.word) == -1)];
+            const words = readInternalDictionary(lines);
+            const seen: Set<string> = new Set<string>();
 
-            // we signal removal of elements via pronunciation of "DELETE"
-            setData(filtered.filter(x => x.pronunciation != 'DELETE'));
+            // data (in memory values) takes priority
+            const values = [...data, ...words].filter(x => {
+                // accept no dupes, if it does not have pron or pron is not marked for deletion
+                const valid = !seen.has(x.word) && !x.pronunciation?.shouldDelete;
+                seen.add(x.word);
+                return valid;
+            });
+
+            setData(values);
         }
 
         if (isFile) load(str, process);
@@ -45,20 +51,14 @@ export default function Home() {
     }
 
     function replace(e: Event) {
-        load((e as CustomEvent).detail as string, (lines) => {
-            const phonetics = processDictionary(lines);
-            setData(phonetics);
-        });
+        load((e as CustomEvent).detail as string, lines => setData(readInternalDictionary(lines)));
     }
 
     useEffect(() => {
         // load internal dictionary
         if (!loaded) {
             setLoaded(true);
-            load('/Medical-Dictionary/data.txt', (lines) => {
-                const phonetics = processDictionary(lines);
-                setData(phonetics);
-            }, false);
+            load('/Medical-Dictionary/data.txt', lines => setData(readInternalDictionary(lines)), false);
         }
 
         window.addEventListener('internal-dictionary-upload', upload);
@@ -78,12 +78,12 @@ export default function Home() {
                         <button className={"flex-grow rounded-md " + (tabGroup == 0 ? 'bg-tonal10' : 'bg-tonal0 hover:bg-surface10')} onClick={() => setTabGroup(0)}>Phonetic Tree</button>
                         <button className={"flex-grow rounded-md " + (tabGroup == 1 ? 'bg-tonal10' : 'bg-tonal0 hover:bg-surface10')} onClick={() => setTabGroup(1)}>File Search</button>
                     </div>
-                    <div className={tabGroup == 0 ? '' : 'hidden'}><PhoneticTree data={data}/></div>
+                    {/* <div className={tabGroup == 0 ? '' : 'hidden'}><PhoneticTree data={data}/></div> */}
                     <div className={tabGroup == 1 ? '' : 'hidden'}><FileSearch files={files} phrase={focusedWord} /></div>
                 </div>
                 <div className="flex flex-col gap-4">
                     <Search setFocused={setFocusedWord} dictionary={data} />
-                    <Settings files={files} setFiles={setFiles} dictionary={data} />
+                    {/* <Settings files={files} setFiles={setFiles} dictionary={data} /> */}
                 </div>
             </div>
         </div>

@@ -1,36 +1,6 @@
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
-import { ConsonantOrder, ConsonantSearch, StandardType, Tokenization, VowelOrder, branchState, formattedConsonants, phoneme, r_tail_c, r_vowel, readRegex, replacement, standardize, standardizeType, toRegexOr } from "./constants";
+import { ConsonantOrder, ConsonantSearch, VowelOrder, branchState, phoneme, r_tail_c, r_vowel, readRegex } from "./constants";
 import { PhoneticSearchController, PhoneticSearchControllerRef } from "./search";
-
-export function toIpa(str: string, from: standardizeType, debug = false) {
-    const standard = standardize.get(from);
-    const proc = standardize.getProcessed(from);
-
-    const base = proc.base;
-    const rep = proc.rep
-    const joinedReg = proc.joinedReg;
-
-    str = str.replaceAll(base, (v) => standard[v] as string);
-
-    const ind = [...str.matchAll(toRegexOr(Object.keys(rep), 'g'))];
-    const stressUnits = [...str.matchAll(/ˈ|ˌ/g)].map(x => x.index);
-
-    if (ind.length > 0) {
-        // for each of these vowels, check if they are stressed or not
-        // specifically, within the current stress unit find the first vowel and check if the index is the current
-        ind.forEach((match) => {
-            let isStressed = stressUnits.length == 0 || match.index > stressUnits[0];
-
-            rep[match[0]].forEach(x => {
-                if (x.whenStress == isStressed) {
-                    str = str.substring(0, match.index!) + x.to + str.substring(match.index! + match[0].length);
-                }
-            });
-        })
-    }
-
-    return str;
-}
 
 export default function PhoneticTree({ data }: { data: phoneme[] }) {
     // search results

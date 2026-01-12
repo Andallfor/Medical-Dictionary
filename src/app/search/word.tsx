@@ -1,25 +1,72 @@
-import { mw, phoneme, StandardType, Tokenization, wordDefinitionData } from "../phoneticTree/constants";
-import { toIpa } from "../phoneticTree/tree";
+import { mw, phoneme, StandardType, Token, Tokenization, Word, wordDefinitionData } from "../phoneticTree/constants";
 import { capitalize } from "../util";
 import { getAudio, hasAudio } from "./api";
 import { useEffect, useRef, useState } from "react";
 
-export function SingleWord({ words, dictionary, userSearch }: { words: mw[] | string, dictionary: phoneme[], userSearch: boolean }) {
+export function SingleWord({ words, dictionary, userSearch }: { words: mw[] | string, dictionary: Word[], userSearch: boolean }) {
     // definition loaded from internal dictionary
-    const [internal, setInternal] = useState<wordDefinitionData | undefined>(undefined);
+    const [internal, setInternal] = useState<Word | undefined>(undefined);
     // definition loaded from external source (i.e. MW)
-    const [external, setExternal] = useState<wordDefinitionData | undefined>(undefined);
+    const [external, setExternal] = useState<Word | undefined>(undefined);
 
     // slightly jank as we need to coerce mw[] and phoneme into wordDefinitionData
     useEffect(() => {
+        let _external: Word | undefined = undefined;
+        let _internal: Word | undefined = undefined;        
+
+        // get MW def
+        if (typeof words != 'string') {
+            const m = (words as mw[])[0]; // take the first output
+            _external = {
+                word: m.meta.id.split(':')[0],
+                part: m.fl,
+                def: m.shortdef,
+                audio: '',
+                isInternal: false,
+            };
+
+            if (m.hwi?.prs) {
+                const t = Tokenization.tokenize(m.hwi.prs[0].mw.trim(), StandardType.mw);
+                _external!.pronunciation = {
+                    tokens: t,
+                    text: Tokenization.toString(t),
+                    shouldDelete: false,
+                };
+
+                const a = hasAudio(m.hwi.prs);
+                if (a) _external.audio = getAudio(a);
+            }
+        }
+
+        // sync our internal search with MW search (if present)
+        // TODO: this is a bit unintuitive? likely need to redo the parameters to pass in both mw and what the user searched
+        const internalDef = _external ? dictionary.find(x => x.word == _external.word) : dictionary.find(x => x.word == words as string);
+        if (internalDef) {
+            _internal = {
+                word: internalDef.word,
+                part: internalDef.part,
+                def: internalDef.def,
+                audio: '',
+                isInternal: false,
+            }
+
+            if (internalDef.pronunciation) {
+                _internal.pronunciation = internalDef.pronunciation;
+                _internal.isInternal = true;
+            }
+        }
+
+
+
         // get mw def
-        let _external: wordDefinitionData | undefined = undefined;
+        /* let _external: wordDefinitionData | undefined = undefined;
         if (typeof words != 'string') { // mw exists
             const m = (words as mw[])[0];
             let pron: string | undefined, audio: string | undefined;
 
             if (m.hwi && m.hwi.prs) {
-                pron = toIpa(m.hwi.prs[0].mw.trim(), 'MW');
+                const basePron = m.hwi.prs[0].mw.trim();
+                pron = Tokenization.toString(Tokenization.tokenize(basePron, StandardType.mw));
 
                 const a = hasAudio(m.hwi.prs);
                 if (a) audio = getAudio(a);
@@ -33,10 +80,10 @@ export function SingleWord({ words, dictionary, userSearch }: { words: mw[] | st
                 audio: audio,
                 shouldWarn: true,
             };
-        } else _external = undefined;
+        } else _external = undefined; */
 
         // get internal def
-        let _internal: wordDefinitionData | undefined = undefined;
+/*         let _internal: wordDefinitionData | undefined = undefined;
         const internalDef = _external ? dictionary.find(x => x.word == _external?.word) : dictionary.find(x => x.word == words as string);
         if (internalDef) {
             const internalTemplate: wordDefinitionData = {
@@ -53,7 +100,7 @@ export function SingleWord({ words, dictionary, userSearch }: { words: mw[] | st
             }
 
             _internal = internalTemplate;
-        } else _internal = undefined;
+        } else _internal = undefined; */
 
         // check if _internal is the same as _external. if it is, get rid of _internal
         if (_internal && _external) {
@@ -89,7 +136,7 @@ export function SingleWord({ words, dictionary, userSearch }: { words: mw[] | st
     } else return <div className="text-lg ml-2 mt-1 text-[#d9646c]">Unable to find {typeof words == 'string' ? (words as string) : 'word'}.</div>;
 }
 
-function Definition({ word, source }: { word: wordDefinitionData, source: string }) {
+function Definition({ word, source }: { word: Word, source: string }) {
     const audioPlayer = useRef<HTMLAudioElement | null>(null);
 
     return (
@@ -100,20 +147,23 @@ function Definition({ word, source }: { word: wordDefinitionData, source: string
                     <div className="text-2xl flex items-center">
                         <span className="capitalize">{word.word}</span>
                         {word.audio
-                            ? <button className={"ml-3 hover:bg-tonal0/70 border bg-tonal0 rounded-md px-2 text-xl py-0.5 " + (word.shouldWarn ? 'border-red-500' : 'border-surface20')}
-                                title={word.shouldWarn ? "Pronunciation was converted from MW and so may not be correct." : undefined}
+                            ? <button className={"ml-3 hover:bg-tonal0/70 border bg-tonal0 rounded-md px-2 text-xl py-0.5 " + (!word.isInternal ? 'border-red-500' : 'border-surface20')}
+                                title={!word.isInternal ? "Pronunciation was converted from MW and so may not be correct." : undefined}
                                 onClick={() => audioPlayer.current ? audioPlayer.current.play() : null}>
-                                <span>{word.pronunciation}</span>
+                                <span>{word.pronunciation?.text ?? ''}</span>
                                 <i className="ml-2 mr-1 ri-volume-up-fill text-primary40"></i>
                                 <audio src={word.audio} ref={audioPlayer}></audio>
                             </button>
                             : word.pronunciation
-                                ? <div className={"ml-3 border bg-tonal0 rounded-md text-2 text-xl py-0.5 px-2 " + (word.shouldWarn ? 'border-red-500' : 'border-surface20')}>{word.pronunciation}</div>
+                                ? <div className={"ml-3 border bg-tonal0 rounded-md text-2 text-xl py-0.5 px-2 " + (!word.isInternal ? 'border-red-500' : 'border-surface20')}>{word.pronunciation.text}</div>
                                 : <span className="text-base mx-6">[No pronunciation found]</span>}
                     </div>
                     <div className="flex items-center">
                         <i className="text-sm">({source})</i>
-                        {(word.pronunciation) ? <button className="button ml-3 ri-file-copy-line text-base" onClick={() => navigator.clipboard.writeText(word.pronunciation!)}></button> : <></>}
+                        {word.pronunciation
+                            ? <button className="button ml-3 ri-file-copy-line text-base"
+                                onClick={() => navigator.clipboard.writeText(word.pronunciation!.text)}></button>
+                            : <></>}
                     </div>
                 </div>
                 <div className="text-primary40">

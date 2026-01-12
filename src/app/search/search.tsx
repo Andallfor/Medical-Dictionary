@@ -1,10 +1,10 @@
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import { SingleWord } from "./word";
 import { getCollegiateDef } from "./api";
-import { mw, phoneme } from "../phoneticTree/constants";
+import { mw, phoneme, Word } from "../phoneticTree/constants";
 import { capitalize } from "../util";
 
-export function Search({ setFocused, dictionary }: { setFocused: Dispatch<SetStateAction<string>>, dictionary: phoneme[] }) {
+export function Search({ setFocused, dictionary }: { setFocused: Dispatch<SetStateAction<string>>, dictionary: Word[] }) {
     const [loading, setLoading] = useState('');
     const [isUserSearch, setIsUserSearch] = useState(false);
     const [searchHistory, setSearchHistory] = useState<string[]>([]);

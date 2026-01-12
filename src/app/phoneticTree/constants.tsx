@@ -45,6 +45,22 @@ export interface phoneme {
     def?: string[],
 }
 
+export interface Pronunciation {
+    tokens: Token[];
+    text: string; // string representation of tokens
+    shouldDelete: boolean;
+}
+
+export interface Word {
+    word: string; // the actual word
+    pronunciation?: Pronunciation;
+    part: string; // part of speech
+    audio: string; // url to the word's audio (from MW)
+    def: string[]; // definition
+
+    isInternal: boolean; // whether or not the word is pulled from the internal dictionary (e.g. not from MW)
+}
+
 export interface wordDefinitionData {
     word: string,
     pronunciation?: string,
@@ -146,14 +162,6 @@ export const ConsonantSearch: string[] = [
     'j'
 ]
 
-export type standardizeType = 'OED' | 'MW';
-
-type standardizeProcessed = {
-    base: RegExp;
-    rep: Record<string, replacement[]>;
-    joinedReg: RegExp;
-}
-
 /*
 
 the phonetic translation pipeline needs to be much more robust
@@ -187,30 +195,63 @@ TODO: vowel order and consonant search should search by token id
 
 // we consider everything have the primary stress mark to be stressed
 // if the secondary appears afterwards, then stress becomes both
-enum Stress {
+export enum Stress {
     none = 0,
     primary = 1,   // 01
     secondary = 2, // 10
     both = 3,      // 11
 }
 
-enum TokenType { primaryStress, secondaryStress, vowel, consonant, unknown }
+export enum TokenType { primaryStress, secondaryStress, vowel, consonant, unknown }
 
 export enum StandardType { mw, oed }
 
-interface Token {
+export interface TokenInstance {
+    canonical: string; // textual representation of phoneme
+    stress: Stress; // the current stress this token is in
+    // TODO: maybe add in some debug information? like tags?
+}
+
+export class Token {
     id: string; // an identifier for the token
+    instance: TokenInstance; // values may differ between equivalent phonemes (id)
 
-    equivalent: string[]; // any exact matches within the text are considered to be this token
-    type: TokenType;
-    known: boolean; // is this a predefined token?
-    replaceCanonical: boolean; // should the canonical be set as the first element of equivalent?
+    equivalent: [string, ...string[]]; // any exact matches within the text are considered to be this token. always has at least 1 element
+    type: TokenType = TokenType.unknown;
+    known: boolean = false; // is this a predefined token?
+    replaceCanonical: boolean = true; // should the canonical be set as the first element of equivalent?
 
-    // values may differ between equivalent phonemes (id)
-    instance: {
-        canonical: string; // textual representation of phoneme
-        stress: Stress; // the current stress this token is in
-        // TODO: maybe add in some debug information? like tags?
+    constructor(id: string, equivalent?: [string, ...string[]], type = TokenType.unknown, known = false, replaceCanonical = true) {
+        this.id = id;
+        this.instance = { canonical: id, stress: Stress.none };
+        this.equivalent = equivalent ?? [id];
+
+        this.type = type;
+        this.known = known;
+        this.replaceCanonical = replaceCanonical;
+
+        if (this.replaceCanonical) this.instance.canonical = this.equivalent[0];
+    }
+
+    // deep copy token
+    copy(): Token {
+        const t = new Token(
+            this.id.repeat(1),
+            this.equivalent.map(x => x.repeat(1)) as [string, ...string[]],
+            this.type,
+            this.known,
+            this.replaceCanonical,
+        );
+
+        t.instance.canonical = this.instance.canonical.repeat(1);
+        t.instance.stress = this.instance.stress;
+
+        return t;
+    }
+
+    equals(other: string | Token): boolean {
+        if (typeof other == 'string') return this.equivalent.includes(other);
+        else return this.equivalent.some(x => other.equals(x));
     }
 }
 
@@ -219,7 +260,7 @@ type Rule = { (tokens: Token[]): Token[] };
 export class Tokenization {
     // later values have higher priority
     // null means it applies to all types
-    static rules: [StandardType | null, Rule][] = [
+    private static rules: [StandardType | null, Rule][] = [
         // apply stress
         [null,
         toks => {
@@ -237,13 +278,12 @@ export class Tokenization {
         }],
 
         // translations
-        [StandardType.mw, t => this.translate(t, standardize.fromMw)],
-        [StandardType.oed, t => this.translate(t, standardize.fromOed)],
+        [StandardType.mw, t => this.translate(t, this.translation[StandardType.mw])],
+        [StandardType.oed, t => this.translate(t, this.translation[StandardType.oed])],
 
         // coalesce tokens into known tokens
         [null,
         toks => {
-            return toks;
             // as with translations, we also want to form the largest tokens possible
             // im sure theres a better way to go about this but ehhh
 
@@ -284,7 +324,7 @@ export class Tokenization {
 
                         // we have a match, save it as we want to take the longest match
                         if (numTokens > best[0]) {
-                            const t = {...e};
+                            const t = e.copy();
                             t.instance.canonical = reference;
 
                             best = [numTokens, t];
@@ -307,7 +347,7 @@ export class Tokenization {
         // set all the known values
     ];
 
-    static knownTokens: Token[] = [
+    private static knownTokens: Token[] = [
         // currently, this is the same as vowel order
         ...this.simpleTokenVector([
             'i',
@@ -367,6 +407,65 @@ export class Tokenization {
         this.simpleToken(['ˌ'], TokenType.secondaryStress),
     ];
 
+    private static translation: Record<StandardType, Record<string, string | replacement[]>> = {
+        [StandardType.mw]: {
+            'ē': [{to: 'i', whenStress: true},
+                {to: 'ɪ', whenStress: false}],
+            'i': 'ɪ',
+            'ā': 'e',
+            'e': 'ɛ',
+            'a': 'æ',
+            'ə': [{to: 'ʌ', whenStress: true}],
+            'ər': 'əː',
+            'ü': 'u',
+            'u̇': 'ʊ',
+            'ō': 'o',
+            'ȯ': 'ɔ',
+            'ȯr': 'ɔr',
+            'ä': 'a',
+            'är': 'ar',
+            'ī': 'aɪ',
+            'ȯi': 'ɔi',
+            'au̇': 'au',
+            'ir': 'iɚ',
+            'er': 'ɛɚ',
+            'u̇r': 'ʊɚ',
+            'oe': 'eu',
+            'ue': 'iʊ',
+            'ᵊ': '',
+            '-': '',
+        },
+        [StandardType.oed]: {
+            'ɪ(ə)r': 'iɚ',
+            'ɛ(ə)r': 'ɛɚ',
+            'ʊ(ə)r': 'ʊɚ',
+            'eɪ': 'e',
+            'ər': 'əː',
+            'oʊ': 'o',
+            'ɑr': 'ar',
+            'kl': 'cl',
+            'kr': 'cr',
+            'kj': 'ky',
+            'tʃ': 'ch',
+            'dʒ': 'j',
+            '(h)w': 'wh̤',
+            'ɑ': 'a',
+            'ɑ̃': 'an',
+            'æ̃': 'n',
+            'ᵻ': 'ɪ',
+            'ᵿ': 'ə',
+            'ŋ': 'ng',
+            'x': 'k',
+            'ʃ': 'sh',
+            'ð': 'th̥',
+            'θ': 'th̬',
+            'ʒ': 'zh',
+            'ə': [{to: 'ʌ', whenStress: true}],
+            'ɡ':'g',
+            'ɒ': 'a',
+        }
+    };
+
     static tokenize(pronunciation: string, type: StandardType): Token[] {
         if (pronunciation.length == 0) return [];
 
@@ -398,7 +497,7 @@ export class Tokenization {
         return tokens;
     }
 
-    static translate(toks: Token[], from: Record<string, string | replacement[]>): Token[] {
+    private static translate(toks: Token[], from: Record<string, string | replacement[]>): Token[] {
         const out: Token[] = [];
 
         // assumptions:
@@ -414,7 +513,7 @@ export class Tokenization {
 
         // find the index of each match
         const pron = this.toString(toks);
-        const matches = [...pron.matchAll(toRegexOr(Object.keys(from), 'ugd'))];
+        const matches = [...pron.matchAll(toRegexOr(Object.keys(from), 'g'))];
 
         let srcIndex = 0; // index corresponding to toks
         matches.forEach(m => {
@@ -460,157 +559,13 @@ export class Tokenization {
     static toString(tokens: Token[]): string { return tokens.map(x => x.instance.canonical).join(''); }
 
     // first element in base is used as canonical and id
-    static simpleToken(base: [string, ...string[]], type: TokenType, known: boolean = true): Token {
-        return {
-            id: base[0],
-            equivalent: base,
-            replaceCanonical: false,
-            type: type,
-            known: known,
-            instance: {
-                canonical: base[0],
-                stress: Stress.none,
-            }
-        };
+    private static simpleToken(base: [string, ...string[]], type: TokenType, known: boolean = true): Token {
+        return new Token(base[0], base, type, known, false);
     }
 
     // create tokens for a list of phonemes, assuming they all have only one equivalency and are of the same type
-    static simpleTokenVector(phonemes: string[], type: TokenType): Token[] { return phonemes.map((s) => this.simpleToken([s], type)); }
-    static simpleTokenVector2D(phonemes: [string, ...string[]][], type: TokenType): Token[] { return phonemes.map((s) => this.simpleToken(s, type)); }
-
-    static copy(token: Token | undefined): Token | undefined {
-        if (!token) return token;
-
-        return {
-            id: token.id.repeat(1), // deep copy string
-            equivalent: token.equivalent.map(x => x.repeat(1)),
-            replaceCanonical: token.replaceCanonical,
-            type: token.type,
-            known: token.known,
-            instance: {
-                canonical: token.instance.canonical.repeat(1),
-                stress: token.instance.stress,
-            }
-        }
-    }
-}
-
-// move into separate file?
-export class standardize {
-    static get(t: standardizeType) {
-        if (t == 'OED') return standardize.fromOed;
-        else return standardize.fromMw;
-    }
-
-    static getProcessed(t: standardizeType) {
-        if (!standardize._p_mw) {
-            const [a, b, c] = standardize._format(standardize.fromMw);
-            standardize._p_mw = {
-                base: a as RegExp,
-                rep: b as Record<string, replacement[]>,
-                joinedReg: c as RegExp,
-            };
-        }
-        if (!standardize._p_oed) {
-            const [a, b, c] = standardize._format(standardize.fromOed);
-            standardize._p_oed = {
-                base: a as RegExp,
-                rep: b as Record<string, replacement[]>,
-                joinedReg: c as RegExp,
-            };
-        }
-
-        if (t == 'OED') return standardize._p_oed!;
-        else return standardize._p_mw!;
-    }
-
-    // this replaces the previous toIpa
-    static format(pronunciation: string, type: standardizeType): [string, Token[]] {
-        
-
-
-
-        return ['', []]
-    }
-
-    // sklɪərəʊˈdəːmə
-    // sclɪəːəʊˈʌːmʌ
-    // sclɪəːəʊˈdəːmə
-    static fromOed: Record<string, string | replacement[]> = {
-        'ɪ(ə)r': 'iɚ',
-        'ɛ(ə)r': 'ɛɚ',
-        'ʊ(ə)r': 'ʊɚ',
-        'eɪ': 'e',
-        'ər': 'əː',
-        'oʊ': 'o',
-        'ɑr': 'ar',
-        'kl': 'cl',
-        'kr': 'cr',
-        'kj': 'ky',
-        'tʃ': 'ch',
-        'dʒ': 'j',
-        '(h)w': 'wh̤',
-        'ɑ': 'a',
-        'ɑ̃': 'an',
-        'æ̃': 'n',
-        'ᵻ': 'ɪ',
-        'ᵿ': 'ə',
-        'ŋ': 'ng',
-        'x': 'k',
-        'ʃ': 'sh',
-        'ð': 'th̥',
-        'θ': 'th̬',
-        'ʒ': 'zh',
-        'ə': [{to: 'ʌ', whenStress: true}],
-        'ɡ':'g',
-        'ɒ': 'a',
-    };
-    static _p_oed?: standardizeProcessed = undefined;
-
-    static fromMw: Record<string, string | replacement[]> = {
-        'ē': [{to: 'i', whenStress: true},
-              {to: 'ɪ', whenStress: false}],
-        'i': 'ɪ',
-        'ā': 'e',
-        'e': 'ɛ',
-        'a': 'æ',
-        'ə': [{to: 'ʌ', whenStress: true}],
-        'ər': 'əː',
-        'ü': 'u',
-        'u̇': 'ʊ',
-        'ō': 'o',
-        'ȯ': 'ɔ',
-        'ȯr': 'ɔr',
-        'ä': 'a',
-        'är': 'ar',
-        'ī': 'aɪ',
-        'ȯi': 'ɔi',
-        'au̇': 'au',
-        'ir': 'iɚ',
-        'er': 'ɛɚ',
-        'u̇r': 'ʊɚ',
-        'oe': 'eu',
-        'ue': 'iʊ',
-        'ᵊ': '',
-        '-': '',
-    };
-    static _p_mw?: standardizeProcessed = undefined;
-
-    static _format(r: Record<string, string | replacement[]>) {
-        const keys = Object.keys(r).sort((a, b) => a.length - b.length);
-        const base: Record<string, string> = {};
-        const rep: Record<string, replacement[]> = {};
-
-        keys.forEach(k => {
-            if (typeof r[k] == 'string') base[k] = r[k] as string;
-            else rep[k] = r[k] as replacement[];
-        });
-
-        const reg = toRegexOr(Object.keys(base));
-        const joinedReg = toRegexOr([...Object.keys(VowelOrder), ...Object.keys(rep)]);
-
-        return [reg, rep, joinedReg];
-    }
+    private static simpleTokenVector(phonemes: string[], type: TokenType): Token[] { return phonemes.map((s) => this.simpleToken([s], type)); }
+    private static simpleTokenVector2D(phonemes: [string, ...string[]][], type: TokenType): Token[] { return phonemes.map((s) => this.simpleToken(s, type)); }
 }
 
 const regexEscape = new RegExp(/[-[\]{}()*+?.,\\^$|#\s]/g);
