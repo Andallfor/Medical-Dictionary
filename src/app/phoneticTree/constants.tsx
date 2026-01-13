@@ -583,7 +583,9 @@ export class Tokenization {
         return out;
     }
 
-    static toString(tokens: Token[]): string { return tokens.map(x => x.instance.canonical).join(''); }
+    static toString(tokens: Token[]): string {
+        return tokens.map(x => x.replaceCanonical ? x.equivalent[0] : x.instance.canonical).join('');
+    }
 
     // first element in base is used as canonical and id
     private static simpleToken(base: [string, ...string[]], type: TokenType, known: boolean = true): Token {

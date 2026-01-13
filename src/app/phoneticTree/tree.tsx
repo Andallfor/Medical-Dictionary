@@ -58,7 +58,7 @@ export default function PhoneticTree({ data }: { data: Word[] }) {
         // non-greedy match everything except for vowels expect for the exact vowel we want
 
         const valid = data.filter((p) => {
-            if (p.pronunciation?.shouldDelete) return false;
+            // if (p.pronunciation?.shouldDelete) return false;
             if (p.word == requestExact) return true; // exact match
 
             if (pattern.length == 0) return p.pronunciation == undefined; // strict empty
@@ -70,8 +70,7 @@ export default function PhoneticTree({ data }: { data: Word[] }) {
                 let index = tokens.findIndex(x => x.instance.stress & Stress.primary);
                 
                 if (index == -1) {
-                    console.warn(`Word ${p.word} (${p.pronunciation.text}) has no stress!`);
-                    console.log(p.pronunciation);
+                    console.warn(`Word ${p.word} (${p.pronunciation.text}) has no stress!`, p.pronunciation);
                     return false;
                 }
 
@@ -79,6 +78,9 @@ export default function PhoneticTree({ data }: { data: Word[] }) {
                 for (; i < pattern.length; i++) {
                     const pat = pattern[i];
                     let vowelAllowance = 0;
+
+                    // no asterisk
+                    if (pat == "") continue;
 
                     if (pat == undefined) {
                         // we want undefined to match any number of consonants and at most one vowel
@@ -98,7 +100,7 @@ export default function PhoneticTree({ data }: { data: Word[] }) {
                         if (tokens[index].type == TokenType.vowel && vowelAllowance-- <= 0) return false;
                     }
 
-                    if (!valid) return false;
+                    if (pat != undefined && !valid) return false;
                 }
 
                 // we need to have consumed all tokens (above loop automatically checks if we consume the entire pattern)
@@ -112,13 +114,15 @@ export default function PhoneticTree({ data }: { data: Word[] }) {
         Tokenization.knownTokens.forEach((t, i) => {
             if (t.type == TokenType.consonant) consonantMap[t.id] = i;
             else if (t.type == TokenType.vowel) vowelMap[t.id] = i;
-        })
+        });
 
-        valid.sort((a, b) => {
+        // dont sort if no pronunciation
+        if (pattern.length != 0) valid.sort((a, b) => {
             // exact match first
             if (a.word == requestExact) return -1;
             if (b.word == requestExact) return 1;
 
+            // TODO: probably should cache this somewhere
             const at = a.pronunciation!.tokens.filter(x =>
                 x.instance.stress & Stress.primary &&
                 !(x.type & (TokenType.primaryStress | TokenType.secondaryStress)));
