@@ -202,7 +202,13 @@ export enum Stress {
     both = 3,      // 11
 }
 
-export enum TokenType { primaryStress, secondaryStress, vowel, consonant, unknown }
+export enum TokenType {
+    unknown = 0,
+    vowel = 1,
+    consonant = 2,
+    primaryStress = 4,
+    secondaryStress = 8,
+}
 
 export enum StandardType { mw, oed }
 
@@ -234,7 +240,8 @@ export class Token {
     }
 
     // deep copy token
-    copy(): Token {
+    // if reference is provided, new token will take its instance properties
+    copy(reference?: Token): Token {
         const t = new Token(
             this.id.repeat(1),
             this.equivalent.map(x => x.repeat(1)) as [string, ...string[]],
@@ -243,8 +250,11 @@ export class Token {
             this.replaceCanonical,
         );
 
-        t.instance.canonical = this.instance.canonical.repeat(1);
-        t.instance.stress = this.instance.stress;
+        if (reference) t.instance = reference.instance;
+        else {
+            t.instance.canonical = this.instance.canonical.repeat(1);
+            t.instance.stress = this.instance.stress;   
+        }
 
         return t;
     }
@@ -326,6 +336,7 @@ export class Tokenization {
                         if (numTokens > best[0]) {
                             const t = e.copy();
                             t.instance.canonical = reference;
+                            t.instance.stress = toks[i].instance.stress;
 
                             best = [numTokens, t];
                         }
@@ -345,9 +356,25 @@ export class Tokenization {
         // special rules
 
         // set all the known values
+        [null,
+        toks => toks.map(t => {
+            if (t.type != TokenType.unknown) return t;
+
+            const ind = this.knownTokens.findIndex(x => x.equals(t));
+            if (ind == -1) {
+                t.known = false;
+                return t;
+            }
+
+            return this.knownTokens[ind].copy(t);
+        })
+        ],
+
+        // coalesce parenthesis
     ];
 
-    private static knownTokens: Token[] = [
+    // TODO: if performance is an issue, probably convert this to a map
+    static knownTokens: Token[] = [
         // currently, this is the same as vowel order
         ...this.simpleTokenVector([
             'i',

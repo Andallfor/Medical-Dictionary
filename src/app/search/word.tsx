@@ -56,52 +56,6 @@ export function SingleWord({ words, dictionary, userSearch }: { words: mw[] | st
             }
         }
 
-
-
-        // get mw def
-        /* let _external: wordDefinitionData | undefined = undefined;
-        if (typeof words != 'string') { // mw exists
-            const m = (words as mw[])[0];
-            let pron: string | undefined, audio: string | undefined;
-
-            if (m.hwi && m.hwi.prs) {
-                const basePron = m.hwi.prs[0].mw.trim();
-                pron = Tokenization.toString(Tokenization.tokenize(basePron, StandardType.mw));
-
-                const a = hasAudio(m.hwi.prs);
-                if (a) audio = getAudio(a);
-            }
-
-            _external = {
-                word: m.meta.id.split(':')[0],
-                part: m.fl,
-                def: m.shortdef,
-                pronunciation: pron,
-                audio: audio,
-                shouldWarn: true,
-            };
-        } else _external = undefined; */
-
-        // get internal def
-/*         let _internal: wordDefinitionData | undefined = undefined;
-        const internalDef = _external ? dictionary.find(x => x.word == _external?.word) : dictionary.find(x => x.word == words as string);
-        if (internalDef) {
-            const internalTemplate: wordDefinitionData = {
-                word: internalDef.word,
-                part: internalDef.part,
-                def: internalDef.def,
-                audio: undefined,
-                shouldWarn: true,
-            };
-
-            if (internalDef.pronunciation.length > 0) {
-                internalTemplate.pronunciation = internalDef.pronunciation;
-                internalTemplate.shouldWarn = false;
-            }
-
-            _internal = internalTemplate;
-        } else _internal = undefined; */
-
         // check if _internal is the same as _external. if it is, get rid of _internal
         if (_internal && _external) {
             // word and pronunciation must be the same
@@ -121,7 +75,7 @@ export function SingleWord({ words, dictionary, userSearch }: { words: mw[] | st
             window.dispatchEvent(new CustomEvent('phonetic-tree-external-search', {
                 detail: [ // try to use internal if available
                     _internal?.word ?? _external?.word,
-                    (_internal?.pronunciation ?? _external?.pronunciation) ?? '',
+                    (_internal?.pronunciation?.text ?? _external?.pronunciation?.text) ?? '',
                     true
                 ]
             }));

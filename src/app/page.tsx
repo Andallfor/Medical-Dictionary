@@ -10,6 +10,8 @@ import { phoneme, Word } from "./phoneticTree/constants";
 import { Settings } from "./settings/panel";
 import { processDictionary, readInternalDictionary } from "./settings/dictionary";
 
+// TODO: initial load is no longer instant, add small loading indicator
+
 export default function Home() {
     const [focusedWord, setFocusedWord] = useState<string>('');
     const [files, setFiles] = useState<fileData[]>([]);
@@ -78,7 +80,7 @@ export default function Home() {
                         <button className={"flex-grow rounded-md " + (tabGroup == 0 ? 'bg-tonal10' : 'bg-tonal0 hover:bg-surface10')} onClick={() => setTabGroup(0)}>Phonetic Tree</button>
                         <button className={"flex-grow rounded-md " + (tabGroup == 1 ? 'bg-tonal10' : 'bg-tonal0 hover:bg-surface10')} onClick={() => setTabGroup(1)}>File Search</button>
                     </div>
-                    {/* <div className={tabGroup == 0 ? '' : 'hidden'}><PhoneticTree data={data}/></div> */}
+                    <div className={tabGroup == 0 ? '' : 'hidden'}><PhoneticTree data={data}/></div>
                     <div className={tabGroup == 1 ? '' : 'hidden'}><FileSearch files={files} phrase={focusedWord} /></div>
                 </div>
                 <div className="flex flex-col gap-4">

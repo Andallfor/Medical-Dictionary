@@ -1,10 +1,12 @@
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
-import { ConsonantOrder, ConsonantSearch, VowelOrder, branchState, phoneme, r_tail_c, r_vowel, readRegex } from "./constants";
+import { ConsonantOrder, ConsonantSearch, Stress, Token, TokenType, Tokenization, VowelOrder, Word, branchState, phoneme, r_tail_c, r_vowel, readRegex } from "./constants";
 import { PhoneticSearchController, PhoneticSearchControllerRef } from "./search";
 
-export default function PhoneticTree({ data }: { data: phoneme[] }) {
+export default function PhoneticTree({ data }: { data: Word[] }) {
+    // TODO: branch state should also use tokens!
+
     // search results
-    const [focused, setFocused] = useState<phoneme[]>([]);
+    const [focused, setFocused] = useState<Word[]>([]);
     const [searchStr, setSearchStr] = useState<(string | undefined)[] | undefined>(undefined);
 
     // tree state
@@ -41,8 +43,6 @@ export default function PhoneticTree({ data }: { data: phoneme[] }) {
             } else pattern.push(undefined);
         }
 
-        const tail = pattern[pattern.length - 1];
-
         // ensure the pattern is different
         if (!force && searchStr != undefined &&
             pattern.length == searchStr.length && pattern.reduce((a, x, i) => a && (x == searchStr[i]), true)) return;
@@ -57,91 +57,106 @@ export default function PhoneticTree({ data }: { data: phoneme[] }) {
         // unfortunately we can't use regex for this because we need a
         // non-greedy match everything except for vowels expect for the exact vowel we want
 
-        // sort vowels from largest to smallest for matching
-        const sortedVowels = [...Object.keys(VowelOrder).sort((a, b) => b.length - a.length)];
-
         const valid = data.filter((p) => {
+            if (p.pronunciation?.shouldDelete) return false;
             if (p.word == requestExact) return true; // exact match
 
-            if (pattern.length == 0) return p.pronunciation.length == 0; // strict empty
+            if (pattern.length == 0) return p.pronunciation == undefined; // strict empty
             else {
-                if (p.pronunciation.length == 0) return false;
+                if (p.pronunciation == undefined) return false;
 
-                // we match against the actual pronunciation string
-                const split = p.pronunciation.split('ˈ');
-                let primary = split.length == 1 ? split[0] : split[1];
+                // start search at primary stress
+                const tokens = p.pronunciation.tokens;
+                let index = tokens.findIndex(x => x.instance.stress & Stress.primary);
+                
+                if (index == -1) {
+                    console.warn(`Word ${p.word} (${p.pronunciation.text}) has no stress!`);
+                    console.log(p.pronunciation);
+                    return false;
+                }
 
-                for (let i = 0; i < pattern.length; i++) {
+                let i = 0;
+                for (; i < pattern.length; i++) {
                     const pat = pattern[i];
+                    let vowelAllowance = 0;
 
                     if (pat == undefined) {
-                        if (primary.length == 0) return true;
                         // we want undefined to match any number of consonants and at most one vowel
                         // we also assume that undefined is at the very end
                         if (i != pattern.length - 1) console.warn(`Phonetic tree pattern ${pattern.join(', ')} has non-terminating undefined`);
-
-                        // consume everything and make sure we see at most one vowel
-                        let vowelAllowance = 1;
-                        while (primary.length != 0) {
-                            for (let j = 0; j < sortedVowels.length; j++) {
-                                if (primary.startsWith(sortedVowels[j]) && vowelAllowance-- == 0) return false;
-                            }
-
-                            primary = primary.substring(1);
-                        }
-
-                        return true;
-                    } else {
-                        if (primary.startsWith(pat)) {
-                            primary = primary.substring(pat.length);
-                            continue;
-                        }
-
-                        if (primary.length == 0) return false;
-
-                        // no match, check if this is a vowel. if not, skip and try again
-                        for (let j = 0; j < sortedVowels.length; j++) {
-                            // hit vowel (necessarily not pat), so * cannot contain this
-                            if (primary.startsWith(sortedVowels[j])) return false;
-                        }
-
-                        primary = primary.substring(1);
-                        i--;
+                        vowelAllowance = 1;
                     }
+
+                    // consume tokens until we hit our match or run out of vowel allowance
+                    let valid = false;
+                    for (; index < tokens.length; index++) {
+                        if (pat != undefined && tokens[index].equals(pat)) {
+                            index++;
+                            valid = true;
+                            break;
+                        }
+                        if (tokens[index].type == TokenType.vowel && vowelAllowance-- <= 0) return false;
+                    }
+
+                    if (!valid) return false;
                 }
 
-                return primary.length == 0;
+                // we need to have consumed all tokens (above loop automatically checks if we consume the entire pattern)
+                // >= because if we match on last token index gets incremented
+                return index >= tokens.length;
             }
         });
+
+        const vowelMap: Record<string, number> = {};
+        const consonantMap: Record<string, number> = {};
+        Tokenization.knownTokens.forEach((t, i) => {
+            if (t.type == TokenType.consonant) consonantMap[t.id] = i;
+            else if (t.type == TokenType.vowel) vowelMap[t.id] = i;
+        })
 
         valid.sort((a, b) => {
             // exact match first
             if (a.word == requestExact) return -1;
             if (b.word == requestExact) return 1;
 
-            const av = a.primary.vowels;
-            const bv = b.primary.vowels;
+            const at = a.pronunciation!.tokens.filter(x =>
+                x.instance.stress & Stress.primary &&
+                !(x.type & (TokenType.primaryStress | TokenType.secondaryStress)));
+            const bt = b.pronunciation!.tokens.filter(x =>
+                x.instance.stress & Stress.primary &&
+                !(x.type & (TokenType.primaryStress | TokenType.secondaryStress)));
 
-            for (let i = 0; i < Math.max(av.length, bv.length); i++) {
-                const ac = i >= av.length ? -1 : VowelOrder[av[i]];
-                const bc = i >= bv.length ? -1 : VowelOrder[bv[i]];
+            const av = at.filter(x => x.type == TokenType.vowel);
+            const bv = bt.filter(x => x.type == TokenType.vowel);
 
-                if (ac - bc != 0) return ac - bc;
+            // sort by vowel
+            const len = Math.max(av.length, bv.length);
+            for (let i = 0; i < len; i++) {
+                const ac = i >= av.length ? -1 : vowelMap[av[i].id];
+                const bc = i >= bv.length ? -1 : vowelMap[bv[i].id];
+
+                if (ac != bc) return ac - bc;
             }
 
+            // sort by leading consonant
             // prioritize words with no leading consonant
-            const alc = a.primary.consonants.leading.length == 0 ? -1 : ConsonantOrder[a.primary.consonants.leading];
-            const blc = b.primary.consonants.leading.length == 0 ? -1 : ConsonantOrder[b.primary.consonants.leading];
-            const pc = alc - blc;
-            if (pc != 0) return pc;
+            const ac = at[0].type == TokenType.consonant ? consonantMap[at[0].id] : -1;
+            const bc = bt[0].type == TokenType.consonant ? consonantMap[bt[0].id] : -1;
+            if (ac != bc) return ac - bc;
 
-            const tc = ConsonantOrder[a.primary.consonants.tail] - ConsonantOrder[b.primary.consonants.tail];
-            return tc;
+            // sort by tail consonant
+            const al = at[at.length - 1];
+            const bl = bt[bt.length - 1];
+            return (
+                al.type == TokenType.consonant ? consonantMap[al.id] : -1 - 
+                bl.type == TokenType.consonant ? consonantMap[bl.id] : -1
+            );
         });
 
         setFocused(valid.slice(0, 200));
     }
 
+    // TODO: update to pass Word around, not string text
     function handleExternalSearch(e: Event) {
         if (!vowelRef.current || !consonantRef.current) return;
 
@@ -218,7 +233,7 @@ export default function PhoneticTree({ data }: { data: phoneme[] }) {
                             <button className="line group" onClick={() => window.dispatchEvent(new CustomEvent('force-set-file-search', { detail: [p.word, false] }))}>
                                 <div className="flex-grow flex justify-start">
                                     <span className="mr-4 font-semibold min-w-32 text-left">{p.word[0].toUpperCase() + p.word.substring(1)}</span>
-                                    <span>/{p.pronunciation}/</span>
+                                    <span>/{p.pronunciation?.text ?? ''}/</span>
                                 </div>
                                 <i className="ri-arrow-right-s-fill ri-lg group-hover:translate-x-2 transition-transform"></i>
                             </button>
