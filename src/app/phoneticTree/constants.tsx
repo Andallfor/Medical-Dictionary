@@ -358,8 +358,7 @@ export class Tokenization {
             }
 
             return this.knownTokens[ind].copy(t);
-        })
-        ],
+        })],
 
         // coalesce parenthesis
     ];
@@ -368,27 +367,25 @@ export class Tokenization {
     static knownTokens: Token[] = [
         // currently, this is the same as vowel order
         ...this.simpleTokenVector([
-            'i',
+            'ī',
             'ɪ',
             'e',
             'ɛ',
             'æ',
             'ə',
-            'ʌ',
             'əː',
+            'ʌ',
             'u',
             'ʊ',
             'o',
             'ɔ',
-            'ɔr',
             'a',
-            'ar',
             'aɪ',
             'ɔɪ',
-            'aʊ',
+            'au', // TODO: is this au or aʊ?
             'iɚ',
             'ɛɚ',
-            'ʊɚ'
+            'ʊɚ',
         ], TokenType.vowel),
 
         // this is the same as consonant order
@@ -397,10 +394,10 @@ export class Tokenization {
             ['m'],
             ['p',  'pl', 'pr'],
             ['b',  'bl', 'br'],
-            ['n',  'ng'],
+            ['n',  'ŋ'],
             ['t',  'tr'],
             ['d',  'dr'],
-            ['k',  'cl', 'cr'],
+            ['k',  'x', 'cl', 'cr'],
             ['kw', 'kj'],
             ['g',  'gl', 'gr'],
             ['f',  'fl', 'fr'],
@@ -427,15 +424,17 @@ export class Tokenization {
 
     private static translation: Record<StandardType, Record<string, string | replacement[]>> = {
         [StandardType.mw]: {
-            'ē': [{to: 'i', whenStress: true},
-                {to: 'ɪ', whenStress: false}],
+            'ē': [{to: 'ī', whenStress: true},
+                  {to: 'ɪ', whenStress: false}],
             'i': 'ɪ',
             'ā': 'e',
             'e': 'ɛ',
             'a': 'æ',
-            'ə': [{to: 'ʌ', whenStress: true}],
+            'ə': [{to: 'ʌ', whenStress: true},
+                  {to: 'ə', whenStress: false}],
             'ər': 'əː',
             'ü': 'u',
+            'yü': 'yu',
             'u̇': 'ʊ',
             'ō': 'o',
             'ȯ': 'ɔ',
@@ -443,44 +442,41 @@ export class Tokenization {
             'ä': 'a',
             'är': 'ar',
             'ī': 'aɪ',
-            'ȯi': 'ɔi',
+            'oi': 'ɔɪ',
             'au̇': 'au',
             'ir': 'iɚ',
             'er': 'ɛɚ',
             'u̇r': 'ʊɚ',
-            'oe': 'eu',
-            'ue': 'iʊ',
+            'oe': 'eu̇',
+            'ue': 'īu̇',
             'ᵊ': '',
             '-': '',
         },
         [StandardType.oed]: {
+            'i': 'ī',
+            'ɪ': 'ɪ', // no change
+            'eɪ': 'e',
+            'ɛ': 'ɛ', // no change
+            'æ': 'æ', // no change
+            'ə': [{to: 'ʌ', whenStress: true},
+                  {to: 'ə', whenStress: false}],
+            'ər': 'əː',
+            'u': 'u', // no change
+            'ju': 'yu',
+            'jü': 'yu',
+            'ʊ': 'ʊ', // no change
+            'oʊ': 'o',
+            'əu': 'o',
+            'ɔ': 'ɔ', // no change
+            'ɔr': 'ɔr', // no change
+            'ɑ': 'a',
+            'ɑr': 'ar',
+            'ɑɪ': 'aɪ',
+            'ɔɪ': 'ɔɪ',
+            'ɑʊ': 'au',
             'ɪ(ə)r': 'iɚ',
             'ɛ(ə)r': 'ɛɚ',
             'ʊ(ə)r': 'ʊɚ',
-            'eɪ': 'e',
-            'ər': 'əː',
-            'oʊ': 'o',
-            'ɑr': 'ar',
-            'kl': 'cl',
-            'kr': 'cr',
-            'kj': 'ky',
-            'tʃ': 'ch',
-            'dʒ': 'j',
-            '(h)w': 'wh̤',
-            'ɑ': 'a',
-            'ɑ̃': 'an',
-            'æ̃': 'n',
-            'ᵻ': 'ɪ',
-            'ᵿ': 'ə',
-            'ŋ': 'ng',
-            'x': 'k',
-            'ʃ': 'sh',
-            'ð': 'th̥',
-            'θ': 'th̬',
-            'ʒ': 'zh',
-            'ə': [{to: 'ʌ', whenStress: true}],
-            'ɡ':'g',
-            'ɒ': 'a',
         }
     };
 

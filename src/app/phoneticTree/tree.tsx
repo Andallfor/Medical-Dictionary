@@ -3,29 +3,10 @@ import { ConsonantOrder, ConsonantSearch, Stress, Token, TokenType, Tokenization
 import { Branch, BranchEntry, BranchState, PhoneticSearchController, PhoneticSearchControllerRef } from "./search";
 
 // these should correspond to known token ids
-const BranchVowels = [
-    'i',
-    'ɪ',
-    'e',
-    'ɛ',
-    'æ',
-    'ə',
-    'əː',
-    'ʌ',
-    'u',
-    'ʊ',
-    'o',
-    'ɔ',
-    // 'ɔr', // TODO:!!! try to ensure consistency between this and known tokens + token equivalencies
-    'a',
-    // 'ar',
-    'aɪ',
-    'ɔɪ',
-    'aʊ',
-    'iɚ',
-    'ɛɚ',
-    'ʊɚ',
-].map(x => new BranchEntry(x));
+// for vowels, this is one-to-one with our vowel tokens
+const BranchVowels = Tokenization.knownTokens
+    .filter(x => x.type == TokenType.vowel)
+    .map(x => new BranchEntry(x.instance.canonical));
 
 const BranchConsonants = [
     new BranchEntry('', 'None'),
@@ -35,7 +16,7 @@ const BranchConsonants = [
     new BranchEntry('n', 'n/ŋ'),
     't',
     'd',
-    new BranchEntry('', 'k/x'), // TODO:
+    new BranchEntry('k', 'k/x'),
     'g',
     'f',
     'v',
@@ -52,8 +33,6 @@ const BranchConsonants = [
 ].map(x => typeof x == 'string' ? new BranchEntry(x) : x);
 
 export default function PhoneticTree({ data }: { data: Word[] }) {
-    // TODO: branch state should also use tokens!
-
     // search results
     const [focused, setFocused] = useState<Word[]>([]);
     const [searchStr, setSearchStr] = useState<(string | undefined)[] | undefined>(undefined);
