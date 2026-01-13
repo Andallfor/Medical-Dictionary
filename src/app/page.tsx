@@ -8,7 +8,7 @@ import PhoneticTree from "./phoneticTree/tree";
 import { Search } from "./search/search";
 import { phoneme, Word } from "./phoneticTree/constants";
 import { Settings } from "./settings/panel";
-import { processDictionary, readInternalDictionary } from "./settings/dictionary";
+import { readInternalDictionary } from "./settings/dictionary";
 
 // TODO: initial load is no longer instant, add small loading indicator
 

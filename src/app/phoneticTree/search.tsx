@@ -1,121 +1,160 @@
 import { Dispatch, Ref, SetStateAction, useEffect, useImperativeHandle, useState } from "react";
-import { branchState } from "./constants";
+import { branchState, Token, Tokenization } from "./constants";
 
 interface customizationProps {
     width: string;
 }
 
 interface phoneticSearchProps {
-    num: number;
+    numBranches: number; // number of branches
     ref: Ref<PhoneticSearchControllerRef>;
     props: {
-        list: string[];
-        states: branchState[];
-        setStates: Dispatch<SetStateAction<branchState[]>>;
-        search: () => void;
+        list: BranchEntry[]; // entries
+
+        // state management (since this is controlled by PhoneticSearchController)
+        states: BranchState[];
+        setStates: Dispatch<SetStateAction<BranchState[]>>;
+
+        search: () => void; // search callback
     };
     customization: customizationProps;
+}
+
+export class BranchEntry {
+    display: string;
+    id: string; // should match to a known token
+
+    constructor(id: string, display?: string) {
+        this.id = id;
+        this.display = display ?? id;
+    }
+}
+
+export interface BranchState {
+    // properties
+    id: number; // a single phonetic controller can have multiple branches. note that this is also the index of the branch
+    autoSearch: boolean; // single click triggers search
+    entries: BranchEntry[];
+
+    // instance
+    active: boolean;
+    isSearch: boolean; // true if the current branch indicates a search
+    index: number; // index into entries which is currently selected (-1 if none)
 }
 
 export type PhoneticSearchControllerRef = {
     update: (symbols: string[]) => void;
 }
 
-export function Branch({ state, customization, update }: { state: branchState, customization: customizationProps, update: (i: number, s: string | undefined, search: boolean) => void }) {
+export function Branch({ state, customization, update }: { state: BranchState, customization: customizationProps, update: (id: number, entryIndex: number, search: boolean) => void }) {
     const [clicks, setClicks] = useState(0);
 
-    function handleClick(v: string) {
+    function handleClick(index: number) {
         setTimeout(() => setClicks(0), 250);
         if (clicks == 0) {
             setClicks(1);
-            update(state.ind, v == state.phoneme ? undefined : v, state.autoSearch);
+            // if user clicks on the same element, send -1 to indicate we want it to be cleared
+            update(state.id, index == state.index ? -1 : index, state.autoSearch);
         } else {
             // dont retrigger search on double click if we are already searching
-            if (!state.autoSearch || !state.shouldSearch) update(state.ind, v, true);
+            if (!state.autoSearch || !state.isSearch) update(state.id, index, true);
         }
     }
 
-    function buttonStyle(v: string) {
-        if (state.active) {
-            return state.phoneme == v
-            ? 'text-tonal10 font-semibold ' + ((state.shouldSearch || state.autoSearch) ? 'bg-red-500' : 'bg-[#79bd92]')
+    function buttonStyle(index: number) {
+        if (state.active) return state.index == index
+            ? 'text-tonal10 font-semibold ' + ((state.isSearch || state.autoSearch) ? 'bg-red-500' : 'bg-[#79bd92]')
             : 'hover:bg-surface20';
-        } else return 'pointer-events-none';
+        else return 'pointer-events-none';
     }
 
     return (
         <div className={
             customization.width + " rounded-sm flex flex-col " + (state.active ? 'bg-tonal0' : 'bg-surface10 text-tonal20')}>
-            {state.phonemeList.map((v, k) =>
+            {state.entries.map((v, k) =>
                 <button key={k}
-                    className={"cursor-pointer rounded-sm py-0.5 " + buttonStyle(v)}
-                    onClick={() => handleClick(v)}>
-                    <p>{v}</p>
+                    className={"cursor-pointer rounded-sm py-0.5 " + buttonStyle(k)}
+                    onClick={() => handleClick(k)}>
+                    <p>{v.display}</p>
                 </button>
             )}
         </div>
     );
 }
 
-export function PhoneticSearchController({ ref, num, props, customization }: phoneticSearchProps ) {
+export function PhoneticSearchController({ ref, numBranches, props, customization }: phoneticSearchProps ) {
     useEffect(() => {
-        const state: branchState[] = [];
-        for (let i = 0; i < num; i++) {
+        // we expect props.list to be ids corresponding known tokens
+        props.list.forEach(x => {
+            // special handling for empty (Sound Selection)
+            if (x.id == '') return;
+
+            if (!Tokenization.knownTokens.find(y => y.id == x.id))
+                console.warn(`Branch entry has no matching known token! (display=${x.display}, id=${x.id})`);
+        })
+
+        const state: BranchState[] = [];
+        for (let i = 0; i < numBranches; i++) {
             state.push({
+                id: i,
+                autoSearch: i == numBranches - 1, // last branch auto searches
+                entries: props.list,
+
                 active: i == 0,
-                autoSearch: i == num - 1,
-                shouldSearch: false,
-                ind: i,
-                phoneme: undefined,
-                phonemeList: props.list
+                isSearch: false,
+                index: -1,
             });
         }
 
         props.setStates(state);
-    }, [num]);
+    }, [numBranches]);
 
-    function updateBranch(ind: number, s: string | undefined, search: boolean = false) {
+    function updateBranch(id: number, entryIndex: number, search: boolean = false) {
         const state = [...props.states];
 
-        // deactivate later branches
-        if (search || !s) {
-            for (let i = ind + 1; i < state.length; i++) {
+        // user is clearing this branch, deactivate everything after it
+        if (entryIndex == -1) {
+            for (let i = id + 1; i < state.length; i++) {
                 state[i].active = false;
-                state[i].phoneme = undefined;
+                state[i].index = -1;
             }
+        } else {
+            // user has selected something in this branch, activate the next branch
+            if (id + 1 < state.length) state[id + 1].active = true;
         }
 
-        if ((s || search) && ind + 1 < state.length) state[ind + 1].active = true;
+        for (let i = 0; i < id; i++) state[i].isSearch = false;
 
-        for (let i = 0; i < ind; i++) state[i].shouldSearch = false;
-
-        state[ind].phoneme = s;
-        state[ind].shouldSearch = search;
+        state[id].index = entryIndex;
+        state[id].isSearch = search;
 
         props.setStates(state);
         if (search) props.search();
     }
 
     useImperativeHandle(ref, () => ({
-        update(symbols) {
-            updateBranch(0, undefined, false);
+        // used by parent; set the current state of branches to match to requested phonemes
+        update(requestedEntries: string[]) {
+            if (requestedEntries.length > numBranches) {
+                console.warn(`Not enough branches (${numBranches}) to represented desired pattern ${requestedEntries.join()}`);
+                requestedEntries = requestedEntries.slice(0, numBranches);
+            }
 
-            let j = 0;
-            symbols.forEach(s => {
-                if (j >= props.states.length) return;
-
-                if (props.list.includes(s)) {
-                    updateBranch(j, s, false);
-                    j++;
-                }
-            })
+            // tell each branch what entry to take
+            updateBranch(0, -1, false); // reset branches
+            requestedEntries.forEach((x, i) =>
+                updateBranch(
+                    i,
+                    props.list.findIndex(y => y.display == x || y.id == x),
+                    false)
+            );
         },
     }));
 
     return (
         <div className="flex gap-2">
-            {props.states.length == num ? 
-                props.states.map((s, i) => <Branch key={i} state={s} customization={customization} update={updateBranch}/>)
+            {props.states.length == numBranches
+                ? props.states.map((s, i) => <Branch key={i} state={s} customization={customization} update={updateBranch}/>)
                 : ''
             }
         </div>

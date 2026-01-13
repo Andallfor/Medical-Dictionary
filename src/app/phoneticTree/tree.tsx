@@ -1,6 +1,55 @@
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import { ConsonantOrder, ConsonantSearch, Stress, Token, TokenType, Tokenization, VowelOrder, Word, branchState, phoneme, r_tail_c, r_vowel, readRegex } from "./constants";
-import { PhoneticSearchController, PhoneticSearchControllerRef } from "./search";
+import { Branch, BranchEntry, BranchState, PhoneticSearchController, PhoneticSearchControllerRef } from "./search";
+
+// these should correspond to known token ids
+const BranchVowels = [
+    'i',
+    'ɪ',
+    'e',
+    'ɛ',
+    'æ',
+    'ə',
+    'əː',
+    'ʌ',
+    'u',
+    'ʊ',
+    'o',
+    'ɔ',
+    // 'ɔr', // TODO:!!! try to ensure consistency between this and known tokens + token equivalencies
+    'a',
+    // 'ar',
+    'aɪ',
+    'ɔɪ',
+    'aʊ',
+    'iɚ',
+    'ɛɚ',
+    'ʊɚ',
+].map(x => new BranchEntry(x));
+
+const BranchConsonants = [
+    new BranchEntry('', 'None'),
+    'm',
+    'p',
+    'b',
+    new BranchEntry('n', 'n/ŋ'),
+    't',
+    'd',
+    new BranchEntry('', 'k/x'), // TODO:
+    'g',
+    'f',
+    'v',
+    'l',
+    'n(t)l',
+    'r',
+    's',
+    'ʃ',
+    'tʃ',
+    'ð',
+    'θ',
+    'ʒ',
+    'dʒ'
+].map(x => typeof x == 'string' ? new BranchEntry(x) : x);
 
 export default function PhoneticTree({ data }: { data: Word[] }) {
     // TODO: branch state should also use tokens!
@@ -10,9 +59,9 @@ export default function PhoneticTree({ data }: { data: Word[] }) {
     const [searchStr, setSearchStr] = useState<(string | undefined)[] | undefined>(undefined);
 
     // tree state
-    const [vowelState, setVowelStates] = useState<branchState[]>([]);
-    const [consonantState, setConsonantState] = useState<branchState[]>([]);
-    const [noPronState, setNoPronState] = useState<branchState[]>([]);
+    const [vowelState, setVowelStates] = useState<BranchState[]>([]);
+    const [consonantState, setConsonantState] = useState<BranchState[]>([]);
+    const [noPronState, setNoPronState] = useState<BranchState[]>([]);
 
     // ref
     const vowelRef = useRef<PhoneticSearchControllerRef>(null);
@@ -37,10 +86,12 @@ export default function PhoneticTree({ data }: { data: Word[] }) {
         // pattern: [vowels... consonant | undefined] or [] for noPron
         const pattern: (string | undefined)[] = [];
         if (!matchNoPron) {
-            vowelState.forEach(v => { if (v.phoneme) pattern.push(v.phoneme) });
-            if (consonantState[0].phoneme) {
-                pattern.push(consonantState[0].phoneme == 'None' ? '' : consonantState[0].phoneme);
-            } else pattern.push(undefined);
+            // note that we assume vowels appear first
+            vowelState.forEach(v => { if (v.index != -1) pattern.push(v.entries[v.index].id) });
+
+            if (consonantState.length != 1) console.warn("Phonetic tree has multiple consonant branches!");
+            const c = consonantState[0];
+            pattern.push(c.index == -1 ? undefined : c.entries[c.index].id)
         }
 
         // ensure the pattern is different
@@ -195,26 +246,26 @@ export default function PhoneticTree({ data }: { data: Word[] }) {
     return (
         <div className="flex gap-6">
             <div className="flex flex-col gap-2">
-                <PhoneticSearchController ref={noPronRef} num={1} props={{
+                <PhoneticSearchController ref={noPronRef} numBranches={1} props={{
                     states: noPronState,
                     setStates: setNoPronState,
                     search: () => search(true),
-                    list: ["Sound Selection"]
+                    list: [new BranchEntry('', 'Sound Selection')]
                 }} customization={{ width: 'w-full' }}/>
                 <div className="flex gap-2">
-                    <PhoneticSearchController ref={vowelRef} num={4} props={{
+                    <PhoneticSearchController ref={vowelRef} numBranches={4} props={{
                         states: vowelState,
                         setStates: setVowelStates,
                         search: search,
-                        list: Object.keys(VowelOrder),
+                        list: BranchVowels
                     }} customization={{
                         width: 'w-8'
                     }}/>
-                    <PhoneticSearchController ref={consonantRef} num={1} props={{
+                    <PhoneticSearchController ref={consonantRef} numBranches={1} props={{
                         states: consonantState,
                         setStates: setConsonantState,
                         search: search,
-                        list: ConsonantSearch
+                        list: BranchConsonants,
                     }} customization={{
                         width: 'w-12'
                     }}/>

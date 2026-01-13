@@ -61,15 +61,6 @@ export interface Word {
     isInternal: boolean; // whether or not the word is pulled from the internal dictionary (e.g. not from MW)
 }
 
-export interface wordDefinitionData {
-    word: string,
-    pronunciation?: string,
-    part?: string,
-    def?: string[],
-    audio?: string,
-    shouldWarn: boolean, // if pronunciation was only from MW
-}
-
 export interface branchState {
     ind: number;
     active: boolean;

@@ -1,4 +1,4 @@
-import { mw, phoneme, StandardType, Token, Tokenization, Word, wordDefinitionData } from "../phoneticTree/constants";
+import { mw, phoneme, StandardType, Token, Tokenization, Word } from "../phoneticTree/constants";
 import { capitalize } from "../util";
 import { getAudio, hasAudio } from "./api";
 import { useEffect, useRef, useState } from "react";
