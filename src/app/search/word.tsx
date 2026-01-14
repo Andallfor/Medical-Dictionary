@@ -22,7 +22,6 @@ export function SingleWord({ words, dictionary, userSearch }: { words: mw[] | st
                 part: m.fl,
                 def: m.shortdef,
                 audio: '',
-                isInternal: false,
             };
 
             if (m.hwi?.prs) {
@@ -47,13 +46,9 @@ export function SingleWord({ words, dictionary, userSearch }: { words: mw[] | st
                 part: internalDef.part,
                 def: internalDef.def,
                 audio: '',
-                isInternal: false,
             }
 
-            if (internalDef.pronunciation) {
-                _internal.pronunciation = internalDef.pronunciation;
-                _internal.isInternal = true;
-            }
+            if (internalDef.pronunciation) _internal.pronunciation = internalDef.pronunciation;
         }
 
         // check if _internal is the same as _external. if it is, get rid of _internal
@@ -73,11 +68,8 @@ export function SingleWord({ words, dictionary, userSearch }: { words: mw[] | st
         // if needed, update the phonetic tree to have it match the newly searched word
         if (userSearch && (_internal || _external)) { // cannot use state as it has not updated yet
             window.dispatchEvent(new CustomEvent('phonetic-tree-external-search', {
-                detail: [ // try to use internal if available
-                    _internal?.word ?? _external?.word,
-                    (_internal?.pronunciation?.text ?? _external?.pronunciation?.text) ?? '',
-                    true
-                ]
+                // use internal if exists
+                detail:  { word: _internal ?? _external }
             }));
         }
     }, [words]);
@@ -101,15 +93,14 @@ function Definition({ word, source }: { word: Word, source: string }) {
                     <div className="text-2xl flex items-center">
                         <span className="capitalize">{word.word}</span>
                         {word.audio
-                            ? <button className={"ml-3 hover:bg-tonal0/70 border bg-tonal0 rounded-md px-2 text-xl py-0.5 " + (!word.isInternal ? 'border-red-500' : 'border-surface20')}
-                                title={!word.isInternal ? "Pronunciation was converted from MW and so may not be correct." : undefined}
+                            ? <button className={"ml-3 hover:bg-tonal0/70 border bg-tonal0 rounded-md px-2 text-xl py-0.5 border-surface20"}
                                 onClick={() => audioPlayer.current ? audioPlayer.current.play() : null}>
                                 <span>{word.pronunciation?.text ?? ''}</span>
                                 <i className="ml-2 mr-1 ri-volume-up-fill text-primary40"></i>
                                 <audio src={word.audio} ref={audioPlayer}></audio>
                             </button>
                             : word.pronunciation
-                                ? <div className={"ml-3 border bg-tonal0 rounded-md text-2 text-xl py-0.5 px-2 " + (!word.isInternal ? 'border-red-500' : 'border-surface20')}>{word.pronunciation.text}</div>
+                                ? <div className={"ml-3 border bg-tonal0 rounded-md text-2 text-xl py-0.5 px-2 border-surface20"}>{word.pronunciation.text}</div>
                                 : <span className="text-base mx-6">[No pronunciation found]</span>}
                     </div>
                     <div className="flex items-center">

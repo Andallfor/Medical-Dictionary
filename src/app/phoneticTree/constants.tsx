@@ -57,8 +57,6 @@ export interface Word {
     part: string; // part of speech
     audio: string; // url to the word's audio (from MW)
     def: string[]; // definition
-
-    isInternal: boolean; // whether or not the word is pulled from the internal dictionary (e.g. not from MW)
 }
 
 export interface branchState {
@@ -199,6 +197,7 @@ export enum TokenType {
     consonant = 2,
     primaryStress = 4,
     secondaryStress = 8,
+    stressMark = primaryStress | secondaryStress,
 }
 
 export enum StandardType { mw, oed }
@@ -572,6 +571,11 @@ export class Tokenization {
 
     static toString(tokens: Token[]): string {
         return tokens.map(x => x.replaceCanonical ? x.equivalent[0] : x.instance.canonical).join('');
+    }
+
+    // return all tokens that have primary stress, skipping the primary stress mark
+    static getPrimary(tokens: Token[]): Token[] {
+        return tokens.filter(x => x.instance.stress & Stress.primary && !(x.type & TokenType.stressMark));
     }
 
     // first element in base is used as canonical and id

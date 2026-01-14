@@ -153,12 +153,8 @@ export default function PhoneticTree({ data }: { data: Word[] }) {
             if (b.word == requestExact) return 1;
 
             // TODO: probably should cache this somewhere
-            const at = a.pronunciation!.tokens.filter(x =>
-                x.instance.stress & Stress.primary &&
-                !(x.type & (TokenType.primaryStress | TokenType.secondaryStress)));
-            const bt = b.pronunciation!.tokens.filter(x =>
-                x.instance.stress & Stress.primary &&
-                !(x.type & (TokenType.primaryStress | TokenType.secondaryStress)));
+            const at = Tokenization.getPrimary(a.pronunciation!.tokens);
+            const bt = Tokenization.getPrimary(b.pronunciation!.tokens);
 
             const av = at.filter(x => x.type == TokenType.vowel);
             const bv = bt.filter(x => x.type == TokenType.vowel);
@@ -190,23 +186,26 @@ export default function PhoneticTree({ data }: { data: Word[] }) {
         setFocused(valid.slice(0, 200));
     }
 
-    // TODO: update to pass Word around, not string text
     function handleExternalSearch(e: Event) {
         if (!vowelRef.current || !consonantRef.current) return;
 
-        const event = e as CustomEvent;
-        const [word, pron] = event.detail as [string, string];
+        const word = (e as CustomEvent).detail.word as Word;
+        if (!word.pronunciation) {
+            console.warn(`Given word ${word.word} but has undefined pronunciation!`);
+            return;
+        }
 
-        if (pron != '') {
-            const primary = pron.includes('ˈ') ? pron.split('ˈ')[1] : pron;
-            const vowels = [...primary.matchAll(r_vowel)].map(x => x[0] as string);
-            const tailCon = readRegex(primary.match(r_tail_c));
+        if (!word.pronunciation.text || word.pronunciation.tokens.length == 0) {
+            console.warn(`Given word ${word.word} but has empty pronunciation!`);
+            return;
+        }
 
-            vowelRef.current.update(vowels);
-            consonantRef.current.update([tailCon.length == 0 ? 'None' : tailCon]);
-        } else noPronRef.current?.update(['Sound Selection']);
+        // we are given tokens, take all primary stressed vowels + ending consonant (if exists)
+        const p = Tokenization.getPrimary(word.pronunciation.tokens);
+        vowelRef.current.update(p.filter(x => x.type == TokenType.vowel).map(x => x.id))
+        consonantRef.current.update([p[p.length - 1].type == TokenType.consonant ? p[p.length - 1].id : 'None']);
 
-        search(pron == '', word.toLowerCase(), true);
+        search(false, word.word.toLowerCase(), true);
     }
 
     function clear() {
