@@ -5,8 +5,9 @@ import { Tokenization, StandardType } from "../tokenization";
 import { capitalize } from "../util";
 import { getAudio, hasAudio } from "./api";
 import { useContext, useEffect, useRef, useState } from "react";
+import { SearchState } from "./search";
 
-export function SingleWord({ words, userSearch }: { words: mw[] | string, userSearch: boolean }) {
+export function SingleWord({ query, userSearch }: { query: SearchState, userSearch: boolean }) {
     const dictionary = useContext(DICTIONARY_CONTEXT);
 
     // definition loaded from internal dictionary
@@ -17,42 +18,34 @@ export function SingleWord({ words, userSearch }: { words: mw[] | string, userSe
     // slightly jank as we need to coerce mw[] and phoneme into wordDefinitionData
     useEffect(() => {
         let _external: Word | undefined = undefined;
-        let _internal: Word | undefined = undefined;
+        let _internal: Word | undefined = dictionary.find(x => x.word == query.word);
 
-        // get MW def
-        if (typeof words != 'string') {
-            const m = (words as mw[])[0]; // take the first output
+        externalQuery: if (query.mw) {
+            // mw may return a different word than what we search (if it doesn't have the exact)
+            // but we may have an internal def instead - in such a case, don't show mw
+            const mwWord = query.mw.meta.id.split(':')[0].toLowerCase();
+            if (query.word != mwWord) {
+                if (_internal) break externalQuery; // exit the if statement; we dont want to process this
+                // TODO: give user note that mw did not return exact match?
+            }
+
             _external = {
-                word: m.meta.id.split(':')[0].toLowerCase(),
-                part: m.fl,
-                def: m.shortdef,
+                word: mwWord,
+                part: query.mw.fl,
+                def: query.mw.shortdef,
                 audio: '',
             };
 
-            if (m.hwi?.prs) {
-                const t = Tokenization.tokenize(_external.word, m.hwi.prs[0].mw.trim(), StandardType.mw);
+            if (query.mw.hwi?.prs) {
+                const t = Tokenization.tokenize(_external.word, query.mw.hwi.prs[0].mw.trim(), StandardType.mw);
                 _external!.pronunciation = {
                     tokens: t,
                     text: Tokenization.toString(t),
                 };
 
-                const a = hasAudio(m.hwi.prs);
+                const a = hasAudio(query.mw.hwi.prs);
                 if (a) _external.audio = getAudio(a);
             }
-        }
-
-        // sync our internal search with MW search (if present)
-        // TODO: this is a bit unintuitive? likely need to redo the parameters to pass in both mw and what the user searched
-        const internalDef = _external ? dictionary.find(x => x.word == _external.word) : dictionary.find(x => x.word == words as string);
-        if (internalDef) {
-            _internal = {
-                word: internalDef.word,
-                part: internalDef.part,
-                def: internalDef.def,
-                audio: '',
-            }
-
-            if (internalDef.pronunciation) _internal.pronunciation = internalDef.pronunciation;
         }
 
         // check if _internal is the same as _external. if it is, get rid of _internal
@@ -76,14 +69,14 @@ export function SingleWord({ words, userSearch }: { words: mw[] | string, userSe
                 detail:  { word: _internal ?? _external }
             }));
         }
-    }, [words]);
+    }, [query]);
 
     if (internal || external) {
         return (<div className="mt-2 mb-6">
             {external ? <Definition word={external} source={'Merriam-Webster'}/> : <></>}
             {internal ? <Definition word={internal} source={'Internal'}/> : <></>}
         </div>);
-    } else return <div className="text-lg ml-2 mt-1 text-[#d9646c]">Unable to find {typeof words == 'string' ? (words as string) : 'word'}.</div>;
+    } else return <div className="text-lg ml-2 mt-1 text-[#d9646c]">Unable to find {query.word}.</div>;
 }
 
 function Definition({ word, source }: { word: Word, source: string }) {

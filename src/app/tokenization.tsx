@@ -207,9 +207,7 @@ export class Tokenization {
         // 7.2.2.1: see translations
 
         // TODO: add in debug screen to show translation process
-        // TODO: add in indicator to note if mw lookup is different from search
-
-
+        // TODO: clarify: does 'e mean whenever e is stressed, or when e is immediately preceded by a stress mark?
 
         // TODO: how to handle parenthesis?
     ];

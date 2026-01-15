@@ -4,12 +4,17 @@ import { getCollegiateDef } from "./api";
 import { mw } from "../phoneticTree/constants";
 import { capitalize } from "../util";
 
+export interface SearchState {
+    word: string; // the word the user searched (as it appears in the search bar)
+    mw?: mw; // the closest mw result
+}
+
 export function Search({ setFocused }: { setFocused: Dispatch<SetStateAction<string>> }) {
     const [loading, setLoading] = useState('');
     const [isUserSearch, setIsUserSearch] = useState(false);
     const [searchHistory, setSearchHistory] = useState<string[]>([]);
     const [displayIndex, setDisplayIndex] = useState(0);
-    const [words, setWords] = useState<(mw[] | string)[]>([]);
+    const [queries, setQueries] = useState<SearchState[]>([]);
     const [dirty, setDirty] = useState(false);
     const search = useRef<HTMLInputElement | null>(null);
 
@@ -19,7 +24,7 @@ export function Search({ setFocused }: { setFocused: Dispatch<SetStateAction<str
 
         // due to how we style the input bar we cant handle multiple spaces
         search.current.value = search.current.value.replace(/ {2}/g, '')
-        setWords([]); // purposefully clear state to trigger a refresh (for phonetic-tree-external-search event)
+        setQueries([]); // purposefully clear state to trigger a refresh (for phonetic-tree-external-search event)
         if (search.current.value == '') {
             setFocused('');
             return;
@@ -39,16 +44,19 @@ export function Search({ setFocused }: { setFocused: Dispatch<SetStateAction<str
         const w = search.current.value.toLowerCase().split(' ').map(x => x.normalize());
 
         // get the def of each word
-        const state: (mw[] | string)[] = [];
+        const state: SearchState[] = [];
         for (let i = 0; i < w.length; i++) {
             const word = w[i];
-            const [col, dym] = await getCollegiateDef(word); // could be more efficient if we perform requests in parallel but like were requesting up to like 3 words max
-            if (col) state.push(col as mw[]);
-            else state.push(word);
+            const [col, _] = await getCollegiateDef(word); // could be more efficient if we perform requests in parallel but like were requesting up to like 3 words max
+
+            state.push({
+                word: word,
+                mw: col ? (col as mw[])[0] : undefined
+            });
         }
 
         // apply changes
-        setWords(state);
+        setQueries(state);
         setFocused(search.current.value);
         setLoading('');
     }
@@ -110,7 +118,7 @@ export function Search({ setFocused }: { setFocused: Dispatch<SetStateAction<str
                 </div>
             )}
             {/* Definition */}
-            {words.length == 0 ? <></> : <SingleWord words={words[displayIndex]} userSearch={isUserSearch}/>}
+            {queries.length == 0 ? <></> : <SingleWord query={queries[displayIndex]} userSearch={isUserSearch}/>}
         </div>
     )
 }
