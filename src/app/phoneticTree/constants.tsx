@@ -61,7 +61,7 @@ export const BranchConsonants = [
     'f',
     'v',
     'l',
-    'n(t)l',
+    new BranchEntry('ntl', 'n(t)l'),
     'r',
     's',
     'ʃ',

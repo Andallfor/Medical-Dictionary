@@ -76,10 +76,12 @@ interface Replacement { to: string; whenStress: boolean; }
 
 export class Tokenization {
     // later values have higher priority
-    // null means it applies to all types
-    private static rules: [StandardType | null, Rule][] = [
+    // [applicability, description, rule]
+    //      if applicability = null, then apply to everything
+    //      if description = '', then do not log
+    private static rules: [StandardType | null, string, Rule][] = [
         // apply stress
-        [null,
+        [null, "Base",
         toks => {
             toks.forEach((t, i) => {
                 if (i != 0) t.instance.stress = toks[i - 1].instance.stress; // stress propagates forwards
@@ -96,11 +98,11 @@ export class Tokenization {
         }],
 
         // translations
-        [StandardType.mw, t => this.translate(t, this.translation[StandardType.mw])],
-        [StandardType.oed, t => this.translate(t, this.translation[StandardType.oed])],
+        [StandardType.mw, "Translate (Merriam-Webster)", t => this.translate(t, this.translation[StandardType.mw])],
+        [StandardType.oed, "Translate (Oxford English Dictionary/Internal)", t => this.translate(t, this.translation[StandardType.oed])],
 
         // coalesce tokens into known tokens
-        [null,
+        [null, '',
         toks => {
             // as with translations, we also want to form the largest tokens possible
             // im sure theres a better way to go about this but ehhh
@@ -164,7 +166,7 @@ export class Tokenization {
         // special rules
 
         // set all the known values
-        [null,
+        [null, 'Final',
         toks => toks.map(t => {
             if (t.type != TokenType.unknown) return t;
 
@@ -218,6 +220,7 @@ export class Tokenization {
             ['f',  'fl', 'fr'],
             ['v'],
             ['l'],
+            ['ntl', 'n(t)l'],
             ['r'],
             ['s',  'sm', 'sp', 'spl', 'spr', 'sn', 'st', 'str', 'sk', 'sl', 'sw'],
             ['z'],
@@ -330,7 +333,7 @@ export class Tokenization {
         }
 
         // theres probably a cleaner functional way to do this but oh well
-        this.rules.forEach(([filter, rule]) => {
+        this.rules.forEach(([filter, desc, rule]) => {
             if (filter == null || filter == type) tokens = rule(tokens);
         });
 
