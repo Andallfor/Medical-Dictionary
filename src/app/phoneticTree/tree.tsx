@@ -1,7 +1,8 @@
 import { useContext, useEffect, useRef, useState } from "react";
-import { Stress, TokenType, Tokenization, Word } from "./constants";
 import { BranchEntry, BranchState, PhoneticSearchController, PhoneticSearchControllerRef } from "./search";
 import { DICTIONARY_CONTEXT } from "../page";
+import { Word } from "../dictionary";
+import { Tokenization, TokenType, Stress } from "../tokenization";
 
 // these should correspond to known token ids
 // for vowels, this is one-to-one with our vowel tokens

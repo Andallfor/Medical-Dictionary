@@ -6,9 +6,8 @@ import { fileData } from "./fileSearch/input";
 import FileSearch from "./fileSearch/search";
 import PhoneticTree from "./phoneticTree/tree";
 import { Search } from "./search/search";
-import { Word } from "./phoneticTree/constants";
 import { Settings } from "./settings/panel";
-import { Dictionary } from "./settings/dictionary";
+import { Dictionary, Word } from "./dictionary";
 
 export const DICTIONARY_CONTEXT = createContext<Word[]>([]);
 

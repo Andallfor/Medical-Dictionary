@@ -1,5 +1,5 @@
 import { Dispatch, Ref, SetStateAction, useEffect, useImperativeHandle, useState } from "react";
-import { branchState, Token, Tokenization } from "./constants";
+import { Tokenization } from "../tokenization";
 
 interface customizationProps {
     width: string;

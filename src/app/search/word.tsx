@@ -1,5 +1,7 @@
+import { Word } from "../dictionary";
 import { DICTIONARY_CONTEXT } from "../page";
-import { mw, StandardType, Tokenization, Word } from "../phoneticTree/constants";
+import { mw } from "../phoneticTree/constants";
+import { Tokenization, StandardType } from "../tokenization";
 import { capitalize } from "../util";
 import { getAudio, hasAudio } from "./api";
 import { useContext, useEffect, useRef, useState } from "react";

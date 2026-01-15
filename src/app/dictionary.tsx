@@ -1,5 +1,18 @@
 import { Dispatch, SetStateAction } from "react";
-import { Tokenization, StandardType, Word } from "../phoneticTree/constants";
+import { StandardType, Token, Tokenization } from "./tokenization";
+
+export interface Pronunciation {
+    tokens: Token[];
+    text: string; // string representation of tokens
+}
+
+export interface Word {
+    word: string; // the actual word
+    pronunciation?: Pronunciation;
+    part: string; // part of speech
+    audio: string; // url to the word's audio (from MW)
+    def: string[]; // definition
+}
 
 export class DictionaryEdit {
     word: string;
