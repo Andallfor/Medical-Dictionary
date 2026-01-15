@@ -17,7 +17,7 @@ export function SingleWord({ words, userSearch }: { words: mw[] | string, userSe
     // slightly jank as we need to coerce mw[] and phoneme into wordDefinitionData
     useEffect(() => {
         let _external: Word | undefined = undefined;
-        let _internal: Word | undefined = undefined;        
+        let _internal: Word | undefined = undefined;
 
         // get MW def
         if (typeof words != 'string') {
@@ -30,7 +30,7 @@ export function SingleWord({ words, userSearch }: { words: mw[] | string, userSe
             };
 
             if (m.hwi?.prs) {
-                const t = Tokenization.tokenize(m.hwi.prs[0].mw.trim(), StandardType.mw);
+                const t = Tokenization.tokenize(_external.word, m.hwi.prs[0].mw.trim(), StandardType.mw);
                 _external!.pronunciation = {
                     tokens: t,
                     text: Tokenization.toString(t),

@@ -16,7 +16,7 @@ export enum TokenType {
     stressMark = primaryStress | secondaryStress,
 }
 
-export enum StandardType { mw, oed }
+export enum StandardType { mw, oed, none }
 
 export interface TokenInstance {
     canonical: string; // textual representation of phoneme
@@ -71,18 +71,21 @@ export class Token {
     }
 }
 
-interface Rule { (tokens: Token[]): Token[] };
-interface Replacement { to: string; whenStress: boolean; }
+interface Rule { (tokens: Token[], word: string): Token[] };
+interface Replacement {
+    to: string;
+    whenStress?: boolean;
+    withoutPhysicalPattern?: string; // if defined, then check if string appears in the actual word (not pron)
+                                     // if it does, do not apply translation
+}
 
 export class Tokenization {
     // later values have higher priority
-    // [applicability, description, rule]
-    //      if applicability = null, then apply to everything
-    //      if description = '', then do not log
-    private static rules: [StandardType | null, string, Rule][] = [
+    // [restriction, rule]
+    //      if restriction = none, then apply to everything
+    private static rules: [StandardType, Rule][] = [
         // apply stress
-        [null, "Base",
-        toks => {
+        [StandardType.none, toks => {
             toks.forEach((t, i) => {
                 if (i != 0) t.instance.stress = toks[i - 1].instance.stress; // stress propagates forwards
 
@@ -98,12 +101,12 @@ export class Tokenization {
         }],
 
         // translations
-        [StandardType.mw, "Translate (Merriam-Webster)", t => this.translate(t, this.translation[StandardType.mw])],
-        [StandardType.oed, "Translate (Oxford English Dictionary/Internal)", t => this.translate(t, this.translation[StandardType.oed])],
+        [StandardType.mw,   (t, w) => this.translate(t, w, this.translation[StandardType.mw])],
+        [StandardType.oed,  (t, w) => this.translate(t, w, this.translation[StandardType.oed])],
+        [StandardType.none, (t, w) => this.translate(t, w, this.translation[StandardType.none])],
 
         // coalesce tokens into known tokens
-        [null, '',
-        toks => {
+        [StandardType.none, toks => {
             // as with translations, we also want to form the largest tokens possible
             // im sure theres a better way to go about this but ehhh
 
@@ -163,11 +166,8 @@ export class Tokenization {
             return out;
         }],
 
-        // special rules
-
         // set all the known values
-        [null, 'Final',
-        toks => toks.map(t => {
+        [StandardType.none, toks => toks.map(t => {
             if (t.type != TokenType.unknown) return t;
 
             const ind = this.knownTokens.findIndex(x => x.equals(t));
@@ -179,7 +179,39 @@ export class Tokenization {
             return this.knownTokens[ind].copy(t);
         })],
 
-        // coalesce parenthesis
+        // special rules
+        [StandardType.none, toks => { // 7.1 (stress consonant)
+            // if no consonant between primary stress symbol and first vowel, check if there is a consonant immediately before stress
+            // if true, duplicate the consonant and insert it in front of the stress mark
+            // exception: if the prior consonant is 'r', do not duplicate and instead treat it as a vowel
+
+            const index = toks.findIndex(x => x.type == TokenType.primaryStress);
+            if (index <= 0) return toks; // -1 = no match, 0 is start and there cant be anything prior
+
+            const prev = toks[index - 1];
+            if (prev.type == TokenType.consonant) {
+                if (prev.equals('r')) prev.type = TokenType.vowel;
+                else {
+                    toks.splice(index + 1, 0, prev.copy());
+                    toks[index + 1].instance.stress |= Stress.primary;
+                }
+            }
+
+            return toks;
+
+            // example: adenoma, angioma (exception)
+        }],
+
+        // 7.2.1: annotate pronunciations with their source. this is already implemented
+        // 7.2.2: mw translator, already implemented
+        // 7.2.2.1: see translations
+
+        // TODO: add in debug screen to show translation process
+        // TODO: add in indicator to note if mw lookup is different from search
+
+
+
+        // TODO: how to handle parenthesis?
     ];
 
     // TODO: if performance is an issue, probably convert this to a map
@@ -194,6 +226,7 @@ export class Tokenization {
             'əː',
             'ʌ',
             'u',
+            'yu', // 7.2.2.1
             'ʊ',
             'o',
             'ɔ',
@@ -232,7 +265,7 @@ export class Tokenization {
             ['dʒ'],
             ['h'],
             ['w'],
-            ['wh'], // NOTE:
+            ['wh'],
             ['y'],
         ], TokenType.consonant),
 
@@ -292,7 +325,6 @@ export class Tokenization {
                   {to: 'ə', whenStress: false}],
             'ər': 'əː',
             'u': 'u', // no change
-            'ju': 'yu',
             'jü': 'yu',
             'ʊ': 'ʊ', // no change
             'oʊ': 'o',
@@ -311,10 +343,17 @@ export class Tokenization {
             // consonants
             'x': 'ks',
             '(h)w': 'wh',
+        },
+        [StandardType.none]: { // applies to both mw and oed
+            // 7.2.2.1
+            '(j)u': [{to: 'yu', withoutPhysicalPattern: 'ju'}],
+            'ju': [{to: 'yu', withoutPhysicalPattern: 'ju'}],
+            'jʊ': [{to: 'yu', withoutPhysicalPattern: 'ju'}],
+            'yʊ': [{to: 'yu', withoutPhysicalPattern: 'ju'}],
         }
     };
 
-    static tokenize(pronunciation: string, type: StandardType): Token[] {
+    static tokenize(word: string, pronunciation: string, type: StandardType): Token[] {
         if (pronunciation.length == 0) return [];
 
         // sanity check: known tokens has no same tokens
@@ -333,14 +372,14 @@ export class Tokenization {
         }
 
         // theres probably a cleaner functional way to do this but oh well
-        this.rules.forEach(([filter, desc, rule]) => {
-            if (filter == null || filter == type) tokens = rule(tokens);
+        this.rules.forEach(([filter, rule]) => {
+            if (filter == StandardType.none || filter == type) tokens = rule(tokens, word);
         });
 
         return tokens;
     }
 
-    private static translate(toks: Token[], from: Record<string, string | Replacement[]>): Token[] {
+    private static translate(toks: Token[], word: string, from: Record<string, string | Replacement[]>): Token[] {
         const out: Token[] = [];
 
         // assumptions:
@@ -373,9 +412,13 @@ export class Tokenization {
             if (typeof replacement == 'string') val = replacement;
             else {
                 const stressed = toks[ind].instance.stress != Stress.none;
-                const rep = replacement.find(x =>
-                    (x.whenStress && stressed) || (!x.whenStress && !stressed)
-                );
+                const rep = replacement.find(x => {
+                    let valid = true;
+                    if (x.whenStress != undefined) valid &&= x.whenStress == stressed;
+                    if (x.withoutPhysicalPattern != undefined) valid &&= !word.includes(x.withoutPhysicalPattern);
+
+                    return valid;
+                });
 
                 if (rep != undefined) val = rep.to;
             }

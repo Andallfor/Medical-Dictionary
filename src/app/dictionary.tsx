@@ -96,7 +96,7 @@ export class Dictionary {
             }
 
             if (pron) {
-                const t = Tokenization.tokenize(pron, StandardType.oed);
+                const t = Tokenization.tokenize(text, pron, StandardType.oed);
                 word.pronunciation = {
                     tokens: t,
                     text: Tokenization.toString(t),
@@ -177,7 +177,7 @@ export class Dictionary {
                 word: edit.word,
                 pronunciation: edit.pron ? {
                     text: edit.pron,
-                    tokens: Tokenization.tokenize(edit.pron, StandardType.oed) // TODO: maybe add internal type so we dont perform translation on this?
+                    tokens: Tokenization.tokenize(edit.word, edit.pron, StandardType.oed) // TODO: maybe add internal type so we dont perform translation on this?
                 } : undefined,
                 part: edit.part,
                 def: edit.def ? [edit.def] : [],
