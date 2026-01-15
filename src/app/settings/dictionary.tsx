@@ -1,84 +1,178 @@
-import { phoneme, readRegex, r_stress_c, r_vowel, r_sec_c, r_tail_c, Tokenization, StandardType, Word, Token } from "../phoneticTree/constants";
-import { lineData } from "./editor";
+import { Dispatch, SetStateAction } from "react";
+import { Tokenization, StandardType, Word } from "../phoneticTree/constants";
 
-export function readInternalDictionary(lines: string[]): Word[] {
-    const out: Word[] = [];
-    const seen: Set<string> = new Set<string>();
+export class DictionaryEdit {
+    word: string;
+    pron: string;
+    part: string;
+    def: string;
 
-    lines.forEach(line => {
-        if (line.length == 0) return;
-        line = line.trim().normalize();
+    delete: boolean = false;
 
-        // we expect lines to be in the format (weird delimiters are since user can input whatever text in def and i dont really want to do proper input validation)
-        // anything after = is optional
-        // word=pronunciation<@>part of speech<->def 1<->def 2<->...
+    constructor(word = '', pron = '', part = '', def = '') {
+        this.word = word;
+        this.pron = pron;
+        this.part = part;
+        this.def = def;
+    }
 
-        const [base, secondary] = line.split('<@>');
-        const [text, pron] = base.split('=').map(x => x?.normalize());
+    valid(): boolean { return this.word.length > 0; }
+    isEmpty(): boolean { return this.pron.trim().length == 0 && this.word.trim().length == 0; }
+}
 
-        if (seen.has(text)) {
-            console.warn(`Found duplicate ${text}. Skipping`);
+// singleton
+export class Dictionary {
+    // we maintain the state of current
+    // always call set to update!!!
+    private static current: Word[] = [];
+    private static sync: Dispatch<SetStateAction<Word[]>>;
+    private static active: boolean = false;
+
+    static init(setDict: Dispatch<SetStateAction<Word[]>>) {
+        if (this.active) console.warn("Called Dictionary.init on already initialized dictionary");
+
+        this.sync = setDict;
+        this.active = true;
+    }
+
+    private static set(to: Word[]) {
+        this.current = to;
+        this.sync(to);
+    }
+
+    // if union is true, do not replace dictionary; take union of new dictionary and current
+    // (with new dictionary override duplicate values)
+    static async load(url: string, union = false) {
+        if (!this.active) {
+            console.error(`Attempting to load dictionary at ${url} but dictionary is not initialized!`);
             return;
         }
-        seen.add(text);
-        
-        const word: Word = {
-            word: text,
-            def: [],
-            part: '',
-            audio: '',
-            isInternal: true,
+
+        const response = await fetch(url);
+        if (!response.ok) {
+            console.error(`Could not read dictionary at ${url}!`);
+            return;
         }
 
-        if (pron) {
-            const t = Tokenization.tokenize(pron, StandardType.oed);
-            word.pronunciation = {
-                tokens: t,
-                text: Tokenization.toString(t),
-                shouldDelete: false,
-            };
-        }
+        const lines = (await response.text()).split('\n');
+        const out: Word[] = [];
+        const seen: Set<string> = new Set<string>();
 
-        if (secondary) {
-            const split = secondary.split('<->');
-            word.part = split[0];
+        lines.forEach(line => {
+            if (line.length == 0) return;
+            line = line.trim().normalize();
 
-            for (let i = 1; i < split.length; i++) {
-                const s = split[i].trim();
-                if (s.length > 0) word.def.push(s);
+            // we expect lines to be in the format (weird delimiters are since user can input whatever text in def and i dont really want to do proper input validation)
+            // anything after = is optional
+            // word=pronunciation<@>part of speech<->def 1<->def 2<->...
+
+            const [base, secondary] = line.split('<@>');
+            const [text, pron] = base.split('=').map(x => x?.normalize());
+
+            if (seen.has(text)) {
+                console.warn(`Found duplicate ${text}. Skipping`);
+                return;
             }
+            seen.add(text);
+            
+            const word: Word = {
+                word: text,
+                def: [],
+                part: '',
+                audio: '',
+            }
+
+            if (pron) {
+                const t = Tokenization.tokenize(pron, StandardType.oed);
+                word.pronunciation = {
+                    tokens: t,
+                    text: Tokenization.toString(t),
+                };
+            }
+
+            if (secondary) {
+                const split = secondary.split('<->');
+                word.part = split[0];
+
+                for (let i = 1; i < split.length; i++) {
+                    const s = split[i].trim();
+                    if (s.length > 0) word.def.push(s);
+                }
+            }
+
+            out.push(word);
+        });
+
+        // we want current to be overridden so dont add anything that is in seen by new dict
+        if (union) this.current.forEach(x => {
+            if (!seen.has(x.word)) {
+                out.push(x);
+                seen.add(x.word);
+            }
+        });
+
+        this.set(out);
+    }
+
+    // write dictionary to file
+    static save(file: string) {
+        if (!this.active) {
+            console.error(`Attempting to save dictionary to ${file} but dictionary is not initialized!`);
+            return;
         }
 
-        out.push(word);
-    });
+        // convert to dictionary text format
+        const formatted = this.current.map(w => {
+            let root = `${w.word}=${w.pronunciation?.text ?? ''}`;
+            const secondary = [];
+            if (w.part) secondary.push(w.part);
+            if (w.def.length != 0) secondary.push(...w.def.map(x => x.trim()));
 
-    return out;
-}
+            if (secondary.length != 0) root += '<@>' + secondary.join('<->');
 
-export function fmt_ld(x: lineData) {
-    // signal deletion with "DELETE"
-    if (x.shouldDelete) return `${x.edit.word}=DELETE`;
-    else {
-        let base = `${x.edit.word}=${x.edit.pron}`;
-        const hasPart = x.edit.part && x.edit.part.length > 0;
-        const hasDef = x.edit.def && x.edit.def.length > 0;
-        if (hasPart || hasDef) {
-            base += `<@>${hasPart ? x.edit.part : ''}<->`;
-            if (hasDef) base += x.edit.def!.trim().replace(/\r?\n/g, '<->');
+            return root;
+        }).join('\n');
+
+        // https://stackoverflow.com/questions/72683352/how-do-i-write-inta-a-file-and-download-the-file-using-javascript
+        const blob = new Blob([formatted], {type: 'text/plain;charset=UTF-8;'});
+        // @ts-ignore
+        if ('msSaveOrOpenBlob' in window.navigator) window.navigator.msSaveBlob(blob, file);
+        else {
+            const elem = window.document.createElement('a');
+            elem.href = window.URL.createObjectURL(blob);
+            elem.download = file;
+            document.body.appendChild(elem);
+            elem.click();
+            document.body.removeChild(elem);
+        }
+    }
+
+    // for each element,
+    // if to is defined, then delete prev word (word = id), and insert in to
+    // if to is undefined, then just delete word
+    static update(edits: DictionaryEdit[]) {
+        if (!this.active) {
+            console.error(`Attempting to update dictionary but dictionary is not initialized!`);
+            return;
         }
 
-        return base;
-    }
-}
+        edits.forEach(edit => {
+            const index = this.current.findIndex(x => x.word == edit.word);
+            if (index != -1) this.current.splice(index, 1);
 
-export function fmt_ph(x: phoneme) {
-    let base = `${x.word}=${x.pronunciation}`;
-    const hasPart = x.part && x.part.length > 0;
-    const hasDef = x.def && x.def.length > 0;
-    if (hasPart || hasDef) {
-        base += `<@>${hasPart ? x.part : ''}<->`;
-        if (hasDef) base += x.def!.map(x => x.trim()).join('<->');
-    }
+            if (!edit.delete) this.current.push({
+                word: edit.word,
+                pronunciation: edit.pron ? {
+                    text: edit.pron,
+                    tokens: Tokenization.tokenize(edit.pron, StandardType.oed) // TODO: maybe add internal type so we dont perform translation on this?
+                } : undefined,
+                part: edit.part,
+                def: edit.def ? [edit.def] : [],
+                audio: '',
+            });
+        });
 
-    return base;
+        // inefficient but need to force update
+        this.set([...this.current]);
+    }
 }

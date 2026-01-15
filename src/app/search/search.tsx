@@ -1,10 +1,10 @@
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import { SingleWord } from "./word";
 import { getCollegiateDef } from "./api";
-import { mw, phoneme, Word } from "../phoneticTree/constants";
+import { mw } from "../phoneticTree/constants";
 import { capitalize } from "../util";
 
-export function Search({ setFocused, dictionary }: { setFocused: Dispatch<SetStateAction<string>>, dictionary: Word[] }) {
+export function Search({ setFocused }: { setFocused: Dispatch<SetStateAction<string>> }) {
     const [loading, setLoading] = useState('');
     const [isUserSearch, setIsUserSearch] = useState(false);
     const [searchHistory, setSearchHistory] = useState<string[]>([]);
@@ -44,10 +44,7 @@ export function Search({ setFocused, dictionary }: { setFocused: Dispatch<SetSta
             const word = w[i];
             const [col, dym] = await getCollegiateDef(word); // could be more efficient if we perform requests in parallel but like were requesting up to like 3 words max
             if (col) state.push(col as mw[]);
-            else {
-                state.push(word);
-                if (dym) console.log(dym);
-            }
+            else state.push(word);
         }
 
         // apply changes
@@ -113,7 +110,7 @@ export function Search({ setFocused, dictionary }: { setFocused: Dispatch<SetSta
                 </div>
             )}
             {/* Definition */}
-            {words.length == 0 ? <></> : <SingleWord words={words[displayIndex]} dictionary={dictionary} userSearch={isUserSearch}/>}
+            {words.length == 0 ? <></> : <SingleWord words={words[displayIndex]} userSearch={isUserSearch}/>}
         </div>
     )
 }

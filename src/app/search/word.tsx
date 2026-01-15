@@ -1,9 +1,12 @@
-import { mw, phoneme, StandardType, Token, Tokenization, Word } from "../phoneticTree/constants";
+import { DICTIONARY_CONTEXT } from "../page";
+import { mw, StandardType, Tokenization, Word } from "../phoneticTree/constants";
 import { capitalize } from "../util";
 import { getAudio, hasAudio } from "./api";
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 
-export function SingleWord({ words, dictionary, userSearch }: { words: mw[] | string, dictionary: Word[], userSearch: boolean }) {
+export function SingleWord({ words, userSearch }: { words: mw[] | string, userSearch: boolean }) {
+    const dictionary = useContext(DICTIONARY_CONTEXT);
+
     // definition loaded from internal dictionary
     const [internal, setInternal] = useState<Word | undefined>(undefined);
     // definition loaded from external source (i.e. MW)
@@ -18,7 +21,7 @@ export function SingleWord({ words, dictionary, userSearch }: { words: mw[] | st
         if (typeof words != 'string') {
             const m = (words as mw[])[0]; // take the first output
             _external = {
-                word: m.meta.id.split(':')[0],
+                word: m.meta.id.split(':')[0].toLowerCase(),
                 part: m.fl,
                 def: m.shortdef,
                 audio: '',
@@ -29,7 +32,6 @@ export function SingleWord({ words, dictionary, userSearch }: { words: mw[] | st
                 _external!.pronunciation = {
                     tokens: t,
                     text: Tokenization.toString(t),
-                    shouldDelete: false,
                 };
 
                 const a = hasAudio(m.hwi.prs);

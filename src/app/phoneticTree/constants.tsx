@@ -30,25 +30,9 @@ export interface mw {
     searchTerm: string,
 }
 
-export interface phoneme {
-    word: string,
-    pronunciation: string,
-    primary: { // information regarding pronunciation after the primary stress to the end of the word
-        vowels: string[],
-        consonants: {
-            stressed: string[], // all consonants immediately following ˈ or ˌ in order. First entry will be the primary stressed or empty string if none
-            leading: string, // empty string if none (i.e. vowel starts instead)
-            tail: string, // empty string if none
-        }
-    },
-    part?: string,
-    def?: string[],
-}
-
 export interface Pronunciation {
     tokens: Token[];
     text: string; // string representation of tokens
-    shouldDelete: boolean;
 }
 
 export interface Word {
@@ -68,119 +52,10 @@ export interface branchState {
     phonemeList: string[];
 }
 
-export interface replacement { // these are assumed to be vowels
+export interface Replacement { // these are assumed to be vowels
     to: string;
     whenStress: boolean;
 }
-
-// all vowels and consonants are IPA (unless otherwise noted)
-export const VowelOrder: Record<string, number> = {
-    'i': 0,
-    'ɪ': 1,
-    'e': 2,
-    'ɛ': 3,
-    'æ': 4,
-    'ə': 5,
-    'ʌ': 6,
-    'əː': 7,
-    'u': 8,
-    'ʊ': 9,
-    'o': 10,
-    'ɔ': 11,
-    'ɔr': 12,
-    'a': 13,
-    'ar': 14,
-    'aɪ': 15,
-    'ɔɪ': 16,
-    'aʊ': 17,
-    'iɚ': 18,
-    'ɛɚ': 19,
-    'ʊɚ': 20,
-};
-
-export const ConsonantOrder: Record<string, number> = {
-    'm': 0,
-    'p': 1, 'pl': 1, 'pr': 1,
-    'b': 2, 'bl': 2, 'br': 2,
-    'n': 3, 'ng': 3,
-    't': 4, 'tr': 4,
-    'd': 5, 'dr': 5,
-    'k': 6, 'cl': 6, 'cr': 6,
-    'kw': 7, 'kj': 7,
-    'g': 8, 'gl': 8, 'gr': 8,
-    'f': 9, 'fl': 9, 'fr': 9,
-    'v': 10,
-    'l': 11,
-    'r': 12,
-    's': 13, 'sl': 13, 'sp': 13, 'st': 13, 'str': 13, 'sk': 13, 'sw': 13,
-    'z': 14,
-    'sh': 15,
-    'ch': 16,
-    'th̥': 17, // voiceless
-    'th̬': 18, // voiced
-    'zh': 19,
-    'j': 20,
-    'h': 21,
-    'w': 22,
-    'wh̤': 23, // with breath
-    'y': 24,
-    '': 100 // override for no consonant
-}
-
-export const ConsonantSearch: string[] = [
-    'None',
-    'm',
-    'p',
-    'b',
-    'n',
-    'ng', // in source these two are supposed to be the same but thats rather diff to support currently
-    't',
-    'd',
-    'k', // we are supposed to match for both k and x but we translate x to k in oedToIpa
-    'g',
-    'f',
-    'v',
-    'l',
-    'r',
-    's',
-    'sh',
-    'ch',
-    'th̥',
-    'th̬',
-    'zh',
-    'j'
-]
-
-/*
-
-the phonetic translation pipeline needs to be much more robust
-we need to support:
-- phonetic tree search matches for multiple variations of a phoneme (4)
-- more post processing
-    - duplicate stressed consonant (and r as vowel) (7.1)
-    - 7.2.1, 7.2.2 are already implemented
-    - coerce some phonetics to yu (7.2.2.1)
-        - note exception with j in actual word before ju
-        - add 'yu' sound
-    - coerce u: to omega (7.2.2.2)
-    - coerce əʊ to o (7.2.2.3)
-    - coerce various to iɚ (7.2.2.4)
-        - exception, if before consonant
-    - coerce various to ɛɚ (7.2.2.5)
-    - coerce various to ʊɚ (7.2.2.6)
-    - coerce ʌː to əː (7.2.2.7)
-
-proposed pipeline
-we want to represent everything as a token, so a pronunciation is made up of a list of tokens
-    each token should contain its own metadata, e.g. type (primary/secondary stress, vowel, consonant)
-
-we first perform substitution
-during translation, treat every character as its own token. then repeatedly run "rules" over it until we finish all rules
-    - higher priority rules are run last
-    - these rules update the tokens
-
-TODO: vowel order and consonant search should search by token id
-*/
 
 // we consider everything have the primary stress mark to be stressed
 // if the secondary appears afterwards, then stress becomes both
@@ -265,9 +140,10 @@ export class Tokenization {
         [null,
         toks => {
             toks.forEach((t, i) => {
+                if (i != 0) t.instance.stress = toks[i - 1].instance.stress; // stress propagates forwards
+
                 if (t.id == 'ˈ') t.instance.stress |= Stress.primary;
                 else if (t.id == 'ˌ') t.instance.stress |= Stress.secondary;
-                else if (i != 0) t.instance.stress = toks[i - 1].instance.stress; // stress propagates forwards
             })
 
             // if no stress marks appear, then the entire pron is stressed
@@ -421,7 +297,7 @@ export class Tokenization {
         this.simpleToken(['ˌ'], TokenType.secondaryStress),
     ];
 
-    private static translation: Record<StandardType, Record<string, string | replacement[]>> = {
+    private static translation: Record<StandardType, Record<string, string | Replacement[]>> = {
         [StandardType.mw]: {
             'ē': [{to: 'ī', whenStress: true},
                   {to: 'ɪ', whenStress: false}],
@@ -497,20 +373,15 @@ export class Tokenization {
             tokens.push(this.simpleToken([pronunciation[i]], TokenType.unknown, false));
         }
 
-        // console.log(tokens.map(this.copy));
-
         // theres probably a cleaner functional way to do this but oh well
         this.rules.forEach(([filter, rule]) => {
-            if (filter == null || filter == type) {
-                tokens = rule(tokens);
-                // console.log(tokens.map(this.copy));
-            }
+            if (filter == null || filter == type) tokens = rule(tokens);
         });
 
         return tokens;
     }
 
-    private static translate(toks: Token[], from: Record<string, string | replacement[]>): Token[] {
+    private static translate(toks: Token[], from: Record<string, string | Replacement[]>): Token[] {
         const out: Token[] = [];
 
         // assumptions:
@@ -539,10 +410,6 @@ export class Tokenization {
 
             // now apply the translation
             const replacement = from[key];
-            if (replacement == undefined) {
-                console.log(key);
-                console.log(from);
-            }
             let val: string = key; // by default dont replace
             if (typeof replacement == 'string') val = replacement;
             else {
@@ -555,11 +422,15 @@ export class Tokenization {
             }
 
             if (val != '') {
-                // we need to maintain stress
-                const t = this.simpleToken([val], TokenType.unknown, true);
-                t.instance.stress = toks[ind].instance.stress;
+                // NOTE: we split replacement into individual tokens for each letter!
+                // rather than have val as one token
+                // this is because some replacements may not be a known token
+                for (let i = 0; i < val.length; i++) {
+                    const t = this.simpleToken([val[i]], TokenType.unknown, true);
+                    t.instance.stress = toks[ind].instance.stress; // we need to maintain stress
 
-                out.push(t);
+                    out.push(t);
+                }
             }
         });
 
@@ -590,24 +461,10 @@ export class Tokenization {
 
 const regexEscape = new RegExp(/[-[\]{}()*+?.,\\^$|#\s]/g);
 
-// regex to match each phoneme, e.g. /ie|a|i|e|.../ with longest phonemes first
-export const r_vowel = toRegexOr(Object.keys(VowelOrder));
-export const formattedConsonants = toRegexOr(Object.keys(ConsonantOrder)).source;
-export const r_tail_c = new RegExp(`(${formattedConsonants})$`);
-export const r_stress_c = new RegExp(`^(${formattedConsonants})`); // note that lead and primary stressed const are the same
-export const r_sec_c = new RegExp(`ˌ(${formattedConsonants})`, 'g');
-
 // given an array of strings, sort them in descending length and escape any needed characters
 // then join them together as (arr1|arr2|...)
 export function toRegexOr(arr: string[], flags = 'g'): RegExp {
     // https://stackoverflow.com/questions/3561493/is-there-a-regexp-escape-function-in-javascript
     arr = arr.map(x => x.replace(regexEscape, '\\$&')).sort((a, b) => b.length - a.length);
     return new RegExp(`(${arr.join('|')})`, flags);
-}
-
-export function readRegex(r: RegExpMatchArray | null, rm = '') {
-    if (r) {
-        if (rm != '') return r[0].replace(rm, '');
-        else return r[0];
-    } else return '';
 }

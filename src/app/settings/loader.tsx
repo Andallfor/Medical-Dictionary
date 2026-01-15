@@ -1,41 +1,26 @@
-import { ChangeEvent, useEffect, useState } from "react";
-import { phoneme } from "../phoneticTree/constants";
-import { DictionaryEditor, lineData, lineEditData } from "./editor";
-import { fmt_ld, fmt_ph } from "./dictionary";
+import { ChangeEvent, useContext, useEffect, useState } from "react";
+import { DictionaryEditor, lineData } from "./editor";
+import { DICTIONARY_CONTEXT } from "../page";
+import { Dictionary, DictionaryEdit } from "./dictionary";
 
-export function Editor({ dictionary }: { dictionary: phoneme[] }) {
-    const [lenEmpty, setLenEmpty] = useState(0);
+export function Editor() {
+    const dictionary = useContext(DICTIONARY_CONTEXT);
+
+    const [lenEmpty, setLenEmpty] = useState(0); // number of entries with no pronunciation
     const [name, setName] = useState('');
     const [isDirty, setIsDirty] = useState(false);
 
-    useEffect(() => {
-        setLenEmpty(dictionary.filter(x => x.pronunciation.length == 0).length);
-    }, [dictionary])
+    useEffect(() =>
+        setLenEmpty(dictionary.filter(x => !x.pronunciation || x.pronunciation.text == '').length),
+    [dictionary])
 
     function download() {
         setIsDirty(false);
-
-        const file = name.length == 0 ? 'dictionary.txt' : name;
-        let data = "";
-        dictionary.forEach(x => data += fmt_ph(x) + '\n');
-
-        // https://stackoverflow.com/questions/72683352/how-do-i-write-inta-a-file-and-download-the-file-using-javascript
-        const blob = new Blob([data], {type: 'text/plain;charset=UTF-8;'});
-        if ('msSaveOrOpenBlob' in window.navigator) {
-            // @ts-ignore
-            window.navigator.msSaveBlob(blob, file);
-        } else {
-            const elem = window.document.createElement('a');
-            elem.href = window.URL.createObjectURL(blob);
-            elem.download = file;
-            document.body.appendChild(elem);
-            elem.click();
-            document.body.removeChild(elem);
-        }
+        Dictionary.save(name ?? 'dictionary.txt');
     }
 
-    function loadFile(event: ChangeEvent<HTMLInputElement>, isReplace = false) {
-        if (!isReplace) setIsDirty(true); // modified dictionary, so is dirty
+    function loadFile(event: ChangeEvent<HTMLInputElement>, union = false) {
+        if (!union) setIsDirty(true); // modified dictionary, so is dirty
 
         const f = event.target.files!.item(0)!;
         const name = f.name;
@@ -43,18 +28,15 @@ export function Editor({ dictionary }: { dictionary: phoneme[] }) {
 
         setName(name);
 
-        if (isReplace) window.dispatchEvent(new CustomEvent('internal-dictionary-replace', { detail: url }));
-        else window.dispatchEvent(new CustomEvent('internal-dictionary-upload', { detail: [url, true] }));
+        Dictionary.load(url, union);
     }
 
-    function updateDictionary(lines: lineData[]) {
-        // last element will always be empty
-        const str = lines.filter(x => x.edit.word.length != 0).map(fmt_ld).join('\n');
-
+    function applyEdits(edits: DictionaryEdit[]) {
+        // since each line/edit is an actual line in the ui, the last line will always be empty
         setIsDirty(true);
-        if (name.length == 0) setName('Modified.txt')
+        if (name.length == 0) setName('Modified.txt');
 
-        window.dispatchEvent(new CustomEvent('internal-dictionary-upload', {detail: [str, false]}));
+        Dictionary.update(edits.filter(x => x.valid()));
     }
 
     return (
@@ -68,12 +50,12 @@ export function Editor({ dictionary }: { dictionary: phoneme[] }) {
                     </div>
                     <div className="flex gap-2">
                         <label className="button-text px-1 cursor-pointer">
-                            <input type='file' accept=".txt" className="hidden" onChange={(e) => loadFile(e, true)}/>
+                            <input type='file' accept=".txt" className="hidden" onChange={(e) => loadFile(e, false)}/>
                             <i className="ri-file-add-line text-lg mr-1"></i>
                             Replace
                         </label>
                         <label className="button-text px-1 cursor-pointer">
-                            <input type='file' accept=".txt" className="hidden" onChange={(e) => loadFile(e, false)}/>
+                            <input type='file' accept=".txt" className="hidden" onChange={(e) => loadFile(e, true)}/>
                             <i className="ri-file-upload-line text-lg mr-1"></i>
                             Upload
                         </label>
@@ -91,7 +73,7 @@ export function Editor({ dictionary }: { dictionary: phoneme[] }) {
                     </div>
                 </div>
             </div>
-            <DictionaryEditor dictionary={dictionary} update={updateDictionary}/>
+            <DictionaryEditor apply={applyEdits} />
         </div>
     )
 }

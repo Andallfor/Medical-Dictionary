@@ -1,6 +1,7 @@
-import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
-import { ConsonantOrder, ConsonantSearch, Stress, Token, TokenType, Tokenization, VowelOrder, Word, branchState, phoneme, r_tail_c, r_vowel, readRegex } from "./constants";
-import { Branch, BranchEntry, BranchState, PhoneticSearchController, PhoneticSearchControllerRef } from "./search";
+import { useContext, useEffect, useRef, useState } from "react";
+import { Stress, TokenType, Tokenization, Word } from "./constants";
+import { BranchEntry, BranchState, PhoneticSearchController, PhoneticSearchControllerRef } from "./search";
+import { DICTIONARY_CONTEXT } from "../page";
 
 // these should correspond to known token ids
 // for vowels, this is one-to-one with our vowel tokens
@@ -32,7 +33,9 @@ const BranchConsonants = [
     'dʒ'
 ].map(x => typeof x == 'string' ? new BranchEntry(x) : x);
 
-export default function PhoneticTree({ data }: { data: Word[] }) {
+export default function PhoneticTree() {
+    const dictionary = useContext(DICTIONARY_CONTEXT);
+
     // search results
     const [focused, setFocused] = useState<Word[]>([]);
     const [searchStr, setSearchStr] = useState<(string | undefined)[] | undefined>(undefined);
@@ -87,7 +90,7 @@ export default function PhoneticTree({ data }: { data: Word[] }) {
         // unfortunately we can't use regex for this because we need a
         // non-greedy match everything except for vowels expect for the exact vowel we want
 
-        const valid = data.filter((p) => {
+        const valid = dictionary.filter((p) => {
             // if (p.pronunciation?.shouldDelete) return false;
             if (p.word == requestExact) return true; // exact match
 
@@ -219,7 +222,7 @@ export default function PhoneticTree({ data }: { data: Word[] }) {
     useEffect(() => {
         window.addEventListener('phonetic-tree-external-search', handleExternalSearch);
         return () => window.removeEventListener('phonetic-tree-external-search', handleExternalSearch);
-    }, [consonantState, vowelState, data]);
+    }, [consonantState, vowelState, dictionary]);
 
     return (
         <div className="flex gap-6">

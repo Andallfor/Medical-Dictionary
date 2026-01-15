@@ -1,9 +1,12 @@
-import { ChangeEvent, KeyboardEventHandler, use, useEffect, useRef, useState } from "react";
-import { phoneme } from "../phoneticTree/constants";
+import { ChangeEvent, useContext, useEffect, useRef, useState } from "react";
+import { DICTIONARY_CONTEXT } from "../page";
+import { DictionaryEdit } from "./dictionary";
 
 // look the majority of this code was written at like ~3am across multiple days so excuse the mess
 
-function SymbolPicker({ update, minimized }: { update: (s: string) => void, minimized: boolean }) {
+function SymbolPicker({ update }: { update: (s: string) => void }) {
+    // TODO: should automatically pull from tokenization?
+    // maybe can just hide the regular ascii characters?
     const vowels = [['i', 'ɪ', 'e', 'ɛ', 'æ', 'ə', 'ʌ'], ['əː', 'u', 'ʊ', 'o', 'ɔ', 'ɔr', 'a'], ['ar', 'aɪ', 'ɔɪ', 'aʊ', 'iɚ', 'ɛɚ', 'ʊɚ']];
     const consonants = [['th̥', 'th̬', 'ɣ', 'ʃ', 'ð', 'ˌ', 'ˈ']];
     const diacritics = [['́', '̃', '̄']] // https://symbl.cc/en/unicode-table/#combining-diacritical-marks
@@ -27,34 +30,16 @@ function SymbolPicker({ update, minimized }: { update: (s: string) => void, mini
     );
 }
 
-function Line({ index, data, fn }: { index: number, data: lineData, fn: lineFn }) {
+// placeholder denotes that we should not care about the validity of this line (i.e. is the last line)
+function Line({ edit, placeholder, fn }: { edit: DictionaryEdit, placeholder: boolean, fn: lineFn }) {
     const [searchFailed, setSearchFailed] = useState(false);
     const [expanded, setExpanded] = useState(false);
     const wordRef = useRef<HTMLInputElement>(null);
     const pronRef = useRef<HTMLInputElement>(null);
 
-    function wrapWord(e: ChangeEvent<HTMLInputElement>) {
-        let t = {...data.edit};
-        t['word'] = e.target.value;
-        fn.update(index, t);
-    }
-
-    function wrapPron(e: ChangeEvent<HTMLInputElement>) {
-        let t = {...data.edit};
-        t['pron'] = e.target.value;
-        fn.update(index, t);
-    }
-
-    function wrapPart(e: ChangeEvent<HTMLInputElement>) {
-        let t = {...data.edit};
-        t['part'] = e.target.value;
-        fn.update(index, t);
-    }
-
-    function wrapDef(e: ChangeEvent<HTMLTextAreaElement>) {
-        let t = {...data.edit};
-        t['def'] = e.target.value;
-        fn.update(index, t);
+    function wrap(e: ChangeEvent<HTMLTextAreaElement> | ChangeEvent<HTMLInputElement>, key: 'word' | 'pron' | 'part' | 'def') {
+        edit[key] = e.target.value;
+        fn.update(edit);
     }
 
     function trySubmit(k: React.KeyboardEvent<HTMLInputElement>, shouldSearch = false) {
@@ -67,25 +52,25 @@ function Line({ index, data, fn }: { index: number, data: lineData, fn: lineFn }
     }
 
     function search() {
-        setSearchFailed(fn.search(index));
+        setSearchFailed(fn.search());
         setTimeout(() => setSearchFailed(false), 2000);
     }
 
     return (
         <div className="flex gap-1.5">
             <div className="flex-grow">
-                <div className={"z-50 h-7 line rounded-b-none hover:bg-surface10 " + (fn.valid(index) ? '' : 'outline-1 outline-red-500 outline')}>
+                <div className={"z-50 h-7 line rounded-b-none hover:bg-surface10 " + (placeholder || edit.valid() ? '' : 'outline-1 outline-red-500 outline')}>
                     <input className="w-1/2 bg-surface10 outline-none placeholder:italic mr-1"
-                        placeholder="Enter Word" ref={wordRef} value={data.edit.word}
-                        onFocus={() => fn.setFocus({inp: wordRef.current!, ind: index, isPron: false})}
-                        onChange={wrapWord}
+                        placeholder="Enter Word" ref={wordRef} value={edit.word}
+                        onFocus={() => fn.setFocus(wordRef.current!, false)}
+                        onChange={(e) => wrap(e, 'word')}
                         onKeyDown={(e) => trySubmit(e, true)}
-                        onBlur={() => fn.clearSelected(wordRef.current ?? undefined)}
+                        onBlur={() => fn.clearSelected(wordRef.current ?? undefined)} // skull
                     />
                     <input className="w-1/2 bg-surface10 outline-none placeholder:italic"
-                        placeholder="Pronunciation" ref={pronRef} value={data.edit.pron}
-                        onFocus={() => fn.setFocus({inp: pronRef.current!, ind: index, isPron: true})}
-                        onChange={wrapPron}
+                        placeholder="Pronunciation" ref={pronRef} value={edit.pron}
+                        onFocus={() => fn.setFocus(pronRef.current!, true)}
+                        onChange={(e) => wrap(e, 'pron')}
                         onKeyDown={trySubmit}
                         onBlur={() => fn.clearSelected(pronRef.current ?? undefined)}
                     />
@@ -93,8 +78,17 @@ function Line({ index, data, fn }: { index: number, data: lineData, fn: lineFn }
                 <div className="flex flex-col">
                     {expanded ?
                         <div className="w-full bg-surface10 pt-1 px-1">
-                            <input className="line text-sm border-none placeholder:italic w-full outline-none" placeholder="Part of Speech" value={data.edit.part} onChange={wrapPart}></input>
-                            <textarea className="line text-sm border-none placeholder:italic w-full outline-none" placeholder="Definition" rows={4} value={data.edit.def} onChange={wrapDef}></textarea>
+                            <input className="line text-sm border-none placeholder:italic w-full outline-none"
+                                placeholder="Part of Speech"
+                                value={edit.part}
+                                onChange={(e) => wrap(e, 'part')}>
+                            </input>
+                            <textarea className="line text-sm border-none placeholder:italic w-full outline-none"
+                                placeholder="Definition"
+                                rows={4}
+                                value={edit.def}
+                                onChange={(e) => wrap(e, 'def')}>
+                            </textarea>
                         </div>
                     : <></>}
                     <button className={"w-full bg-surface10 rounded-b-md " + (expanded ? 'h-5' : 'h-3')} onClick={() => setExpanded(!expanded)}>
@@ -103,32 +97,28 @@ function Line({ index, data, fn }: { index: number, data: lineData, fn: lineFn }
                 </div>
             </div>
             <button className={"ri-file-search-line button outline-1 outline-red-500 " + (searchFailed ? 'outline' : '')} onClick={search} title="Search for pronunciation." />
-            <button className={"button outline-1 outline-red-500 " + (data.shouldDelete ? 'ri-eraser-fill outline' : 'ri-pencil-fill')} onClick={() => fn.toggleDeletion(index)} title={data.shouldDelete ? 'Delete entry.' : 'Add entry.'}/>
-            <button className="ri-close-line button" onClick={() => fn.update(index, {word: '', pron: '', part: '', def: ''})} title="Clear line." />
+            <button className={"button outline-1 outline-red-500 " + (edit.delete ? 'ri-eraser-fill outline' : 'ri-pencil-fill')}
+                onClick={() => {
+                    edit.delete = !edit.delete;
+                    fn.update(edit);
+                }}
+                title={edit.delete ? 'Delete entry.' : 'Add entry.'}/>
+            <button className="ri-close-line button" onClick={() => fn.update(new DictionaryEdit())} title="Clear line." />
         </div>
     );
 }
 
 interface lineFn {
-    update: (index: number, d: lineEditData) => void;
-    clearSelected: (s: HTMLInputElement | undefined) => void;
-    setFocus: (s: lineSelection) => void;
-    search: (index: number) => boolean;
-    valid: (index: number) => boolean;
-    toggleDeletion: (index: number) => void;
-}
+    update: (d: DictionaryEdit) => void;
+    search: () => boolean;
 
-export interface lineEditData {
-    word: string;
-    pron: string;
-    part: string;
-    def: string;
+    clearSelected: (s: HTMLInputElement | undefined) => void;
+    setFocus: (input: HTMLInputElement, isPron: boolean) => void;
 }
 
 export interface lineData {
-    edit: lineEditData;
+    edit: DictionaryEdit;
     id: number;
-    shouldDelete: boolean;
 }
 
 interface lineSelection {
@@ -137,21 +127,30 @@ interface lineSelection {
     isPron: boolean;
 }
 
-export function DictionaryEditor({ dictionary, update }: { dictionary: phoneme[], update: (l: lineData[]) => void }) {
+export function DictionaryEditor({ apply }: { apply: (edits: DictionaryEdit[]) => void }) {
+    const dictionary = useContext(DICTIONARY_CONTEXT);
     const container = useRef<HTMLDivElement>(null);
+
     const [lines, setLines] = useState<lineData[]>([emptyLine()]);
     const [selected, setSelected] = useState<lineSelection | undefined>(undefined);
     const [preventSelectionClear, setPrevention] = useState(false);
     const [minimized, setMinimized] = useState(false);
 
-    function isEmpty(l: lineEditData) { return l.pron == '' && l.word == ''; }
+    function emptyLine(): lineData {
+        return {
+            edit: new DictionaryEdit(),
+            id: Date.now(),
+        }
+    }
 
-    function setLine(index: number, data: lineEditData) {
+    // TODO: in above code we directly modify edit, does that propagate here (and so we dont need to pass data?)
+    function updateLine(index: number, data: DictionaryEdit) {
         const l = [...lines];
         l[index].edit = data;
 
-        if (isEmpty(data) && index != l.length - 1) l.splice(index, 1);
-        if (index == lines.length - 1 && !isEmpty(data)) l.push(emptyLine()); // editing last line should auto add new one
+        const isLast = index == l.length - 1;
+        if (data.isEmpty() && !isLast) l.splice(index, 1); // dont remove last entry
+        else if (!data.isEmpty() && isLast) l.push(emptyLine()); // editing last line should auto add new one
 
         setLines(l);
     }
@@ -177,7 +176,7 @@ export function DictionaryEditor({ dictionary, update }: { dictionary: phoneme[]
             setTimeout(() => selected.inp.setSelectionRange(len, len), 10);
             setPrevention(true);
 
-            setLine(selected.ind, e);
+            updateLine(selected.ind, e);
         }
     }
 
@@ -187,44 +186,11 @@ export function DictionaryEditor({ dictionary, update }: { dictionary: phoneme[]
             const d = dictionary.find((x) => x.word == w);
             if (d) {
                 const l = [...lines];
-                l[index].edit.pron = d.pronunciation;
+                l[index].edit.pron = d.pronunciation?.text ?? '';
                 setLines(l);
 
                 return false;
             }
-        }
-
-        return true;
-    }
-
-    function emptyLine(): lineData {
-        return {
-            edit: {
-                word: '',
-                pron: '',
-                def: '',
-                part: ''
-            },
-            id: Date.now(),
-            shouldDelete: false,
-        };
-    }
-
-    function lineIsValid(index: number) {
-        const line = lines[index];
-
-        const p = line.edit.pron.trim();
-        const w = line.edit.word.trim();
-        
-        if (p.length > 0 && w.length == 0) return false;
-        return true;
-    }
-
-    function canSubmit() {
-        if (lines[0].edit.word.length == 0) return false;
-
-        for (let i = 0; i < lines.length; i++) {
-            if (!lineIsValid(i)) return false;
         }
 
         return true;
@@ -247,10 +213,10 @@ export function DictionaryEditor({ dictionary, update }: { dictionary: phoneme[]
                 <div className="flex-grow flex flex-col gap-2 mt-1">
                     <div className="flex flex-grow-0 gap-2">
                         <button className="button-text px-2 disabled:bg-tonal0 disabled:cursor-not-allowed"
-                            disabled={!canSubmit()}
+                            disabled={lines.length <= 1 || lines.some((x, k) => !(k == lines.length - 1 || x.edit.valid()))}
                             onClick={() => {
-                                update(lines);
-                                setLines([emptyLine()])
+                                apply(lines.map(x => x.edit));
+                                setLines([emptyLine()]);
                             }}>
                             <i className="ri-file-transfer-line text-lg mr-1"></i>
                             Upload Words
@@ -261,24 +227,18 @@ export function DictionaryEditor({ dictionary, update }: { dictionary: phoneme[]
                         </button>
                     </div>
                     {lines.map((x, k) => {
-                        return (<Line key={x.id} index={k} data={x} fn={{
-                            update: setLine,
+                        return (<Line key={x.id} edit={x.edit} placeholder={k == lines.length - 1} fn={{
+                            update: (edit) => updateLine(k, edit),
+                            search: () => search(k),
+                            setFocus: (input, isPron) => setSelected({ inp: input, ind: k, isPron: isPron }),
                             clearSelected: clearSelected,
-                            setFocus: (i) => setSelected(i),
-                            search: search,
-                            valid: lineIsValid,
-                            toggleDeletion: (index: number) => {
-                                const l = [...lines];
-                                l[index].shouldDelete = !l[index].shouldDelete;
-                                setLines(l);
-                            }
                         }}/>);
                     }
                     )}
                 </div>
                 <div className="w-6"></div>
                 <div className="mt-3">
-                    <SymbolPicker update={addSymbol} minimized={minimized}/>
+                    <SymbolPicker update={addSymbol} />
                 </div>
             </div>
         </div>
