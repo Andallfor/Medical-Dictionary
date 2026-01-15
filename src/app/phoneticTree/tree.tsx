@@ -3,36 +3,7 @@ import { BranchEntry, BranchState, PhoneticSearchController, PhoneticSearchContr
 import { DICTIONARY_CONTEXT } from "../page";
 import { Word } from "../dictionary";
 import { Tokenization, TokenType, Stress } from "../tokenization";
-
-// these should correspond to known token ids
-// for vowels, this is one-to-one with our vowel tokens
-const BranchVowels = Tokenization.knownTokens
-    .filter(x => x.type == TokenType.vowel)
-    .map(x => new BranchEntry(x.instance.canonical));
-
-const BranchConsonants = [
-    new BranchEntry('', 'None'),
-    'm',
-    'p',
-    'b',
-    new BranchEntry('n', 'n/ŋ'),
-    't',
-    'd',
-    new BranchEntry('k', 'k/x'),
-    'g',
-    'f',
-    'v',
-    'l',
-    'n(t)l',
-    'r',
-    's',
-    'ʃ',
-    'tʃ',
-    'ð',
-    'θ',
-    'ʒ',
-    'dʒ'
-].map(x => typeof x == 'string' ? new BranchEntry(x) : x);
+import { BranchVowels, BranchConsonants } from "./constants";
 
 export default function PhoneticTree() {
     const dictionary = useContext(DICTIONARY_CONTEXT);

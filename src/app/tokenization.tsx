@@ -182,7 +182,6 @@ export class Tokenization {
 
     // TODO: if performance is an issue, probably convert this to a map
     static knownTokens: Token[] = [
-        // currently, this is the same as vowel order
         ...this.simpleTokenVector([
             'i',
             'ɪ',
@@ -199,13 +198,12 @@ export class Tokenization {
             'a',
             'aɪ',
             'ɔɪ',
-            'au', // TODO: is this au or aʊ?
+            'au',
             'iɚ',
             'ɛɚ',
             'ʊɚ',
         ], TokenType.vowel),
 
-        // this is the same as consonant order
         // note that the first element in each array is considered the canonical
         ...this.simpleTokenVector2D([
             ['m'],
@@ -214,24 +212,24 @@ export class Tokenization {
             ['n',  'ŋ'],
             ['t',  'tr'],
             ['d',  'dr'],
-            ['k',  'x', 'cl', 'cr'],
-            ['kw', 'kj'],
+            ['k',  'ks', 'kl', 'kr'], // NOTE: we translate x to ks! (see branches)
+            ['kw'],
             ['g',  'gl', 'gr'],
             ['f',  'fl', 'fr'],
             ['v'],
             ['l'],
             ['r'],
-            ['s',  'sl', 'sp', 'st', 'str', 'sk', 'sw'],
+            ['s',  'sm', 'sp', 'spl', 'spr', 'sn', 'st', 'str', 'sk', 'sl', 'sw'],
             ['z'],
-            ['sh'],
-            ['ch'],
-            ['th̥'],
-            ['th̬'],
-            ['zh'],
-            ['j'],
+            ['ʃ'],
+            ['tʃ'],
+            ['θ'],
+            ['ð'],
+            ['ʒ'],
+            ['dʒ'],
             ['h'],
             ['w'],
-            ['wh̤'],
+            ['wh'], // NOTE:
             ['y'],
         ], TokenType.consonant),
 
@@ -268,6 +266,18 @@ export class Tokenization {
             'ue': 'iu̇',
             'ᵊ': '',
             '-': '',
+
+            // consonants
+            'k̠': 'k',
+            'x': 'ks',
+            'sh': 'ʃ',
+            'ch': 'tʃ',
+            't͟h': 'θ',
+            'th': 'ð',
+            'zh': 'ʒ',
+            'j': "dʒ",
+            'hw': 'wh',
+            'ʸ': 'y'
         },
         [StandardType.oed]: {
             'i': 'i',
@@ -294,6 +304,10 @@ export class Tokenization {
             'ɪ(ə)r': 'iɚ',
             'ɛ(ə)r': 'ɛɚ',
             'ʊ(ə)r': 'ʊɚ',
+
+            // consonants
+            'x': 'ks',
+            '(h)w': 'wh',
         }
     };
 
