@@ -242,7 +242,7 @@ export class Tokenization {
     static knownTokens: Token[] = [
         // currently, this is the same as vowel order
         ...this.simpleTokenVector([
-            'ī',
+            'i',
             'ɪ',
             'e',
             'ɛ',
@@ -299,7 +299,7 @@ export class Tokenization {
 
     private static translation: Record<StandardType, Record<string, string | Replacement[]>> = {
         [StandardType.mw]: {
-            'ē': [{to: 'ī', whenStress: true},
+            'ē': [{to: 'i', whenStress: true},
                   {to: 'ɪ', whenStress: false}],
             'i': 'ɪ',
             'ā': 'e',
@@ -323,12 +323,12 @@ export class Tokenization {
             'er': 'ɛɚ',
             'u̇r': 'ʊɚ',
             'oe': 'eu̇',
-            'ue': 'īu̇',
+            'ue': 'iu̇',
             'ᵊ': '',
             '-': '',
         },
         [StandardType.oed]: {
-            'i': 'ī',
+            'i': 'i',
             'ɪ': 'ɪ', // no change
             'eɪ': 'e',
             'ɛ': 'ɛ', // no change

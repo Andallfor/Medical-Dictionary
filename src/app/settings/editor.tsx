@@ -7,9 +7,9 @@ import { DictionaryEdit } from "./dictionary";
 function SymbolPicker({ update }: { update: (s: string) => void }) {
     // TODO: should automatically pull from tokenization?
     // maybe can just hide the regular ascii characters?
-    const vowels = [['i', 'ɪ', 'e', 'ɛ', 'æ', 'ə', 'ʌ'], ['əː', 'u', 'ʊ', 'o', 'ɔ', 'ɔr', 'a'], ['ar', 'aɪ', 'ɔɪ', 'aʊ', 'iɚ', 'ɛɚ', 'ʊɚ']];
-    const consonants = [['th̥', 'th̬', 'ɣ', 'ʃ', 'ð', 'ˌ', 'ˈ']];
-    const diacritics = [['́', '̃', '̄']] // https://symbl.cc/en/unicode-table/#combining-diacritical-marks
+    const vowels = [['i', 'ɪ', 'e', 'ɛ', 'æ', 'ə', 'ʌ'], ['əː', 'u', 'ʊ', 'o', 'ɔ', 'ɔr', 'a'], ['ar', 'aɪ', 'ɔɪ', 'au', 'iɚ', 'ɛɚ', 'ʊɚ']];
+    const consonants = [['ŋ', 'ʃ', 'tʃ', 'θ', 'ð', 'ʒ', 'dʒ']];
+    const diacritics = [['́', '̃', '̄', 'ˌ', 'ˈ']] // https://symbl.cc/en/unicode-table/#combining-diacritical-marks
 
     function map(table: string[][]) {
         return table.map((x, i) => 
@@ -22,9 +22,9 @@ function SymbolPicker({ update }: { update: (s: string) => void }) {
         <div>
             <div className="font-semibold">Vowels</div>
             {map(vowels)}
-            <div className="mt-2 font-semibold">Consonants/Misc.</div>
+            <div className="mt-2 font-semibold">Consonants</div>
             {map(consonants)}
-            <div className="mt-2 font-semibold">Diacritics</div>
+            <div className="mt-2 font-semibold">Diacritics/Misc.</div>
             {map(diacritics)}
         </div>
     );
