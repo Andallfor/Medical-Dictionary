@@ -41,6 +41,9 @@ export class Dictionary {
     private static sync: Dispatch<SetStateAction<Word[]>>;
     private static active: boolean = false;
 
+    // we want to be able to see what the base pronunciation was before it was translated
+    static debugInternalLookup: Record<string, string> = {};
+
     static init(setDict: Dispatch<SetStateAction<Word[]>>) {
         if (this.active) console.warn("Called Dictionary.init on already initialized dictionary");
 
@@ -66,6 +69,8 @@ export class Dictionary {
             console.error(`Could not read dictionary at ${url}!`);
             return;
         }
+
+        if (!union) this.debugInternalLookup = {};
 
         const lines = (await response.text()).split('\n');
         const out: Word[] = [];
@@ -96,6 +101,7 @@ export class Dictionary {
             }
 
             if (pron) {
+                this.debugInternalLookup[text] = pron;
                 const t = Tokenization.tokenize(text, pron, StandardType.oed);
                 word.pronunciation = {
                     tokens: t,

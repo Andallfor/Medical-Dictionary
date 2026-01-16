@@ -1,6 +1,6 @@
-import { Word } from "../dictionary";
+import { Dictionary, Word } from "../dictionary";
 import { DICTIONARY_CONTEXT } from "../page";
-import { Tokenization, StandardType } from "../tokenization";
+import { Tokenization, StandardType, Token } from "../tokenization";
 import { capitalize } from "../util";
 import { getAudio, hasAudio } from "./api";
 import { useContext, useEffect, useRef, useState } from "react";
@@ -19,6 +19,9 @@ export function SingleWord({ query, userSearch }: { query: SearchState, userSear
         let _external: Word | undefined = undefined;
         let _internal: Word | undefined = dictionary.find(x => x.word == query.word);
 
+        const extDebug: Token[][] = [];
+        const intDebug: Token[][] = [];
+
         externalQuery: if (query.mw) {
             // mw may return a different word than what we search (if it doesn't have the exact)
             // but we may have an internal def instead - in such a case, don't show mw
@@ -36,7 +39,7 @@ export function SingleWord({ query, userSearch }: { query: SearchState, userSear
             };
 
             if (query.mw.hwi?.prs) {
-                const t = Tokenization.tokenize(_external.word, query.mw.hwi.prs[0].mw.trim(), StandardType.mw);
+                const t = Tokenization.tokenize(_external.word, query.mw.hwi.prs[0].mw.trim(), StandardType.mw, extDebug);
                 _external!.pronunciation = {
                     tokens: t,
                     text: Tokenization.toString(t),
@@ -47,7 +50,17 @@ export function SingleWord({ query, userSearch }: { query: SearchState, userSear
             }
         }
 
-        console.log(_external);
+        if (true) {
+            console.log("=== External");
+            console.log(extDebug);
+            if (query.word in Dictionary.debugInternalLookup) {
+                console.log("=== Internal");
+                Tokenization.tokenize(query.word, Dictionary.debugInternalLookup[query.word], StandardType.oed, intDebug);
+                console.log(intDebug);
+                console.log(Tokenization.toString(intDebug[intDebug.length - 1]));
+                console.log(_internal);
+            } else console.log("No internal present");
+        }
 
         setExternal(_external);
         setInternal(_internal);

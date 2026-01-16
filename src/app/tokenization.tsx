@@ -100,6 +100,7 @@ export class Tokenization {
         }],
 
         // translations
+        [StandardType.mw,   (t, w) => this.translate(t, w, { 'ᵊ': '', '-': '' })],
         [StandardType.mw,   (t, w) => this.translate(t, w, this.translation[StandardType.mw])],
         [StandardType.oed,  (t, w) => this.translate(t, w, this.translation[StandardType.oed])],
         [StandardType.none, (t, w) => this.translate(t, w, this.translation[StandardType.none])],
@@ -352,8 +353,10 @@ export class Tokenization {
             'u̇r': 'ʊɚ',
             'oe': 'eu̇',
             'ue': 'iu̇',
-            'ᵊ': '',
-            '-': '',
+
+            // 7.2.2.4, to catch mw ē to i/ɪ
+            '(ē)ə': [{to: 'iɚ', withoutPhysicalPattern: ['ger', 'jer']}],
+            'ēə': [{to: 'iɚ', withoutPhysicalPattern: ['ger', 'jer']}],
 
             // consonants
             'k̠': 'k',
@@ -369,19 +372,11 @@ export class Tokenization {
             'ʸ': 'y'
         },
         [StandardType.oed]: {
-            'i': 'i', // no change
-            'ɪ': 'ɪ', // no change
             'eɪ': 'e',
-            'ɛ': 'ɛ', // no change
-            'æ': 'æ', // no change
             'ər': 'əː',
-            'u': 'u', // no change
             'jü': 'yu',
-            'ʊ': 'ʊ', // no change
             'oʊ': 'o',
             'əu': 'o',
-            'ɔ': 'ɔ', // no change
-            'ɔr': 'ɔr', // no change
             'ɑ': 'a',
             'ɑr': 'ar',
             'ɑɪ': 'aɪ',
@@ -414,7 +409,6 @@ export class Tokenization {
             'ɪə': [{to: 'iɚ', withoutPhysicalPattern: ['ger', 'jer']}],
             'iə': [{to: 'iɚ', withoutPhysicalPattern: ['ger', 'jer']}],
             'jə': [{to: 'iɚ', withoutPhysicalPattern: ['ger', 'jer']}],
-            'ēə': [{to: 'iɚ', withoutPhysicalPattern: ['ger', 'jer']}], // to catch mw ē to i/ɪ. must be done here - calcaneus has ē-ə
 
             // 7.2.2.5 (ɛɚ detector)
             'ɛ(ə)': 'ɛɚ',
@@ -427,8 +421,9 @@ export class Tokenization {
         }
     };
 
-    static tokenize(word: string, pronunciation: string, type: StandardType): Token[] {
+    static tokenize(word: string, pronunciation: string, type: StandardType, debug?: Token[][]): Token[] {
         if (pronunciation.length == 0) return [];
+        const _debug = debug != undefined;
 
         // sanity check: known tokens has no same tokens
         const _map: Set<string> = new Set<string>();
@@ -445,9 +440,14 @@ export class Tokenization {
             tokens.push(this.simpleToken([pronunciation[i]], TokenType.unknown, false));
         }
 
+        if (_debug) debug.push([...tokens]);
+
         // theres probably a cleaner functional way to do this but oh well
         this.rules.forEach(([filter, rule]) => {
-            if (filter == StandardType.none || filter == type) tokens = rule(tokens, word);
+            if (filter == StandardType.none || filter == type) {
+                tokens = rule(tokens, word);
+                if (_debug) debug.push([...tokens]);
+            }
         });
 
         return tokens;
