@@ -7,26 +7,15 @@ import FileSearch from "./fileSearch/search";
 import PhoneticTree from "./phoneticTree/tree";
 import { Search } from "./search/search";
 import { Settings } from "./settings/panel";
-import { Dictionary, Word } from "./dictionary";
+import { DictionaryWrapper } from "./dictionaryWrapper";
 
-export const DICTIONARY_CONTEXT = createContext<Word[]>([]);
-
-export function Home() {
-    // global state for our dictionary
-    // DO NOT modify these! you should always go through Dictionary instead or useContext(DICTIONARY_CONTEXT)
-    const [INTERNAL_DICTIONARY, SET_INTERNAL_DICTIONARY] = useState<Word[]>([]);
-
+export default function Home() {
     const [focusedWord, setFocusedWord] = useState<string>('');
     const [files, setFiles] = useState<fileData[]>([]);
     const [tabGroup, setTabGroup] = useState(0);
 
-    useEffect(() => {
-        Dictionary.init(SET_INTERNAL_DICTIONARY);
-        Dictionary.load('/Medical-Dictionary/data.txt');
-    }, []);
-
     return (
-        <DICTIONARY_CONTEXT value={ INTERNAL_DICTIONARY }>
+        <DictionaryWrapper>
             <div className="m-8 mt-4">
                 <div className="flex flex-col-reverse xl:grid xl:grid-cols-[50%_minmax(0,1fr)] gap-8">
                     <div className="flex flex-col gap-3 flex-shrink-0">
@@ -43,6 +32,6 @@ export function Home() {
                     </div>
                 </div>
             </div>
-        </DICTIONARY_CONTEXT>
+        </DictionaryWrapper>
     );
 }

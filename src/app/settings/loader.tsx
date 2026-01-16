@@ -1,7 +1,7 @@
 import { ChangeEvent, useContext, useEffect, useState } from "react";
 import { DictionaryEditor } from "./editor";
-import { DICTIONARY_CONTEXT } from "../page";
 import { Dictionary, DictionaryEdit } from "../dictionary";
+import { DICTIONARY_CONTEXT } from "../dictionaryWrapper";
 
 export function Editor() {
     const dictionary = useContext(DICTIONARY_CONTEXT);

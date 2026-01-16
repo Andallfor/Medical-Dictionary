@@ -1,10 +1,10 @@
 import { Dictionary, Word } from "../dictionary";
-import { DICTIONARY_CONTEXT } from "../page";
 import { Tokenization, StandardType, Token } from "../tokenization";
 import { capitalize } from "../util";
 import { getAudio, hasAudio } from "./api";
 import { useContext, useEffect, useRef, useState } from "react";
 import { SearchState } from "./search";
+import { DICTIONARY_CONTEXT } from "../dictionaryWrapper";
 
 export function SingleWord({ query, userSearch }: { query: SearchState, userSearch: boolean }) {
     const dictionary = useContext(DICTIONARY_CONTEXT);
