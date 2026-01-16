@@ -48,16 +48,7 @@ export function SingleWord({ query, userSearch }: { query: SearchState, userSear
             }
         }
 
-        // check if _internal is the same as _external. if it is, get rid of _internal
-        if (_internal && _external) {
-            // word and pronunciation must be the same
-            // def and part must either be undefined or the same
-            if (_internal.word == _external.word && _internal.pronunciation == _external.pronunciation &&
-                (!_internal.def || (_internal.def == _external.def)) &&
-                (!_internal.part || (_internal.part == _external.part))) {
-                _internal = undefined;
-            }
-        }
+        console.log(_external);
 
         setExternal(_external);
         setInternal(_internal);

@@ -7675,7 +7675,6 @@ tactics=ˈtæktɪks
 self=sɛlf
 bet=bɛt
 identification=aɪˌdɛn(t)əfəˈkeɪʃən
-consonants=ðə
 encourage=ᵻnˈkərɪdʒ
 agree=əˈɡri
 department=dəˈpɑrtmənt

@@ -74,7 +74,6 @@ export class Token {
 interface Rule { (tokens: Token[], word: string): Token[] };
 interface Replacement {
     to: string;
-    whenStress?: boolean;
     withoutPhysicalPattern?: string; // if defined, then check if string appears in the actual word (not pron)
                                      // if it does, do not apply translation
 }
@@ -180,6 +179,57 @@ export class Tokenization {
         })],
 
         // special rules
+        // TODO: maybe make the stress stuff its own function?
+        // ē to i when (leading) stressed, ɪ when not
+        [StandardType.mw, toks => {
+            const ti = this.knownTokens.find(x => x.equals('i'));
+            const tɪ = this.knownTokens.find(x => x.equals('ɪ'));
+
+            if (!ti || !tɪ) {
+                console.error("One of i or ɪ is not a known token!");
+                return toks;
+            }
+
+            let leading = false;
+            for (let i = 0; i < toks.length; i++) {
+                if (toks[i].type & TokenType.stressMark) leading = true;
+                else if (toks[i].equals('ē')) { // ē is not a known token, so we have to manually check for it
+                    const s = toks[i].instance.stress;
+                    toks[i] = (leading ? ti : tɪ).copy();
+                    toks[i].instance.stress = s;
+
+                    leading = false;
+                } else if (toks[i].type == TokenType.vowel) leading = false; // only the first vowel is leading
+            }
+
+            return toks;
+        }],
+
+        // ə to ʌ when (leading) stress, no change otherwise
+        [StandardType.none, toks => {
+            const to = this.knownTokens.find(x => x.equals('ʌ'));
+            if (!to) {
+                console.error("ʌ is not a known token!");
+                return toks;
+            }
+
+            let leading = false;
+            for (let i = 0; i < toks.length; i++) {
+                if (toks[i].type & TokenType.stressMark) leading = true;
+                else if (toks[i].type == TokenType.vowel) { // notice that ə is a known token
+                    if (leading && toks[i].equals('ə')) {
+                        const s = toks[i].instance.stress;
+                        toks[i] = to.copy();
+                        to.instance.stress = s;
+                    }
+
+                    leading = false;
+                }
+            }
+
+            return toks;
+        }],
+
         [StandardType.none, toks => { // 7.1 (stress consonant)
             // if no consonant between primary stress symbol and first vowel, check if there is a consonant immediately before stress
             // if true, duplicate the consonant and insert it in front of the stress mark
@@ -187,13 +237,17 @@ export class Tokenization {
 
             const index = toks.findIndex(x => x.type == TokenType.primaryStress);
             if (index <= 0) return toks; // -1 = no match, 0 is start and there cant be anything prior
+            if (index == toks.length - 1) return toks;
 
-            const prev = toks[index - 1];
-            if (prev.type == TokenType.consonant) {
-                if (prev.equals('r')) prev.type = TokenType.vowel;
-                else {
-                    toks.splice(index + 1, 0, prev.copy());
-                    toks[index + 1].instance.stress |= Stress.primary;
+            // next token is not consonant, so there cannot be a consonant between this and the first vowel
+            if (toks[index + 1].type != TokenType.consonant) {
+                const prev = toks[index - 1];
+                if (prev.type == TokenType.consonant) {
+                    if (prev.equals('r')) prev.type = TokenType.vowel;
+                    else {
+                        toks.splice(index + 1, 0, prev.copy());
+                        toks[index + 1].instance.stress |= Stress.primary;
+                    }
                 }
             }
 
@@ -205,6 +259,8 @@ export class Tokenization {
         // 7.2.1: annotate pronunciations with their source. this is already implemented
         // 7.2.2: mw translator, already implemented
         // 7.2.2.1: see translations
+        // 7.2.2.2: see translations
+        // 7.2.2.3: see translations
 
         // TODO: add in debug screen to show translation process
         // TODO: clarify: does 'e mean whenever e is stressed, or when e is immediately preceded by a stress mark?
@@ -273,16 +329,12 @@ export class Tokenization {
 
     private static translation: Record<StandardType, Record<string, string | Replacement[]>> = {
         [StandardType.mw]: {
-            'ē': [{to: 'i', whenStress: true},
-                  {to: 'ɪ', whenStress: false}],
             'i': 'ɪ',
             'ā': 'e',
             'e': 'ɛ',
             'a': 'æ',
-            'ə': [{to: 'ʌ', whenStress: true},
-                  {to: 'ə', whenStress: false}],
             'ər': 'əː',
-            'ü': 'u',
+            'ü': 'ʊ',
             'yü': 'yu',
             'u̇': 'ʊ',
             'ō': 'o',
@@ -311,6 +363,7 @@ export class Tokenization {
             'zh': 'ʒ',
             'j': "dʒ",
             'hw': 'wh',
+            '(h)w': 'wh',
             'ʸ': 'y'
         },
         [StandardType.oed]: {
@@ -319,8 +372,6 @@ export class Tokenization {
             'eɪ': 'e',
             'ɛ': 'ɛ', // no change
             'æ': 'æ', // no change
-            'ə': [{to: 'ʌ', whenStress: true},
-                  {to: 'ə', whenStress: false}],
             'ər': 'əː',
             'u': 'u', // no change
             'jü': 'yu',
@@ -338,12 +389,17 @@ export class Tokenization {
             'ɛ(ə)r': 'ɛɚ',
             'ʊ(ə)r': 'ʊɚ',
 
+            // 7.2.2.2 (ʊ detector)
+            'uː': 'ʊ',
+            // 7.2.2.3 (o detector)
+            'əʊ': 'o',
+
             // consonants
             'x': 'ks',
             '(h)w': 'wh',
         },
         [StandardType.none]: { // applies to both mw and oed
-            // 7.2.2.1
+            // 7.2.2.1 (yu detector)
             '(j)u': [{to: 'yu', withoutPhysicalPattern: 'ju'}],
             'ju': [{to: 'yu', withoutPhysicalPattern: 'ju'}],
             'jʊ': [{to: 'yu', withoutPhysicalPattern: 'ju'}],
@@ -409,10 +465,8 @@ export class Tokenization {
             let val: string = key; // by default dont replace
             if (typeof replacement == 'string') val = replacement;
             else {
-                const stressed = toks[ind].instance.stress != Stress.none;
                 const rep = replacement.find(x => {
                     let valid = true;
-                    if (x.whenStress != undefined) valid &&= x.whenStress == stressed;
                     if (x.withoutPhysicalPattern != undefined) valid &&= !word.includes(x.withoutPhysicalPattern);
 
                     return valid;
