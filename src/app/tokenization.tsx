@@ -74,7 +74,7 @@ export class Token {
 interface Rule { (tokens: Token[], word: string): Token[] };
 interface Replacement {
     to: string;
-    withoutPhysicalPattern?: string; // if defined, then check if string appears in the actual word (not pron)
+    withoutPhysicalPattern?: string[]; // if defined, then check if string appears in the actual word (not pron)
                                      // if it does, do not apply translation
 }
 
@@ -263,7 +263,6 @@ export class Tokenization {
         // 7.2.2.3: see translations
 
         // TODO: add in debug screen to show translation process
-        // TODO: clarify: does 'e mean whenever e is stressed, or when e is immediately preceded by a stress mark?
 
         // TODO: how to handle parenthesis?
     ];
@@ -367,7 +366,7 @@ export class Tokenization {
             'ʸ': 'y'
         },
         [StandardType.oed]: {
-            'i': 'i',
+            'i': 'i', // no change
             'ɪ': 'ɪ', // no change
             'eɪ': 'e',
             'ɛ': 'ɛ', // no change
@@ -400,10 +399,19 @@ export class Tokenization {
         },
         [StandardType.none]: { // applies to both mw and oed
             // 7.2.2.1 (yu detector)
-            '(j)u': [{to: 'yu', withoutPhysicalPattern: 'ju'}],
-            'ju': [{to: 'yu', withoutPhysicalPattern: 'ju'}],
-            'jʊ': [{to: 'yu', withoutPhysicalPattern: 'ju'}],
-            'yʊ': [{to: 'yu', withoutPhysicalPattern: 'ju'}],
+            '(j)u': [{to: 'yu', withoutPhysicalPattern: ['ju']}],
+            'ju': [{to: 'yu', withoutPhysicalPattern: ['ju']}],
+            'jʊ': [{to: 'yu', withoutPhysicalPattern: ['ju']}],
+            'yʊ': [{to: 'yu', withoutPhysicalPattern: ['ju']}],
+
+            // 7.2.2.4 (iɚ detector)
+            'ɪ(ə)': [{to: 'iɚ', withoutPhysicalPattern: ['ger', 'jer']}],
+            'i(ə)': [{to: 'iɚ', withoutPhysicalPattern: ['ger', 'jer']}],
+            'j(ə)': [{to: 'iɚ', withoutPhysicalPattern: ['ger', 'jer']}],
+            'ɪə': [{to: 'iɚ', withoutPhysicalPattern: ['ger', 'jer']}],
+            'iə': [{to: 'iɚ', withoutPhysicalPattern: ['ger', 'jer']}],
+            'jə': [{to: 'iɚ', withoutPhysicalPattern: ['ger', 'jer']}],
+            'ēə': [{to: 'iɚ', withoutPhysicalPattern: ['ger', 'jer']}], // to catch mw ē to i/ɪ. must be done here - calcaneus has ē-ə
         }
     };
 
@@ -467,7 +475,7 @@ export class Tokenization {
             else {
                 const rep = replacement.find(x => {
                     let valid = true;
-                    if (x.withoutPhysicalPattern != undefined) valid &&= !word.includes(x.withoutPhysicalPattern);
+                    if (x.withoutPhysicalPattern != undefined) valid &&= !x.withoutPhysicalPattern.some(x => word.includes(x));
 
                     return valid;
                 });
