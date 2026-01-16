@@ -261,6 +261,9 @@ export class Tokenization {
         // 7.2.2.1: see translations
         // 7.2.2.2: see translations
         // 7.2.2.3: see translations
+        // 7.2.2.4: see translations
+        // 7.2.2.5: see translations
+        // 7.2.2.6: seems to already be implemented
 
         // TODO: add in debug screen to show translation process
 
@@ -412,6 +415,15 @@ export class Tokenization {
             'iə': [{to: 'iɚ', withoutPhysicalPattern: ['ger', 'jer']}],
             'jə': [{to: 'iɚ', withoutPhysicalPattern: ['ger', 'jer']}],
             'ēə': [{to: 'iɚ', withoutPhysicalPattern: ['ger', 'jer']}], // to catch mw ē to i/ɪ. must be done here - calcaneus has ē-ə
+
+            // 7.2.2.5 (ɛɚ detector)
+            'ɛ(ə)': 'ɛɚ',
+            'ɛə': 'ɛɚ',
+            'ɛrə': 'ɛɚ',
+
+            // 7.2.2.6 (ʊɚ detector)
+            'ʊ(ə)': 'ʊɚ',
+            'ʊə': 'ʊɚ',
         }
     };
 
