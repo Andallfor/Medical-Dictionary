@@ -1,7 +1,7 @@
 import { ReactNode, useEffect, useState } from "react";
 import { formattedFileData, formattedFileEntry } from "./input";
 import { SEARCH_IGNORE, formattedMatch, getHash } from "./util";
-import { Divider } from "../util";
+import { Divider } from "../util/util";
 
 export interface f_fileData {
     name: string,

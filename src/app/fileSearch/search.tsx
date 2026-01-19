@@ -1,10 +1,12 @@
 import { fileData, fileType, formattedFileData } from "./input";
 import { TextFileContainer, t_fileData } from "./textFile";
 import { FormattedFileContainer, f_fileData } from "./formattedFile";
-import { useReducer, useState } from "react";
+import { useContext } from "react";
+import { FILE_CONTEXT, FOCUSED_WORD_CONTEXT } from "../util/context";
 
-export default function FileSearch({ files, phrase }: { files: fileData[], phrase: string }) {
-    phrase = phrase.trim().toLowerCase();
+export default function FileSearch() {
+    const phrase = useContext(FOCUSED_WORD_CONTEXT).get.trim().toLowerCase();
+    const files = useContext(FILE_CONTEXT).get;
 
     if (phrase.length == 0) {
         return <div className="bg-tonal0 px-4 py-2 rounded-lg w-full min-w-0">No search phrase.</div>

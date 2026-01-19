@@ -3,7 +3,7 @@ import { BranchEntry, BranchState, PhoneticSearchController, PhoneticSearchContr
 import { Word } from "../dictionary";
 import { Tokenization, TokenType, Stress } from "../tokenization";
 import { BranchVowels, BranchConsonants } from "./constants";
-import { DICTIONARY_CONTEXT } from "../dictionaryWrapper";
+import { DICTIONARY_CONTEXT } from "../util/context";
 
 export default function PhoneticTree() {
     const dictionary = useContext(DICTIONARY_CONTEXT);

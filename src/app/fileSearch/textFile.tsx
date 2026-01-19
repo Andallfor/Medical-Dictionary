@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Divider } from "../util";
+import { Divider } from "../util/util";
 
 const MAX_DISPLAY = 400;
 

@@ -1,10 +1,11 @@
 import { ChangeEvent, useContext, useEffect, useState } from "react";
 import { DictionaryEditor } from "./editor";
 import { Dictionary, DictionaryEdit } from "../dictionary";
-import { DICTIONARY_CONTEXT } from "../dictionaryWrapper";
+import { DICTIONARY_CONTEXT, TRANSLATION_DISPLAY_CONTEXT } from "../util/context";
 
 export function Editor() {
     const dictionary = useContext(DICTIONARY_CONTEXT);
+    const {get: showTranslationDisplay, set: setTranslationDisplay} = useContext(TRANSLATION_DISPLAY_CONTEXT);
 
     const [lenEmpty, setLenEmpty] = useState(0); // number of entries with no pronunciation
     const [name, setName] = useState('');
@@ -40,7 +41,18 @@ export function Editor() {
     }
 
     return (
-        <div>
+        <div className="flex flex-col gap-2">
+            <div>
+                Display Settings:
+                <div className="flex">
+                    <div className="bg-surface20 w-[2px] mx-2"></div>
+                    <div>
+                        <input type="checkbox" id="translationDisplay" className="mr-2"
+                            checked={showTranslationDisplay} onChange={() => { setTranslationDisplay(!showTranslationDisplay) }}/>
+                        <label htmlFor="translationDisplay" className="select-none">Show Phonetic Translation</label>
+                    </div>
+                </div>
+            </div>
             <div>
                 <div className="flex justify-between">
                     <div className={isDirty ? 'font-semibold' : ''}>

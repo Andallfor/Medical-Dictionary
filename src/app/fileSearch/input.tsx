@@ -1,8 +1,9 @@
-import axios, { Axios, AxiosResponse, all } from "axios";
-import { ChangeEvent, Dispatch, SetStateAction, useEffect, useState } from "react";
-import { prettifyFileSize } from "../util";
-import { getHash, readFormattedFile } from "./util";
+import axios from "axios";
+import { ChangeEvent, Dispatch, SetStateAction, useContext, useEffect, useState } from "react";
+import { prettifyFileSize } from "../util/util";
+import { readFormattedFile } from "./util";
 import { FormattedFileEditor } from "./editor";
+import { FILE_CONTEXT } from "../util/context";
 
 interface fileMetadata {
     name: string,
@@ -32,7 +33,8 @@ export interface formattedFileEntry {
     content: string;
 }
 
-export default function FileInput({ files, setFiles }: { files: fileData[], setFiles: Dispatch<SetStateAction<fileData[]>> }) {
+export default function FileInput() {
+    const {get: files, set: setFiles} = useContext(FILE_CONTEXT);
     const [dirtyMap, setDirtyMap] = useState<Record<string, boolean>>({});
 
     async function addFiles(event: ChangeEvent<HTMLInputElement>) {

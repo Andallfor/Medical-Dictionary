@@ -1,15 +1,18 @@
-import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
+import { Dispatch, SetStateAction, useContext, useEffect, useRef, useState } from "react";
 import { SingleWord } from "./word";
 import { getCollegiateDef } from "./api";
 import { mw } from "../phoneticTree/constants";
-import { capitalize } from "../util";
+import { capitalize } from "../util/util";
+import { FOCUSED_WORD_CONTEXT } from "../util/context";
 
 export interface SearchState {
     word: string; // the word the user searched (as it appears in the search bar)
     mw?: mw; // the closest mw result
 }
 
-export function Search({ setFocused }: { setFocused: Dispatch<SetStateAction<string>> }) {
+export function Search() {
+    const setFocused = useContext(FOCUSED_WORD_CONTEXT).set;
+
     const [loading, setLoading] = useState('');
     const [isUserSearch, setIsUserSearch] = useState(false);
     const [searchHistory, setSearchHistory] = useState<string[]>([]);

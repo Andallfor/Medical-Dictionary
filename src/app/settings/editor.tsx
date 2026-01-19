@@ -1,6 +1,6 @@
 import { ChangeEvent, useContext, useEffect, useRef, useState } from "react";
 import { DictionaryEdit } from "../dictionary";
-import { DICTIONARY_CONTEXT } from "../dictionaryWrapper";
+import { DICTIONARY_CONTEXT } from "../util/context";
 
 // look the majority of this code was written at like ~3am across multiple days so excuse the mess
 
