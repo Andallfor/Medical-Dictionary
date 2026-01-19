@@ -86,7 +86,7 @@ export class Tokenization {
     // later values have higher priority
     // [restriction, rule]
     //      if restriction = none, then apply to everything
-    static rules: [StandardType, Rule][] = [
+    static rules: [StandardType, Rule][] = [ // TODO: probably convert this and others (knownTokens, translation) to private setter
         // apply stress
         [StandardType.none, toks => {
             toks.forEach((t, i) => {
@@ -324,7 +324,7 @@ export class Tokenization {
         this.simpleToken(['ˌ'], TokenType.secondaryStress),
     ];
 
-    private static translation: Record<StandardType, Record<string, string | Replacement[]>> = {
+    static translation: Record<StandardType, Record<string, string | Replacement[]>> = {
         [StandardType.mw]: {
             'i': 'ɪ',
             'ā': 'e',

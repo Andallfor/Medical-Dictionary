@@ -2,6 +2,7 @@ import { ReactNode, useContext, useEffect, useState } from "react";
 import { FOCUSED_WORD_CONTEXT, TRANSLATION_DISPLAY_CONTEXT } from "../util/context";
 import { Divider } from "../util/util";
 import { StandardType, Token, Tokenization, TokenType } from "../tokenization";
+import { TranslationTable } from "./table";
 
 export interface TranslationDisplayContext {
     show: boolean;
@@ -55,7 +56,7 @@ function TranslationStep({ toks }: { toks: Token[] }) {
 
 function TranslationProcess({ steps, type }: { steps: Step[], type: StandardType }) {
     return (
-        <div className="flex flex-col items-center w-1/2">
+        <div className="flex flex-col items-center w-1/2 gap-1">
             <div>{type == StandardType.mw ? 'Merriam-Webster' : 'Oxford English Dictionary/Internal'}</div>
             <div className="bg-surface10 w-full p-2 rounded-md border-surface20 border h-full">
                 {steps.length == 0 ? <i className="flex justify-center">No matching word</i> : steps.map((x, i) => {
@@ -163,7 +164,7 @@ export function TranslationDisplay() {
             <div className="flex flex-col gap-2">
                 <Divider title="Information">
                     <div className="flex">
-                        <div className="bg-surface20 w-[2px] mx-2 flex-shrink-0"></div>
+                        <div className="bg-surface20 w-[2px] mx-2 flex-shrink-0 mt-1"></div>
                         <div className="pb-1">
                             This tab describes how we translate phonetic pronunciations from external sources (Merriam-Webster and Oxford English Dictionary) to the pronunciation displayed to the user. This is necessary as the aforementioned sources use their own pseudo-IPA-based pronunciation, which we attempt to coerce into IPA.
                             <br/><br/>
@@ -189,9 +190,18 @@ export function TranslationDisplay() {
                         </div>
                     </div>
                 </Divider>
-                <Divider title="Translation Tables">
-
-                </Divider>
+                {/* <Divider title="Translation Tables">
+                    <div className="flex">
+                        <div className="bg-surface20 w-[2px] mx-2 flex-shrink-0 mt-1"></div>
+                        <div className="w-full pb-1">
+                            <div className="flex w-full gap-4 justify-around mb-4">
+                                <TranslationTable type={StandardType.mw}/>
+                                <TranslationTable type={StandardType.oed}/>
+                            </div>
+                            <TranslationTable type={StandardType.none}/>
+                        </div>
+                    </div>
+                </Divider> */}
                 {!word ? 'No search phrase.' :
                     <div className="flex justify-around w-full mt-4 gap-4">
                         <TranslationProcess steps={mw} type={StandardType.mw}/>
