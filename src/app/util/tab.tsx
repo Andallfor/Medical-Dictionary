@@ -19,7 +19,7 @@ export function Tab({ tabs }: { tabs: tab[] }) {
         <div className="flex flex-col gap-3 flex-shrink-0">
             <div className="flex bg-tonal0 rounded-lg justify-between gap-2 px-2 py-1">
                 {tabs.map((x, i) => {
-                    if (x.hidden) return <div key={i}></div>;
+                    if (x.hidden) return <div key={i} className="-mr-2"></div>; // -mr-2 to offset gap-2
 
                     return (
                         <button key={i}

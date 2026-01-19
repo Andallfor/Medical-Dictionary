@@ -48,7 +48,9 @@ export function Editor() {
                     <div className="bg-surface20 w-[2px] mx-2"></div>
                     <div>
                         <input type="checkbox" id="translationDisplay" className="mr-2"
-                            checked={showTranslationDisplay} onChange={() => { setTranslationDisplay(!showTranslationDisplay) }}/>
+                            checked={showTranslationDisplay.show} onChange={() => {
+                                setTranslationDisplay({...showTranslationDisplay, show: !showTranslationDisplay.show});
+                            }}/>
                         <label htmlFor="translationDisplay" className="select-none">Show Phonetic Translation</label>
                     </div>
                 </div>

@@ -1,6 +1,6 @@
 "use client"
 
-import { useContext, useEffect } from "react";
+import { useContext } from "react";
 import 'remixicon/fonts/remixicon.css'
 import FileSearch from "./fileSearch/search";
 import PhoneticTree from "./phoneticTree/tree";
@@ -27,7 +27,7 @@ function Main() {
                     }, {
                         name: 'Phonetic Translation',
                         value: <TranslationDisplay />,
-                        hidden: !showTranslationDisplay,
+                        hidden: !showTranslationDisplay.show,
                     }
                 ]} />
                 <div className="flex flex-col gap-4">

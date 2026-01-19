@@ -69,6 +69,10 @@ export class Token {
         if (typeof other == 'string') return this.equivalent.includes(other);
         else return this.equivalent.some(x => other.equals(x));
     }
+
+    toString(): string {
+        return (this.replaceCanonical ? this.equivalent[0] : this.instance.canonical).normalize();
+    }
 }
 
 interface Rule { (tokens: Token[], word: string): Token[] };
@@ -82,7 +86,7 @@ export class Tokenization {
     // later values have higher priority
     // [restriction, rule]
     //      if restriction = none, then apply to everything
-    private static rules: [StandardType, Rule][] = [
+    static rules: [StandardType, Rule][] = [
         // apply stress
         [StandardType.none, toks => {
             toks.forEach((t, i) => {
@@ -167,6 +171,7 @@ export class Tokenization {
         }],
 
         // set all the known values
+        // TODO: this can be merged into the prev step
         [StandardType.none, toks => toks.map(t => {
             if (t.type != TokenType.unknown) return t;
 
@@ -256,17 +261,6 @@ export class Tokenization {
 
             // example: adenoma, angioma (exception)
         }],
-
-        // 7.2.1: annotate pronunciations with their source. this is already implemented
-        // 7.2.2: mw translator, already implemented
-        // 7.2.2.1: see translations
-        // 7.2.2.2: see translations
-        // 7.2.2.3: see translations
-        // 7.2.2.4: see translations
-        // 7.2.2.5: see translations
-        // 7.2.2.6: seems to already be implemented
-
-        // TODO: add in debug screen to show translation process
 
         // TODO: how to handle parenthesis?
     ];
@@ -514,9 +508,7 @@ export class Tokenization {
         return out;
     }
 
-    static toString(tokens: Token[]): string {
-        return tokens.map(x => x.replaceCanonical ? x.equivalent[0] : x.instance.canonical).join('');
-    }
+    static toString(tokens: Token[]): string { return tokens.map(x => x.toString()).join(''); }
 
     // return all tokens that have primary stress, skipping the primary stress mark
     static getPrimary(tokens: Token[]): Token[] {

@@ -4,10 +4,11 @@ import { capitalize } from "../util/util";
 import { getAudio, hasAudio } from "./api";
 import { useContext, useEffect, useRef, useState } from "react";
 import { SearchState } from "./search";
-import { DICTIONARY_CONTEXT } from "../util/context";
+import { DICTIONARY_CONTEXT, TRANSLATION_DISPLAY_CONTEXT } from "../util/context";
 
 export function SingleWord({ query, userSearch }: { query: SearchState, userSearch: boolean }) {
     const dictionary = useContext(DICTIONARY_CONTEXT);
+    const {get: showTranslationDisplay, set: setTranslationDisplay} = useContext(TRANSLATION_DISPLAY_CONTEXT);
 
     // definition loaded from internal dictionary
     const [internal, setInternal] = useState<Word | undefined>(undefined);
@@ -50,17 +51,16 @@ export function SingleWord({ query, userSearch }: { query: SearchState, userSear
             }
         }
 
-        if (true) {
-            console.log("=== External");
-            console.log(extDebug);
-            if (query.word in Dictionary.debugInternalLookup) {
-                console.log("=== Internal");
-                Tokenization.tokenize(query.word, Dictionary.debugInternalLookup[query.word], StandardType.oed, intDebug);
-                console.log(intDebug);
-                console.log(Tokenization.toString(intDebug[intDebug.length - 1]));
-                console.log(_internal);
-            } else console.log("No internal present");
-        }
+        // we always set translation display irrespective of whether or not its shown as a user might search a word
+        // then pull up the translation process
+        if (query.word in Dictionary.debugInternalLookup)
+            Tokenization.tokenize(query.word, Dictionary.debugInternalLookup[query.word], StandardType.oed, intDebug);
+        setTranslationDisplay({
+            show: showTranslationDisplay.show,
+            // weird semantics but we consider undefined to be no def
+            oed: intDebug.length == 0 ? undefined : intDebug,
+            mw: extDebug.length == 0 ? undefined : extDebug,
+        });
 
         setExternal(_external);
         setInternal(_internal);

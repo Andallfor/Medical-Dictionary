@@ -2,6 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  ul, ol {
+    list-style: revert;
+  }
+}
+
 .button {
     @apply rounded-md w-[1.75rem] h-[1.75rem] border-surface20 border bg-surface10 hover:bg-tonal0 flex items-center justify-center
 }

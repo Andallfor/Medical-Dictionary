@@ -1,6 +1,7 @@
 import { createContext, Dispatch, ReactNode, SetStateAction, useEffect, useState } from "react";
 import { Word, Dictionary } from "../dictionary";
 import { fileData } from "../fileSearch/input";
+import { TranslationDisplayContext } from "../translationDisplay/translation";
 
 interface Stateful<T> {
     get: T,
@@ -17,7 +18,7 @@ export const FILE_CONTEXT = context<fileData[]>([]);
 // the current files loaded for file search
 export const FOCUSED_WORD_CONTEXT = context<string>('');
 // whether or not the phonetic translation tab is enabled
-export const TRANSLATION_DISPLAY_CONTEXT = context<boolean>(false);
+export const TRANSLATION_DISPLAY_CONTEXT = context<TranslationDisplayContext>({ show: false });
 
 // page.tsx can only export one thing, but we also need to export our global variable here
 export function ContextWrapper({ children }: { children: ReactNode }) {
@@ -25,7 +26,7 @@ export function ContextWrapper({ children }: { children: ReactNode }) {
 
     const [FOCUSED_WORD, SET_FOCUSED_WORD] = useState<string>('');
     const [FILES, SET_FILES] = useState<fileData[]>([]);
-    const [SHOW_TRANSLATION_DISPLAY, SET_SHOW_TRANSLATION_DISPLAY] = useState<boolean>(false);
+    const [SHOW_TRANSLATION_DISPLAY, SET_SHOW_TRANSLATION_DISPLAY] = useState<TranslationDisplayContext>({ show: false });
 
     useEffect(() => {
         Dictionary.init(SET_INTERNAL_DICTIONARY);
