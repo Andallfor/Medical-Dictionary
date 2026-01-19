@@ -80,8 +80,8 @@ function TranslationProcess({ steps, type }: { steps: Step[], type: StandardType
 const ANNOTATIONS: [StandardType, string][] = [
     [StandardType.none, ''],
     [StandardType.mw, 'Remove Syllable Delimiters'],
-    [StandardType.mw, 'Apply Translation Table'],
-    [StandardType.oed, 'Apply Translation Table'],
+    [StandardType.mw, 'Apply Local Translation Table'],
+    [StandardType.oed, 'Apply Local Translation Table'],
     [StandardType.none, 'Apply Global Translation Table'],
     [StandardType.none, ''],
     [StandardType.none, 'Detect Tokens'],
@@ -190,18 +190,18 @@ export function TranslationDisplay() {
                         </div>
                     </div>
                 </Divider>
-                {/* <Divider title="Translation Tables">
+                <Divider title="Translation Tables">
                     <div className="flex">
                         <div className="bg-surface20 w-[2px] mx-2 flex-shrink-0 mt-1"></div>
                         <div className="w-full pb-1">
                             <div className="flex w-full gap-4 justify-around mb-4">
                                 <TranslationTable type={StandardType.mw}/>
                                 <TranslationTable type={StandardType.oed}/>
+                                <TranslationTable type={StandardType.none}/>
                             </div>
-                            <TranslationTable type={StandardType.none}/>
                         </div>
                     </div>
-                </Divider> */}
+                </Divider>
                 {!word ? 'No search phrase.' :
                     <div className="flex justify-around w-full mt-4 gap-4">
                         <TranslationProcess steps={mw} type={StandardType.mw}/>

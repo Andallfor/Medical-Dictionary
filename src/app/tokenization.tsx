@@ -76,7 +76,7 @@ export class Token {
 }
 
 interface Rule { (tokens: Token[], word: string): Token[] };
-interface Replacement {
+export interface Replacement {
     to: string;
     withoutPhysicalPattern?: string[]; // if defined, then check if string appears in the actual word (not pron)
                                      // if it does, do not apply translation
