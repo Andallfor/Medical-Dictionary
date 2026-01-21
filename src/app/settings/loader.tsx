@@ -17,7 +17,7 @@ export function Editor() {
 
     function download() {
         setIsDirty(false);
-        Dictionary.save(name ?? 'dictionary.txt');
+        Dictionary.save(name.length == 0 ? 'dictionary.csv' : name);
     }
 
     function loadFile(event: ChangeEvent<HTMLInputElement>, union = false) {
@@ -35,7 +35,7 @@ export function Editor() {
     function applyEdits(edits: DictionaryEdit[]) {
         // since each line/edit is an actual line in the ui, the last line will always be empty
         setIsDirty(true);
-        if (name.length == 0) setName('Modified.txt');
+        if (name.length == 0) setName('Modified.csv');
 
         Dictionary.update(edits.filter(x => x.valid()));
     }

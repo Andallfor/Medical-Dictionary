@@ -1,13 +1,14 @@
 import { ReactNode, useContext, useEffect, useState } from "react";
 import { FOCUSED_WORD_CONTEXT, TRANSLATION_DISPLAY_CONTEXT } from "../util/context";
 import { Divider } from "../util/util";
-import { StandardType, Token, Tokenization, TokenType } from "../tokenization";
+import { StandardType, StandardType_Expanded, StandardTypeUnion, Token, Tokenization, TokenType } from "../tokenization";
 import { TranslationTable } from "./table";
 
 export interface TranslationDisplayContext {
     show: boolean;
     mw?: Token[][];
     oed?: Token[][];
+    internal?: Token[][];
 }
 
 interface Step {
@@ -55,9 +56,15 @@ function TranslationStep({ toks }: { toks: Token[] }) {
 }
 
 function TranslationProcess({ steps, type }: { steps: Step[], type: StandardType }) {
+    let name = '';
+    switch (type) {
+        case StandardType.mw: name = 'Merriam-Webster'; break;
+        case StandardType.oed: name = 'Oxford English Dictionary'; break;
+        case StandardType.internal: name = 'Internal'; break;
+    }
     return (
         <div className="flex flex-col items-center w-1/2 gap-1">
-            <div>{type == StandardType.mw ? 'Merriam-Webster' : 'Oxford English Dictionary/Internal'}</div>
+            <div>{name}</div>
             <div className="bg-surface10 w-full p-2 rounded-md border-surface20 border h-full">
                 {steps.length == 0 ? <i className="flex justify-center">No matching word</i> : steps.map((x, i) => {
                     // first show always just be the raw text of the pronunciation
@@ -77,17 +84,17 @@ function TranslationProcess({ steps, type }: { steps: Step[], type: StandardType
 
 // one to one with Tokenization.rules
 // if string is empty, then never display
-const ANNOTATIONS: [StandardType, string][] = [
-    [StandardType.none, ''],
+const ANNOTATIONS: [StandardType_Expanded, string][] = [
+    [StandardTypeUnion.all, ''],
     [StandardType.mw, 'Remove Syllable Delimiters'],
     [StandardType.mw, 'Apply Local Translation Table'],
     [StandardType.oed, 'Apply Local Translation Table'],
-    [StandardType.none, 'Apply Global Translation Table'],
-    [StandardType.none, ''],
-    [StandardType.none, 'Detect Tokens'],
+    [StandardTypeUnion.external, 'Apply Global Translation Table'],
+    [StandardTypeUnion.all, ''],
+    [StandardTypeUnion.all, 'Detect Tokens'],
     [StandardType.mw, 'ē to i when stressed, ɪ otherwise'],
-    [StandardType.none, 'ə to ʌ when stressed'],
-    [StandardType.none, 'Duplicate Stressed Consonant'],
+    [StandardTypeUnion.external, 'ə to ʌ when stressed'],
+    [StandardTypeUnion.external, 'Duplicate Stressed Consonant'],
 ];
 
 // make mw/oed steps match length of annotations/rules since not all rules apply
@@ -96,7 +103,7 @@ function pad(arr: Token[][], type: StandardType): Token[][] {
     let ref = 0;
     for (let i = 0; i < ANNOTATIONS.length; i++) {
         const filter = ANNOTATIONS[i][0];
-        if (filter == StandardType.none || filter == type) padded.push(arr[ref++]);
+        if (filter & type) padded.push(arr[ref++]);
         else padded.push([]);
     }
 
@@ -116,7 +123,7 @@ function annotate(padded: Token[][], type: StandardType): Step[] {
         const refType = ANNOTATIONS[i][0];
 
         // these should be the same
-        if (refType != StandardType.none && refType != type) continue;
+        if (!(refType & type)) continue;
         if (padded[i].length == 0) continue;
 
         const step = { tokens: padded[i], description: ANNOTATIONS[i][1] };
@@ -145,7 +152,7 @@ export function TranslationDisplay() {
         // since we annotate steps outside of the actual tokenization steps, make sure nothing has changed
         if (ANNOTATIONS.length != Tokenization.rules.length || ANNOTATIONS.some(([t, _], i) => Tokenization.rules[i][0] != t))
             console.warn("Annotations do not match Tokenization.rules!");
-        
+
         if (data.mw) {
             // skip first element, that is base
             const padded = pad(data.mw.slice(1), StandardType.mw);
@@ -171,11 +178,10 @@ export function TranslationDisplay() {
                             We categorize words into three categories depending on their source:
                             <ol type="1" className="pl-6">
                                 <li className="pl-1"><i>Merriam-Webster</i> - These are retrieved on the fly from the search bar.</li>
-                                <li className="pl-1"><i>Oxford English Dictionary</i> - Anything in the internal dictionary.*</li>
-                                <li className="pl-1"><i>User</i> - Values entered by the user.</li>
+                                <li className="pl-1"><i>Oxford English Dictionary</i> - Anything in the default internal dictionary.</li>
+                                <li className="pl-1"><i>Internal</i> - Values entered by the user.</li>
                             </ol>
                             <br/>
-                            * <span className="text-xs">This means we consider OED and User to be essentially the same. This is because the default internal dictionary was automatically scrapped from OED, which is the same file the user modifies. Notice that this means we apply the OED translations to user-sourced words.</span>
                             <br/><br/>
                             The translation process converts a base pronunciation into IPA and also tokenizes it into the constituent vowels/consonants. Merriam-Webster and Oxford English Dictionary/User based words have separate, but similar translation processes. The primary difference is in their translation tables, which are simple text replacement commands. This process is what is shown below.
                             <br/><br/>
@@ -197,7 +203,7 @@ export function TranslationDisplay() {
                             <div className="flex w-full gap-4 justify-around mb-4">
                                 <TranslationTable type={StandardType.mw}/>
                                 <TranslationTable type={StandardType.oed}/>
-                                <TranslationTable type={StandardType.none}/>
+                                <TranslationTable type={StandardTypeUnion.external}/>
                             </div>
                         </div>
                     </div>

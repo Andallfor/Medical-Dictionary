@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import { Replacement, StandardType, Tokenization } from "../tokenization"
+import { Replacement, StandardType, StandardType_Expanded, Tokenization } from "../tokenization"
 import { capitalize } from "../util/util";
 
 // mildly scuffed arrow
@@ -47,12 +47,12 @@ function Line({ from, to }: { from: string, to: string | Replacement[] }) {
     )
 }
 
-export function TranslationTable({ type }: { type: StandardType }) {
+export function TranslationTable({ type }: { type: StandardType_Expanded }) {
     return (
         <div className="flex-grow flex flex-col items-center gap-1 w-full">
             <div>
                 { type == StandardType.mw ? 'Merriam-Webster'
-                : type == StandardType.oed ? 'Oxford English Dictionary/Internal'
+                : type == StandardType.oed ? 'Oxford English Dictionary'
                 : 'Global'}
             </div>
             <div className="bg-surface10 w-full p-2 px-4 rounded-md border-surface20 border">

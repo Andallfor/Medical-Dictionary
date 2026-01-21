@@ -1,5 +1,7 @@
 import { Dispatch, SetStateAction } from "react";
 import { StandardType, Token, Tokenization } from "./tokenization";
+import { parse } from "csv-parse/sync";
+import { stringify } from "csv-stringify/sync";
 
 export interface Pronunciation {
     tokens: Token[];
@@ -12,6 +14,7 @@ export interface Word {
     part: string; // part of speech
     audio: string; // url to the word's audio (from MW)
     def: string[]; // definition
+    source: StandardType;
 }
 
 export class DictionaryEdit {
@@ -33,6 +36,8 @@ export class DictionaryEdit {
     isEmpty(): boolean { return this.pron.trim().length == 0 && this.word.trim().length == 0; }
 }
 
+type DictionaryDebugRecord = Record<string, [string, StandardType]>;
+
 // singleton
 export class Dictionary {
     // we maintain the state of current
@@ -42,7 +47,7 @@ export class Dictionary {
     private static active: boolean = false;
 
     // we want to be able to see what the base pronunciation was before it was translated
-    static debugInternalLookup: Record<string, string> = {};
+    static debugInternalLookup: DictionaryDebugRecord = {};
 
     static init(setDict: Dispatch<SetStateAction<Word[]>>) {
         if (this.active) console.warn("Called Dictionary.init on already initialized dictionary");
@@ -72,55 +77,9 @@ export class Dictionary {
 
         if (!union) this.debugInternalLookup = {};
 
-        const lines = (await response.text()).split('\n');
-        const out: Word[] = [];
-        const seen: Set<string> = new Set<string>();
-
-        lines.forEach(line => {
-            if (line.length == 0) return;
-            line = line.trim().normalize();
-
-            // we expect lines to be in the format (weird delimiters are since user can input whatever text in def and i dont really want to do proper input validation)
-            // anything after = is optional
-            // word=pronunciation<@>part of speech<->def 1<->def 2<->...
-
-            const [base, secondary] = line.split('<@>');
-            const [text, pron] = base.split('=').map(x => x?.normalize());
-
-            if (seen.has(text)) {
-                console.warn(`Found duplicate ${text}. Skipping`);
-                return;
-            }
-            seen.add(text);
-            
-            const word: Word = {
-                word: text,
-                def: [],
-                part: '',
-                audio: '',
-            }
-
-            if (pron) {
-                this.debugInternalLookup[text] = pron;
-                const t = Tokenization.tokenize(text, pron, StandardType.oed);
-                word.pronunciation = {
-                    tokens: t,
-                    text: Tokenization.toString(t),
-                };
-            }
-
-            if (secondary) {
-                const split = secondary.split('<->');
-                word.part = split[0];
-
-                for (let i = 1; i < split.length; i++) {
-                    const s = split[i].trim();
-                    if (s.length > 0) word.def.push(s);
-                }
-            }
-
-            out.push(word);
-        });
+        const text = (await response.text()).normalize();
+        // slightly scuffed
+        const [out, seen] = url.endsWith('.csv') ? this.asWord(text, this.debugInternalLookup) : this.asWordOld(text, this.debugInternalLookup);
 
         // we want current to be overridden so dont add anything that is in seen by new dict
         if (union) this.current.forEach(x => {
@@ -140,20 +99,8 @@ export class Dictionary {
             return;
         }
 
-        // convert to dictionary text format
-        const formatted = this.current.map(w => {
-            let root = `${w.word}=${w.pronunciation?.text ?? ''}`;
-            const secondary = [];
-            if (w.part) secondary.push(w.part);
-            if (w.def.length != 0) secondary.push(...w.def.map(x => x.trim()));
-
-            if (secondary.length != 0) root += '<@>' + secondary.join('<->');
-
-            return root;
-        }).join('\n');
-
         // https://stackoverflow.com/questions/72683352/how-do-i-write-inta-a-file-and-download-the-file-using-javascript
-        const blob = new Blob([formatted], {type: 'text/plain;charset=UTF-8;'});
+        const blob = new Blob([this.asFormatted(this.current)], {type: 'text/csv;charset=UTF-8;'});
         // @ts-ignore
         if ('msSaveOrOpenBlob' in window.navigator) window.navigator.msSaveBlob(blob, file);
         else {
@@ -179,19 +126,162 @@ export class Dictionary {
             const index = this.current.findIndex(x => x.word == edit.word);
             if (index != -1) this.current.splice(index, 1);
 
-            if (!edit.delete) this.current.push({
-                word: edit.word,
-                pronunciation: edit.pron ? {
-                    text: edit.pron,
-                    tokens: Tokenization.tokenize(edit.word, edit.pron, StandardType.oed) // TODO: maybe add internal type so we dont perform translation on this?
-                } : undefined,
-                part: edit.part,
-                def: edit.def ? [edit.def] : [],
-                audio: '',
-            });
+            if (!edit.delete) {
+                this.current.push({
+                    word: edit.word,
+                    pronunciation: edit.pron ? {
+                        text: edit.pron,
+                        tokens: Tokenization.tokenize(edit.word, edit.pron, StandardType.internal)
+                    } : undefined,
+                    part: edit.part,
+                    def: edit.def ? [edit.def] : [],
+                    audio: '',
+                    source: StandardType.internal,
+                });
+
+                this.debugInternalLookup[edit.word] = [edit.pron, StandardType.internal];
+            } else delete this.debugInternalLookup[edit.word];
         });
 
         // inefficient but need to force update
         this.set([...this.current]);
+    }
+
+    /* There are two formats, old and new
+    Old:
+    word=pronunciation<@>part of speech<->def 1<->def 2<->...
+    with everything after = optional
+
+    New (csv):
+    First line is header
+    source (mw, in, od), word, pronunciation, part of speech, def1, def2, def3,...
+
+    source and word are mandatory
+    */
+
+    // convert to dictionary format
+    private static asFormatted(words: Word[]): string {
+        const srcMap: Record<StandardType, string> = {
+            [StandardType.mw]: 'mw',
+            [StandardType.oed]: 'od',
+            [StandardType.internal]: 'in'
+        };
+
+        const text: string[][] = words.map(x => [srcMap[x.source], x.word, x.pronunciation?.text ?? '', x.part, ...x.def]);
+        const str = stringify(text, {
+            // current version of csv-stringify does not have header_as_comment
+            columns: ['# Source', 'Word', 'Pronunciation', 'Part of Speech', 'Definitions...'],
+            header: true,
+        });
+
+        return str;
+    }
+
+    // convert full text (multiple lines) into words
+    private static asWord(text: string, debug?: DictionaryDebugRecord): [Word[], Set<string>] {
+        const out: Word[] = [];
+        const seen: Set<string> = new Set<string>();
+        text = text.normalize();
+
+        const lines = parse(text, {
+            delimiter: ',',
+            encoding: "utf-8",
+            comment: '#',
+            skip_empty_lines: true,
+        });
+
+        lines.forEach(line => {
+            if (line.length < 2) {
+                console.warn(`${line.join(',')} has invalid length`);
+                return;
+            }
+
+            const [src, word, pron, part, ...defs] = line;
+            if (seen.has(word)) return;
+
+            let source: StandardType | undefined = undefined;
+            switch (src) {
+                case 'mw': source = StandardType.mw; break;
+                case 'od': source = StandardType.oed; break;
+                case 'in': source = StandardType.mw; break;
+            }
+
+            if (!source) {
+                console.warn(`${line.join(',')} has invalid source`);
+                return;
+            }
+
+            seen.add(word);
+
+            if (debug && pron) debug[word] = [pron, source];
+
+            out.push({
+                word: word,
+                pronunciation: pron ? {
+                    tokens: Tokenization.tokenize(word, pron, source),
+                    text: pron
+                } : undefined,
+                part: part ?? '',
+                def: defs,
+                audio: '',
+                source: source
+            });
+        });
+
+        return [out, seen];
+    }
+
+    private static asWordOld(text: string, debug?: DictionaryDebugRecord): [Word[], Set<string>] {
+        const out: Word[] = [];
+        const seen: Set<string> = new Set<string>();
+
+        text.split('\n').forEach(line => {
+            if (line.length == 0) return;
+            line = line.trim().normalize();
+
+            // we expect lines to be in the format (weird delimiters are since user can input whatever text in def and i dont really want to do proper input validation)
+            // anything after = is optional
+            // word=pronunciation<@>part of speech<->def 1<->def 2<->...
+
+            const [base, secondary] = line.split('<@>');
+            const [text, pron] = base.split('=');
+
+            if (seen.has(text)) {
+                console.warn(`Found duplicate ${text}. Skipping`);
+                return;
+            }
+            seen.add(text);
+            
+            const word: Word = {
+                word: text,
+                def: [],
+                part: '',
+                audio: '',
+                source: StandardType.oed,
+            }
+
+            if (pron) {
+                if (debug) debug[StandardType.oed] = [pron, StandardType.oed];
+                const t = Tokenization.tokenize(text, pron, StandardType.oed);
+                word.pronunciation = {
+                    tokens: t,
+                    text: Tokenization.toString(t),
+                };
+            }
+
+            if (secondary) {
+                const split = secondary.split('<->');
+                word.part = split[0];
+
+                for (let i = 1; i < split.length; i++) {
+                    const s = split[i].trim();
+                    if (s.length > 0) word.def.push(s);
+                }
+            }
+
+            out.push(word);
+        });
+
+        return [out, seen];
     }
 }

@@ -30,7 +30,7 @@ export function ContextWrapper({ children }: { children: ReactNode }) {
 
     useEffect(() => {
         Dictionary.init(SET_INTERNAL_DICTIONARY);
-        Dictionary.load('/Medical-Dictionary/data.txt');
+        Dictionary.load('/Medical-Dictionary/dictionary.csv');
     }, []);
 
     // apparently, this is the best way to do this??

@@ -37,6 +37,7 @@ export function SingleWord({ query, userSearch }: { query: SearchState, userSear
                 part: query.mw.fl,
                 def: query.mw.shortdef,
                 audio: '',
+                source: StandardType.mw,
             };
 
             if (query.mw.hwi?.prs) {
@@ -53,13 +54,24 @@ export function SingleWord({ query, userSearch }: { query: SearchState, userSear
 
         // we always set translation display irrespective of whether or not its shown as a user might search a word
         // then pull up the translation process
-        if (query.word in Dictionary.debugInternalLookup)
-            Tokenization.tokenize(query.word, Dictionary.debugInternalLookup[query.word], StandardType.oed, intDebug);
+        // // weird semantics but we consider undefined to be no def
+        const t_mw = extDebug.length == 0 ? undefined : extDebug;
+        let t_oed = undefined;
+        let t_int = undefined;
+        if (query.word in Dictionary.debugInternalLookup) {
+            const [base, src] = Dictionary.debugInternalLookup[query.word];
+            Tokenization.tokenize(query.word, base, src, intDebug);
+
+            if (src == StandardType.oed) t_oed = intDebug;
+            else if (src == StandardType.internal) t_int = intDebug;
+            else console.warn("Internal has type MW!");
+        }
+
         setTranslationDisplay({
             show: showTranslationDisplay.show,
-            // weird semantics but we consider undefined to be no def
-            oed: intDebug.length == 0 ? undefined : intDebug,
-            mw: extDebug.length == 0 ? undefined : extDebug,
+            mw: t_mw,
+            oed: t_oed,
+            internal: t_int,
         });
 
         setExternal(_external);
@@ -77,7 +89,7 @@ export function SingleWord({ query, userSearch }: { query: SearchState, userSear
     if (internal || external) {
         return (<div className="mt-2 mb-6">
             {external ? <Definition word={external} source={'Merriam-Webster'}/> : <></>}
-            {internal ? <Definition word={internal} source={'Internal'}/> : <></>}
+            {internal ? <Definition word={internal} source={internal.source == StandardType.oed ? 'Internal (Oxford English Dictionary)' : 'Internal'}/> : <></>}
         </div>);
     } else return <div className="text-lg ml-2 mt-1 text-[#d9646c]">Unable to find {query.word}.</div>;
 }
@@ -104,7 +116,7 @@ function Definition({ word, source }: { word: Word, source: string }) {
                                 : <span className="text-base mx-6">[No pronunciation found]</span>}
                     </div>
                     <div className="flex items-center">
-                        <i className="text-sm">({source})</i>
+                        <i className="text-sm">{source}</i>
                         {word.pronunciation
                             ? <button className="button ml-3 ri-file-copy-line text-base"
                                 onClick={() => navigator.clipboard.writeText(word.pronunciation!.text)}></button>

@@ -16,7 +16,18 @@ export enum TokenType {
     stressMark = primaryStress | secondaryStress,
 }
 
-export enum StandardType { mw, oed, none }
+export enum StandardType {
+    mw = 1,
+    oed = 2,
+    internal = 4,
+}
+
+// for matching purposes
+export enum StandardTypeUnion {
+    all = StandardType.internal | StandardType.mw | StandardType.oed,
+    external = StandardType.mw | StandardType.oed
+}
+export type StandardType_Expanded = StandardType | StandardTypeUnion;
 
 export interface TokenInstance {
     canonical: string; // textual representation of phoneme
@@ -86,9 +97,9 @@ export class Tokenization {
     // later values have higher priority
     // [restriction, rule]
     //      if restriction = none, then apply to everything
-    static rules: [StandardType, Rule][] = [ // TODO: probably convert this and others (knownTokens, translation) to private setter
+    static rules: [StandardType_Expanded, Rule][] = [ // TODO: probably convert this and others (knownTokens, translation) to private setter
         // apply stress
-        [StandardType.none, toks => {
+        [StandardTypeUnion.all, toks => {
             toks.forEach((t, i) => {
                 if (i != 0) t.instance.stress = toks[i - 1].instance.stress; // stress propagates forwards
 
@@ -107,10 +118,10 @@ export class Tokenization {
         [StandardType.mw,   (t, w) => this.translate(t, w, { 'ᵊ': '', '-': '' })],
         [StandardType.mw,   (t, w) => this.translate(t, w, this.translation[StandardType.mw])],
         [StandardType.oed,  (t, w) => this.translate(t, w, this.translation[StandardType.oed])],
-        [StandardType.none, (t, w) => this.translate(t, w, this.translation[StandardType.none])],
+        [StandardTypeUnion.external, (t, w) => this.translate(t, w, this.translation[StandardTypeUnion.external])],
 
         // coalesce tokens into known tokens
-        [StandardType.none, toks => {
+        [StandardTypeUnion.all, toks => {
             // as with translations, we also want to form the largest tokens possible
             // im sure theres a better way to go about this but ehhh
 
@@ -172,7 +183,7 @@ export class Tokenization {
 
         // set all the known values
         // TODO: this can be merged into the prev step
-        [StandardType.none, toks => toks.map(t => {
+        [StandardTypeUnion.all, toks => toks.map(t => {
             if (t.type != TokenType.unknown) return t;
 
             const ind = this.knownTokens.findIndex(x => x.equals(t));
@@ -212,7 +223,7 @@ export class Tokenization {
         }],
 
         // ə to ʌ when (leading) stress, no change otherwise
-        [StandardType.none, toks => {
+        [StandardTypeUnion.external, toks => {
             const to = this.knownTokens.find(x => x.equals('ʌ'));
             if (!to) {
                 console.error("ʌ is not a known token!");
@@ -236,7 +247,7 @@ export class Tokenization {
             return toks;
         }],
 
-        [StandardType.none, toks => { // 7.1 (stress consonant)
+        [StandardTypeUnion.external, toks => { // 7.1 (stress consonant)
             // if no consonant between primary stress symbol and first vowel, check if there is a consonant immediately before stress
             // if true, duplicate the consonant and insert it in front of the stress mark
             // exception: if the prior consonant is 'r', do not duplicate and instead treat it as a vowel
@@ -324,7 +335,7 @@ export class Tokenization {
         this.simpleToken(['ˌ'], TokenType.secondaryStress),
     ];
 
-    static translation: Record<StandardType, Record<string, string | Replacement[]>> = {
+    static translation: Record<StandardType_Expanded, Record<string, string | Replacement[]>> = {
         [StandardType.mw]: {
             'i': 'ɪ',
             'ā': 'e',
@@ -389,7 +400,7 @@ export class Tokenization {
             'x': 'ks',
             '(h)w': 'wh',
         },
-        [StandardType.none]: { // applies to both mw and oed
+        [StandardTypeUnion.external]: { // applies to both mw and oed
             // 7.2.2.1 (yu detector)
             '(j)u': [{to: 'yu', withoutPhysicalPattern: ['ju']}],
             'ju': [{to: 'yu', withoutPhysicalPattern: ['ju']}],
@@ -412,7 +423,9 @@ export class Tokenization {
             // 7.2.2.6 (ʊɚ detector)
             'ʊ(ə)': 'ʊɚ',
             'ʊə': 'ʊɚ',
-        }
+        },
+        [StandardType.internal]: {},
+        [StandardTypeUnion.all]: {}
     };
 
     static tokenize(word: string, pronunciation: string, type: StandardType, debug?: Token[][]): Token[] {
@@ -438,7 +451,7 @@ export class Tokenization {
 
         // theres probably a cleaner functional way to do this but oh well
         this.rules.forEach(([filter, rule]) => {
-            if (filter == StandardType.none || filter == type) {
+            if (filter & type) {
                 tokens = rule(tokens, word);
                 if (_debug) debug.push([...tokens]);
             }

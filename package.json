@@ -9,8 +9,9 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "axios": "^1.7.9",
-    "jschardet": "^3.1.4",
+    "axios": "^1.13.2",
+    "csv-parse": "^6.1.0",
+    "csv-stringify": "^6.6.0",
     "medical-dictionary": "file:",
     "next": "15.1.4",
     "react": "^19.0.0",
