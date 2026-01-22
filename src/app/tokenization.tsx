@@ -225,6 +225,12 @@ export class Tokenization {
             return toks;
         }],
 
+        [StandardTypeUnion.external, (toks, word) => { // 7.2.2.4 false ɪɚ detector
+            this.conditionalReplacementRule(['a', 'iɚ'], ['aɪ', 'ə'])(toks, word);
+            this.conditionalReplacementRule(['ʌ', 'iɚ'], ['aɪ', 'ə'])(toks, word);
+            this.conditionalReplacementRule(['iɚ'], ['ɪ', 'ə'], [TokenType.vowel])(toks, word);
+            return toks;
+        }], 
         [StandardTypeUnion.external, this.conditionalReplacementRule(['ɛɚ'], ['ɛ', 'r'], [], [TokenType.vowel])], // 7.2.2.5 false ɛɚ detector
         [StandardTypeUnion.external, (toks, word) => { // 7.2.2.6 false ʊɚ detector
             this.conditionalReplacementRule(['ɚ'], ['ə'], ['yu'])(toks, word); // yuɚ -> yuə (note that this is yu+ɚ)
