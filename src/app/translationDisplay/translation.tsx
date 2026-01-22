@@ -92,7 +92,6 @@ const ANNOTATIONS: [StandardType_Expanded, string][] = [
     [StandardTypeUnion.external, 'Apply Global Translation Table'],
     [StandardTypeUnion.all, ''],
     [StandardTypeUnion.all, 'Detect Tokens'],
-    [StandardType.mw, 'ē to i when stressed, ɪ otherwise'],
     [StandardTypeUnion.external, 'ə to ʌ when stressed'],
     [StandardTypeUnion.external, 'Duplicate Stressed Consonant'],
 ];
@@ -203,7 +202,9 @@ export function TranslationDisplay() {
                             <div className="flex w-full gap-4 justify-around mb-4">
                                 <TranslationTable type={StandardType.mw}/>
                                 <TranslationTable type={StandardType.oed}/>
-                                <TranslationTable type={StandardTypeUnion.external}/>
+                                <TranslationTable type={StandardTypeUnion.external} custom={[
+                                    { from: 'ə', to: 'ʌ', condition: 'Stressed' },
+                                ]}/>
                             </div>
                         </div>
                     </div>

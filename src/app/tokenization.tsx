@@ -90,7 +90,8 @@ interface Rule { (tokens: Token[], word: string): Token[] };
 export interface Replacement {
     to: string;
     withoutPhysicalPattern?: string[]; // if defined, then check if string appears in the actual word (not pron)
-                                     // if it does, do not apply translation
+                                       // if it does, do not apply translation
+    withPhysicalPattern?: string[];    // if defined, at least one of the phrases must appear in word
 }
 
 export class Tokenization {
@@ -196,31 +197,6 @@ export class Tokenization {
         })],
 
         // special rules
-        // TODO: maybe make the stress stuff its own function?
-        // ē to i when (leading) stressed, ɪ when not
-        [StandardType.mw, toks => {
-            const ti = this.knownTokens.find(x => x.equals('i'));
-            const tɪ = this.knownTokens.find(x => x.equals('ɪ'));
-
-            if (!ti || !tɪ) {
-                console.error("One of i or ɪ is not a known token!");
-                return toks;
-            }
-
-            let leading = false;
-            for (let i = 0; i < toks.length; i++) {
-                if (toks[i].type & TokenType.stressMark) leading = true;
-                else if (toks[i].equals('ē')) { // ē is not a known token, so we have to manually check for it
-                    const s = toks[i].instance.stress;
-                    toks[i] = (leading ? ti : tɪ).copy();
-                    toks[i].instance.stress = s;
-
-                    leading = false;
-                } else if (toks[i].type == TokenType.vowel) leading = false; // only the first vowel is leading
-            }
-
-            return toks;
-        }],
 
         // ə to ʌ when (leading) stress, no change otherwise
         [StandardTypeUnion.external, toks => {
@@ -337,12 +313,13 @@ export class Tokenization {
 
     static translation: Record<StandardType_Expanded, Record<string, string | Replacement[]>> = {
         [StandardType.mw]: {
+            'ē': 'i',
             'i': 'ɪ',
             'ā': 'e',
             'e': 'ɛ',
             'a': 'æ',
             'ər': 'əː',
-            'ü': 'ʊ',
+            'ü': 'u', // 7.2.2.2
             'yü': 'yu',
             'u̇': 'ʊ',
             'ō': 'o',
@@ -377,34 +354,43 @@ export class Tokenization {
             'ʸ': 'y'
         },
         [StandardType.oed]: {
+            'ᵻ': 'ɪ', // 7.2.2.8
             'eɪ': 'e',
             'ər': 'əː',
+            'ʌː': 'əː', // 7.2.2.7
+            'ü': 'u', // 7.2.2.2
             'jü': 'yu',
+            'uː': 'ʊ', // 7.2.2.2 (ʊ detector)
             'oʊ': 'o',
             'əu': 'o',
+            'əʊ': 'o', // 7.2.2.3 (o detector)
+            'œ': 'o', // 7.2.1
             'ɑ': 'a',
+            'ɒ': 'a', // 7.2.2.9
             'ɑr': 'ar',
             'ɑɪ': 'aɪ',
+            'ʌɪ': 'aɪ', // 7.2.2.10
             'ɔɪ': 'ɔɪ',
             'ɑʊ': 'au',
             'ɪ(ə)r': 'iɚ',
             'ɛ(ə)r': 'ɛɚ',
             'ʊ(ə)r': 'ʊɚ',
 
-            // 7.2.2.2 (ʊ detector)
-            'uː': 'ʊ',
-            // 7.2.2.3 (o detector)
-            'əʊ': 'o',
-
             // consonants
             'x': 'ks',
             '(h)w': 'wh',
+            '(t)ʃ': 'tʃ',
+
+            // 7.2.2.13
+            'j': [{to: 'dʒ', withPhysicalPattern: ['j']},
+                  {to: 'y', withPhysicalPattern: ['y']}],
         },
         [StandardTypeUnion.external]: { // applies to both mw and oed
             // 7.2.2.1 (yu detector)
             '(j)u': [{to: 'yu', withoutPhysicalPattern: ['ju']}],
             'ju': [{to: 'yu', withoutPhysicalPattern: ['ju']}],
             'jʊ': [{to: 'yu', withoutPhysicalPattern: ['ju']}],
+            '(j)ʊ': [{to: 'yu', withoutPhysicalPattern: ['ju']}],
             'yʊ': [{to: 'yu', withoutPhysicalPattern: ['ju']}],
 
             // 7.2.2.4 (iɚ detector)
@@ -494,7 +480,8 @@ export class Tokenization {
             else {
                 const rep = replacement.find(x => {
                     let valid = true;
-                    if (x.withoutPhysicalPattern != undefined) valid &&= !x.withoutPhysicalPattern.some(x => word.includes(x));
+                    if (x.withoutPhysicalPattern != undefined) valid &&= !x.withoutPhysicalPattern.some(y => word.includes(y));
+                    if (x.withPhysicalPattern != undefined) valid &&= x.withPhysicalPattern.some(y => word.includes(y));
 
                     return valid;
                 });
