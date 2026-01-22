@@ -104,7 +104,7 @@ export function Search() {
                     placeholder="Search" type="text" onKeyDown={(k) => k.key == 'Enter' ? handleSearch(true) : (!dirty ? setDirty(true) : null)} ref={search} />
             </div>
             {/* Search history */}
-            <div className="absolute scale-y-0 peer-has-[:focus]:scale-y-100 bg-surface10 mt-2 w-full rounded-md text-base">
+            <div className="absolute scale-y-0 peer-has-[:focus]:scale-y-100 bg-surface10 mt-2 w-full rounded-md text-base z-50">
                 <div className="mx-2">
                     {searchHistory.length > 0 ? searchHistory.map((x, k) => <div key={k} className="my-1 pl-2 rounded-md w-full hover:bg-surface20">
                         <button className="w-full text-left" onMouseDown={() => window.dispatchEvent(new CustomEvent('force-set-file-search', { detail: [x, true] }))}>
