@@ -93,6 +93,8 @@ const ANNOTATIONS: [StandardType_Expanded, string][] = [
     [StandardTypeUnion.all, ''],
     [StandardTypeUnion.all, 'Detect Tokens'],
     [StandardTypeUnion.external, 'ə to ʌ when stressed'],
+    [StandardTypeUnion.external, 'False ɛɚ detector'],
+    [StandardTypeUnion.external, 'False ʊɚ detector'],
     [StandardTypeUnion.external, 'Duplicate Stressed Consonant'],
 ];
 

@@ -1,5 +1,5 @@
 import { Dictionary, Word } from "../dictionary";
-import { Tokenization, StandardType, Token } from "../tokenization";
+import { Tokenization, StandardType, Token, TokenType } from "../tokenization";
 import { capitalize } from "../util/util";
 import { getAudio, hasAudio } from "./api";
 import { useContext, useEffect, useRef, useState } from "react";
@@ -84,29 +84,23 @@ export function SingleWord({ query, userSearch }: { query: SearchState, userSear
                     let int = _internal.pronunciation.text;
                     let ext = _external.pronunciation.text;
 
-                    // differ by a leading stress mark
+                    // differ by a leading stress mark (check if removing initial stress makes them equal)
                     const r1_int = int.startsWith('ˈ') || int.startsWith('ˌ');
                     const r1_ext = ext.startsWith('ˈ') || ext.startsWith('ˌ');
                     if (r1_int) int = int.slice(1);
                     if (r1_ext) ext = ext.slice(1);
-                    // prev differed, detected different starting stresses, now are the same
-                    const r1 = (r1_int || r1_ext) && (int == ext);
-                    
+                    const r1 = int == ext;
 
+                    // NOTE: this relies on the fact that the previous removed differing initial stress marks
                     // differ by presence of (ə) or one has ə and another has (ə)
-                    const r2_int = int.replaceAll(/ə|\(ə\)/g, '')
-                    const r2_ext = ext.replaceAll(/ə|\(ə\)/g, '')
-                    const r2 = int != ext && r2_int == r2_ext;
+                    const r2 = int.replaceAll('(ə)', '') == ext.replaceAll('(ə)', '') || // difference is extra (ə)
+                               int.replaceAll(/\(|\)/g, '') == ext.replaceAll(/\(|\)/g, ''); // difference is (ə) v ə
 
-                    if (r2) { // normalize
-                        int = r2_int;
-                        ext = r2_ext;
-                    }
-
+                    // r3 only matters if r2 is false
+                    // if r2 is false, then difference is not (ə) and is not (ə) v ə
+                    // so we can just replace all ə with ʌ and not worry about parenthesis
                     // differ by ə as ʌ in the same position
-                    const r3_ext = ext.replaceAll(/ʌ|ə/g, '');
-                    const r3_int = int.replaceAll(/ʌ|ə/g, '');
-                    const r3 = int != ext && r3_int == r3_ext;
+                    const r3 = int.replaceAll('ə', 'ʌ') == ext.replaceAll('ə', 'ʌ');
 
                     if (r1 || r2 || r3) { // small difference, replace with internal def
                         // note that we dont change _internal values since that'll affect dictionary

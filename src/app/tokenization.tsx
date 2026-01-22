@@ -198,6 +198,7 @@ export class Tokenization {
 
         // special rules
 
+        // should probably through this and below into some function
         // ə to ʌ when (leading) stress, no change otherwise
         [StandardTypeUnion.external, toks => {
             const to = this.knownTokens.find(x => x.equals('ʌ'));
@@ -206,17 +207,49 @@ export class Tokenization {
                 return toks;
             }
 
-            let leading = false;
+            // coerce number to boolean... (as boolean doesnt work?)
+            let leading = (toks[0].instance.stress & Stress.both) ? true : false;
             for (let i = 0; i < toks.length; i++) {
                 if (toks[i].type & TokenType.stressMark) leading = true;
                 else if (toks[i].type == TokenType.vowel) { // notice that ə is a known token
-                    if (leading && toks[i].equals('ə')) {
-                        const s = toks[i].instance.stress;
-                        toks[i] = to.copy();
-                        to.instance.stress = s;
-                    }
-
+                    if (leading && toks[i].equals('ə')) this.replace(toks, i, [to]);
                     leading = false;
+                }
+            }
+
+            return toks;
+        }],
+
+        [StandardTypeUnion.external, toks => { // 7.2.2.5 false ɛɚ detector
+            const to1 = this.knownTokens.find(x => x.equals('ɛ'));
+            const to2 = this.knownTokens.find(x => x.equals('r'));
+
+            if (!to1 || !to2) {
+                console.error('ɛ or r is not a known token!');
+                return toks;
+            }
+
+            for (let i = 0; i < toks.length - 1; i++) {
+                if (toks[i + 1].type & TokenType.vowel && toks[i].equals('ɛɚ')) this.replace(toks, i, [to1, to2]);
+            }
+
+            return toks;
+        }],
+
+        [StandardTypeUnion.external, toks => { // 7.2.2.6 false ʊɚ detector
+            const to1 = [this.knownTokens.find(x => x.equals('yu')), this.knownTokens.find(x => x.equals('r'))];
+            const to2 = this.knownTokens.find(x => x.equals('ə'));
+
+            if ([...to1, to2].some(x => !x)) {
+                console.error('One of yu, r, u, ə is not a known token!');
+                return toks;
+            }
+
+            for (let i = 0; i < toks.length - 1; i++) {
+                if (toks[i].equals('yu') && toks[i + 1].equals('ɚ')) { // yuɚ (note that this is yu+ɚ)
+                    this.replace(toks, i + 1, [to2!]);
+                } else if (toks[i].equals('ʊɚ') && toks[i + 1].type & TokenType.vowel) { // ʊɚ + vowel
+                    this.replace(toks, i, to1 as [Token, ...Token[]]);
                 }
             }
 
@@ -516,6 +549,18 @@ export class Tokenization {
     // return all tokens that have primary stress, skipping the primary stress mark
     static getPrimary(tokens: Token[]): Token[] {
         return tokens.filter(x => x.instance.stress & Stress.primary && !(x.type & TokenType.stressMark));
+    }
+
+    private static replace(base: Token[], index: number, as: [Token, ...Token[]]): Token[] {
+        const s = base[index].instance.stress;
+        base.splice(index, 1);
+        as.forEach((t, i) => {
+            const copy = t.copy();
+            t.instance.stress = s;
+            base.splice(index + i, 0, copy);
+        })
+
+        return base;
     }
 
     // first element in base is used as canonical and id
