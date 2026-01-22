@@ -268,7 +268,9 @@ export class Tokenization {
             'ʊ',
             'o',
             'ɔ',
+            'ɔr',
             'a',
+            'ar',
             'aɪ',
             'ɔɪ',
             'au',
@@ -380,6 +382,7 @@ export class Tokenization {
             'x': 'ks',
             '(h)w': 'wh',
             '(t)ʃ': 'tʃ',
+            'ɡ': 'g',
 
             // 7.2.2.13
             'j': [{to: 'dʒ', withPhysicalPattern: ['j']},
