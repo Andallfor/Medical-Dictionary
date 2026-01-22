@@ -203,7 +203,7 @@ export class Dictionary {
             switch (src) {
                 case 'mw': source = StandardType.mw; break;
                 case 'od': source = StandardType.oed; break;
-                case 'in': source = StandardType.mw; break;
+                case 'in': source = StandardType.internal; break;
             }
 
             if (!source) {
@@ -215,12 +215,18 @@ export class Dictionary {
 
             if (debug && pron) debug[word] = [pron, source];
 
+            let p: Pronunciation | undefined = undefined;
+            if (pron) {
+                const tokens = Tokenization.tokenize(word, pron, source);
+                p = {
+                    tokens: tokens,
+                    text: Tokenization.toString(tokens),
+                };
+            }
+
             out.push({
                 word: word,
-                pronunciation: pron ? {
-                    tokens: Tokenization.tokenize(word, pron, source),
-                    text: pron
-                } : undefined,
+                pronunciation: p,
                 part: part ?? '',
                 def: defs,
                 audio: '',
