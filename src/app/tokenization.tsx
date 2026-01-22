@@ -212,7 +212,12 @@ export class Tokenization {
             for (let i = 0; i < toks.length; i++) {
                 if (toks[i].type & TokenType.stressMark) leading = true;
                 else if (toks[i].type == TokenType.vowel) { // notice that ə is a known token
-                    if (leading && toks[i].equals('ə')) this.replace(toks, i, [to]);
+                    if (leading && toks[i].equals('ə')) {
+                        const t = to.copy();
+                        t.instance.stress = toks[i].instance.stress;
+                        toks.splice(i, 1, t);
+                    }
+
                     leading = false;
                 }
             }
@@ -220,39 +225,10 @@ export class Tokenization {
             return toks;
         }],
 
-        [StandardTypeUnion.external, toks => { // 7.2.2.5 false ɛɚ detector
-            const to1 = this.knownTokens.find(x => x.equals('ɛ'));
-            const to2 = this.knownTokens.find(x => x.equals('r'));
-
-            if (!to1 || !to2) {
-                console.error('ɛ or r is not a known token!');
-                return toks;
-            }
-
-            for (let i = 0; i < toks.length - 1; i++) {
-                if (toks[i + 1].type & TokenType.vowel && toks[i].equals('ɛɚ')) this.replace(toks, i, [to1, to2]);
-            }
-
-            return toks;
-        }],
-
-        [StandardTypeUnion.external, toks => { // 7.2.2.6 false ʊɚ detector
-            const to1 = [this.knownTokens.find(x => x.equals('yu')), this.knownTokens.find(x => x.equals('r'))];
-            const to2 = this.knownTokens.find(x => x.equals('ə'));
-
-            if ([...to1, to2].some(x => !x)) {
-                console.error('One of yu, r, u, ə is not a known token!');
-                return toks;
-            }
-
-            for (let i = 0; i < toks.length - 1; i++) {
-                if (toks[i].equals('yu') && toks[i + 1].equals('ɚ')) { // yuɚ (note that this is yu+ɚ)
-                    this.replace(toks, i + 1, [to2!]);
-                } else if (toks[i].equals('ʊɚ') && toks[i + 1].type & TokenType.vowel) { // ʊɚ + vowel
-                    this.replace(toks, i, to1 as [Token, ...Token[]]);
-                }
-            }
-
+        [StandardTypeUnion.external, this.conditionalReplacementRule(['ɛɚ'], ['ɛ', 'r'], [], [TokenType.vowel])], // 7.2.2.5 false ɛɚ detector
+        [StandardTypeUnion.external, (toks, word) => { // 7.2.2.6 false ʊɚ detector
+            this.conditionalReplacementRule(['ɚ'], ['ə'], ['yu'])(toks, word); // yuɚ -> yuə (note that this is yu+ɚ)
+            this.conditionalReplacementRule(['ʊɚ'], ['yu', 'r'], [], [TokenType.vowel])(toks, word); // ʊɚ + vowel -> yur
             return toks;
         }],
 
@@ -551,16 +527,49 @@ export class Tokenization {
         return tokens.filter(x => x.instance.stress & Stress.primary && !(x.type & TokenType.stressMark));
     }
 
-    private static replace(base: Token[], index: number, as: [Token, ...Token[]]): Token[] {
-        const s = base[index].instance.stress;
-        base.splice(index, 1);
-        as.forEach((t, i) => {
-            const copy = t.copy();
-            t.instance.stress = s;
-            base.splice(index + i, 0, copy);
-        })
+    private static _conditionalCache: Record<string, Token> = {};
+    // look for segment of tokens that equals preceding, match, succeeding, then replace match with replacement (can be different lengths; will insert prior to succeeding)
+    private static conditionalReplacementRule(match: [string, ...string[]], replacement: string[], preceding?: (string | TokenType)[], succeeding?: (string | TokenType)[]): Rule {
+        function equals(toks: Token[], index: number, desired: (string | TokenType)[]) {
+            return desired.every((x, i) => {
+                const ref = toks[index + i];
+                if (typeof x == 'string') return ref.equals(x);
+                else return ref.type & x;
+            })
+        }
 
-        return base;
+        return (toks) => {
+            for (let i = 0; i < replacement.length; i++) {
+                if (!(replacement[i] in this._conditionalCache)) {
+                    const n = this.knownTokens.find(x => x.equals(replacement[i]));
+                    if (!n) {
+                        console.warn(`Could not find conditional replacement rule replacement token ${replacement[i]}!`);
+                        return toks;
+                    }
+                    this._conditionalCache[replacement[i]] = n;
+                }
+            }
+
+            succeeding = succeeding ?? [];
+            preceding = preceding ?? [];
+
+            // could do this in a single pass without any look ahead/behind but uh thats kinda complicated...
+            for (let i = preceding.length; i < toks.length - succeeding.length - match.length + 1; i++) {
+                if (equals(toks, i, match) &&
+                    equals(toks, i - preceding.length, preceding) &&
+                    equals(toks, i + match.length, succeeding)) {
+                    const s = toks[i].instance.stress;
+                    toks.splice(i, match.length, ...replacement.map(x => {
+                        const t = this._conditionalCache[x].copy();
+                        t.instance.stress = s;
+                        return t;
+                    }));
+                    i += replacement.length - 1;
+                }
+            }
+
+            return toks;
+        };
     }
 
     // first element in base is used as canonical and id

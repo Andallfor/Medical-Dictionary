@@ -82,7 +82,8 @@ function TranslationProcess({ steps, type }: { steps: Step[], type: StandardType
     );
 }
 
-// one to one with Tokenization.rules
+// one to one with Tokenization.rules. not part of tokenization.tsx because this is purely for UI and not really related
+// to the actual translation process
 // if string is empty, then never display
 const ANNOTATIONS: [StandardType_Expanded, string][] = [
     [StandardTypeUnion.all, ''],
