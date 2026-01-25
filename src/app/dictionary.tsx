@@ -34,6 +34,7 @@ export class DictionaryEdit {
 
     valid(): boolean { return this.word.length > 0; }
     isEmpty(): boolean { return this.pron.trim().length == 0 && this.word.trim().length == 0; }
+    formatDef(): string[] { return this.def.trim().replaceAll(/\n+/g, '\n').split('\n'); } // each new line is a separate definition
 }
 
 type DictionaryDebugRecord = Record<string, [string, StandardType]>;
@@ -63,7 +64,7 @@ export class Dictionary {
 
     // if union is true, do not replace dictionary; take union of new dictionary and current
     // (with new dictionary override duplicate values)
-    static async load(url: string, union = false) {
+    static async load(url: string, type: 'csv' | 'txt', union = false) {
         if (!this.active) {
             console.error(`Attempting to load dictionary at ${url} but dictionary is not initialized!`);
             return;
@@ -78,8 +79,7 @@ export class Dictionary {
         if (!union) this.debugInternalLookup = {};
 
         const text = (await response.text()).normalize();
-        // slightly scuffed
-        const [out, seen] = url.endsWith('.csv') ? this.asWord(text, this.debugInternalLookup) : this.asWordOld(text, this.debugInternalLookup);
+        const [out, seen] = type == 'csv' ? this.asWord(text, this.debugInternalLookup) : this.asWordOld(text, this.debugInternalLookup);
 
         // we want current to be overridden so dont add anything that is in seen by new dict
         if (union) this.current.forEach(x => {
@@ -134,7 +134,7 @@ export class Dictionary {
                         tokens: Tokenization.tokenize(edit.word, edit.pron, StandardType.internal)
                     } : undefined,
                     part: edit.part,
-                    def: edit.def ? [edit.def] : [],
+                    def: edit.def ? edit.formatDef() : [],
                     audio: '',
                     source: StandardType.internal,
                 });
@@ -168,11 +168,8 @@ export class Dictionary {
         };
 
         const text: string[][] = words.map(x => [srcMap[x.source], x.word, x.pronunciation?.text ?? '', x.part, ...x.def]);
-        const str = stringify(text, {
-            // current version of csv-stringify does not have header_as_comment
-            columns: ['# Source', 'Word', 'Pronunciation', 'Part of Speech', 'Definitions...'],
-            header: true,
-        });
+        // have to manually add in head as each line may have an arbitrary number of values (definitions...), but defining a header will remove that
+        const str = '# Source, Word, Pronunciation, Part of Speech, Definitions...\n' + stringify(text);
 
         return str;
     }
@@ -188,6 +185,7 @@ export class Dictionary {
             encoding: "utf-8",
             comment: '#',
             skip_empty_lines: true,
+            relax_column_count: true,
         });
 
         lines.forEach(line => {

@@ -27,9 +27,19 @@ export function Editor() {
         const name = f.name;
         const url = URL.createObjectURL(f);
 
-        setName(name);
+        let type: 'csv' | 'txt' | undefined = undefined;
+        switch (f.type) {
+            case 'text/text': type = 'txt'; break;
+            case 'text/csv': type = 'csv'; break;
+            default: console.error(`Unknown internal dictionary file type ${f.type} (${name})`);
+        }
 
-        Dictionary.load(url, union);
+        if (type) {
+            setName(name);
+            Dictionary.load(url, type, union);
+        }
+
+        URL.revokeObjectURL(url);
     }
 
     function applyEdits(edits: DictionaryEdit[]) {
@@ -64,12 +74,12 @@ export function Editor() {
                     </div>
                     <div className="flex gap-2">
                         <label className="button-text px-1 cursor-pointer">
-                            <input type='file' accept=".txt" className="hidden" onChange={(e) => loadFile(e, false)}/>
+                            <input type='file' accept=".txt,.csv" className="hidden" onChange={(e) => loadFile(e, false)}/>
                             <i className="ri-file-add-line text-lg mr-1"></i>
                             Replace
                         </label>
                         <label className="button-text px-1 cursor-pointer">
-                            <input type='file' accept=".txt" className="hidden" onChange={(e) => loadFile(e, true)}/>
+                            <input type='file' accept=".txt,.csv" className="hidden" onChange={(e) => loadFile(e, true)}/>
                             <i className="ri-file-upload-line text-lg mr-1"></i>
                             Upload
                         </label>
