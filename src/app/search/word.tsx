@@ -78,7 +78,12 @@ export function SingleWord({ query, userSearch }: { query: SearchState, userSear
         // note that we always show if it is internal source (as opposed to oed)
         if (_internal && _external && _internal.source != StandardType.internal) {
             if (_internal.def.length == 0 && _internal.part == '') {
-                if (_internal.pronunciation && _external.pronunciation &&
+                // mw does not return pronunciations for abbreviations
+                if (_internal.pronunciation && !_external.pronunciation) {
+                    _external.pronunciation = _internal.pronunciation;
+                }
+                // empty internal def but with pronunciation. is it worth showing the entirety of internal just for its pron?
+                else if (_internal.pronunciation && _external.pronunciation &&
                     _internal.pronunciation.text != _external.pronunciation.text) {
                     // pronunciation is different, determine whether or not the difference is worth showing (as alt)
                     let int = _internal.pronunciation.text;

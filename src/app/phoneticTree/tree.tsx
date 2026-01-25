@@ -1,7 +1,7 @@
 import { useContext, useEffect, useRef, useState } from "react";
 import { BranchEntry, BranchState, PhoneticSearchController, PhoneticSearchControllerRef } from "./search";
 import { Word } from "../dictionary";
-import { Tokenization, TokenType, Stress } from "../tokenization";
+import { Tokenization, TokenType, Stress, Token } from "../tokenization";
 import { BranchVowels, BranchConsonants } from "./constants";
 import { DICTIONARY_CONTEXT } from "../util/context";
 
@@ -114,12 +114,23 @@ export default function PhoneticTree() {
             }
         });
 
-        const vowelMap: Record<string, number> = {};
-        const consonantMap: Record<string, number> = {};
-        Tokenization.knownTokens.forEach((t, i) => {
-            if (t.type == TokenType.consonant) consonantMap[t.id] = i;
-            else if (t.type == TokenType.vowel) vowelMap[t.id] = i;
+        // id: {equivalent...} (since we want to sort by equivalent as well)
+        const vowelMap: Record<string, Record<string, number>> = {};
+        const consonantMap: Record<string, Record<string, number>> = {};
+        let ind = 0;
+        Tokenization.knownTokens.forEach(t => {
+            const map = t.type == TokenType.consonant ? consonantMap : vowelMap;
+
+            map[t.id] = {};
+            t.equivalent.forEach(x => map[t.id][x] = ind++)
         });
+
+        function get(map: Record<string, Record<string, number>>, token: Token): number {
+            const ref = map[token.id];
+            // canonical can technically be anything, so we need to check
+            if (token.instance.canonical in ref) return ref[token.instance.canonical];
+            return Object.values(ref)[0];
+        }
 
         // dont sort if no pronunciation
         if (pattern.length != 0) valid.sort((a, b) => {
@@ -137,24 +148,24 @@ export default function PhoneticTree() {
             // sort by vowel
             const len = Math.max(av.length, bv.length);
             for (let i = 0; i < len; i++) {
-                const ac = i >= av.length ? -1 : vowelMap[av[i].id];
-                const bc = i >= bv.length ? -1 : vowelMap[bv[i].id];
+                const ac = i >= av.length ? -1 : get(vowelMap, av[i]);
+                const bc = i >= bv.length ? -1 : get(vowelMap, bv[i]);
 
                 if (ac != bc) return ac - bc;
             }
 
             // sort by leading consonant
             // prioritize words with no leading consonant
-            const ac = at[0].type == TokenType.consonant ? consonantMap[at[0].id] : -1;
-            const bc = bt[0].type == TokenType.consonant ? consonantMap[bt[0].id] : -1;
+            const ac = at[0].type == TokenType.consonant ? get(consonantMap, at[0]) : -1;
+            const bc = bt[0].type == TokenType.consonant ? get(consonantMap, bt[0]) : -1;
             if (ac != bc) return ac - bc;
 
             // sort by tail consonant
             const al = at[at.length - 1];
             const bl = bt[bt.length - 1];
             return (
-                al.type == TokenType.consonant ? consonantMap[al.id] : -1 - 
-                bl.type == TokenType.consonant ? consonantMap[bl.id] : -1
+                (al.type == TokenType.consonant ? get(consonantMap, al) : -1) - 
+                (bl.type == TokenType.consonant ? get(consonantMap, bl) : -1)
             );
         });
 
