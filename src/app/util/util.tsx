@@ -1,4 +1,4 @@
-import { ReactNode, useState } from "react";
+import { ReactNode, Ref, useImperativeHandle, useState } from "react";
 
 export function capitalize(s: string) {
     if (s.length == 0) return s;
@@ -10,8 +10,19 @@ export function prettifyFileSize(n: number) {
     const i = n == 0 ? 0 : Math.floor(Math.log(n) / Math.log(1024));
     return +((n / Math.pow(1024, i)).toFixed(2)) * 1 + ' ' + ['B', 'kB', 'MB', 'GB', 'TB'][i];
 }
-export function Divider({ title, children, reverse }: { title: string | ReactNode, children?: ReactNode, reverse?: boolean }) {
+
+export type DividerRef = {
+    set: (state: boolean) => void;
+    toggle: () => void;
+}
+
+export function Divider({ title, children, reverse, ref }: { title: string | ReactNode, children?: ReactNode, reverse?: boolean, ref?: Ref<DividerRef> }) {
     const [isExpanded, setIsExpanded] = useState(reverse ? true : false);
+
+    useImperativeHandle(ref, () => ({
+        set(state) { setIsExpanded(state) },
+        toggle() { setIsExpanded(!isExpanded) },
+    }), [isExpanded]);
 
     return (
         <div>

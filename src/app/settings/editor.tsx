@@ -56,6 +56,10 @@ function Line({ edit, placeholder, fn }: { edit: DictionaryEdit, placeholder: bo
         setTimeout(() => setSearchFailed(false), 2000);
     }
 
+    useEffect(() => {
+        if (edit.part || edit.def) setExpanded(true);
+    }, [edit]);
+
     return (
         <div className="flex gap-1.5">
             <div className="flex-grow">
@@ -78,7 +82,7 @@ function Line({ edit, placeholder, fn }: { edit: DictionaryEdit, placeholder: bo
                 <div className="flex flex-col">
                     {expanded ?
                         <div className="w-full bg-surface10 pt-1 px-1">
-                            <input className="line text-sm border-none placeholder:italic w-full outline-none"
+                            <input className="line text-sm border-none italic w-full outline-none"
                                 placeholder="Part of Speech"
                                 value={edit.part}
                                 onChange={(e) => wrap(e, 'part')}>
@@ -144,7 +148,9 @@ export function DictionaryEditor({ apply }: { apply: (edits: DictionaryEdit[]) =
     }
 
     // TODO: in above code we directly modify edit, does that propagate here (and so we dont need to pass data?)
-    function updateLine(index: number, data: DictionaryEdit) {
+    function updateLine(index: number | undefined, data: DictionaryEdit) {
+        if (index == undefined) index = lines.length - 1;
+
         const l = [...lines];
         l[index].edit = data;
 
@@ -200,10 +206,24 @@ export function DictionaryEditor({ apply }: { apply: (edits: DictionaryEdit[]) =
         function handleResize() {
             if (container.current?.offsetWidth) setMinimized(container.current?.offsetWidth < 770);
         }
+
+        function eventAddLine(e: Event) {
+            const edit: DictionaryEdit = (e as CustomEvent).detail.edit;
+            if (!edit) {
+                console.error("internal-dictionary-editor-add-line has incorrect detail", (e as CustomEvent).detail);
+                return;
+            }
+
+            updateLine(undefined, edit);
+        }
     
         window.addEventListener('resize', handleResize);
-        return () => window.removeEventListener('resize', handleResize);
-      }, []);
+        window.addEventListener('internal-dictionary-editor-add-line', eventAddLine);
+        return () => {
+            window.removeEventListener('resize', handleResize);
+            window.removeEventListener('internal-dictionary-editor-add-line', eventAddLine);
+        }
+      }, [lines]);
 
     return (
         <div className="mt-2" ref={container}>
@@ -221,7 +241,7 @@ export function DictionaryEditor({ apply }: { apply: (edits: DictionaryEdit[]) =
                             <i className="ri-file-transfer-line text-lg mr-1"></i>
                             Upload Words
                         </button>
-                        <button className="button-text px-2">
+                        <button className="button-text px-2" onClick={() => setLines([emptyLine()])}>
                             <i className="ri-delete-bin-2-line text-lg mr-1"></i>
                             Clear All
                         </button>

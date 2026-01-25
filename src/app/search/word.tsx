@@ -1,4 +1,4 @@
-import { Dictionary, Word } from "../dictionary";
+import { Dictionary, DictionaryEdit, Word } from "../dictionary";
 import { Tokenization, StandardType, Token, TokenType } from "../tokenization";
 import { capitalize } from "../util/util";
 import { getAudio, hasAudio } from "./api";
@@ -186,6 +186,10 @@ function Definition({ word, altPron }: { word: Word, altPron?: [string, Standard
                     </div>
                     <div className="flex items-center">
                         <i className="text-sm">{getSrc(word.source)}</i>
+                        <button className="button ml-3 text-base ri-pencil-fill"
+                            onClick={() => window.dispatchEvent(new CustomEvent('internal-dictionary-editor-add-line', { detail: {
+                                edit: new DictionaryEdit(word.word, word.pronunciation?.text, word.part, word.def.join('\n')) } }))}>
+                        </button>
                         {word.pronunciation
                             ? <button className="button ml-3 ri-file-copy-line text-base"
                                 onClick={() => navigator.clipboard.writeText(word.pronunciation!.text)}></button>

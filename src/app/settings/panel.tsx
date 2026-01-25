@@ -1,8 +1,18 @@
 import FileInput from "../fileSearch/input";
 import { Editor } from "./loader";
-import { Divider } from "../util/util";
+import { Divider, DividerRef } from "../util/util";
+import { useEffect, useRef } from "react";
 
 export function Settings() {
+    const dict = useRef<DividerRef>(null);
+
+    useEffect(() => {
+        function openDictionary() { dict.current?.set(true); }
+
+        window.addEventListener('internal-dictionary-editor-add-line', openDictionary);
+        return () => window.removeEventListener('internal-dictionary-editor-add-line', openDictionary);
+    });
+
     return (
         <div className="bg-tonal0 rounded-lg">
             <div className="px-4 py-1 text-lg"><i className="ri-tools-line mr-1"></i>Settings</div>
@@ -10,7 +20,7 @@ export function Settings() {
                 <Divider title="File Search">
                     <FileInput />
                 </Divider>
-                <Divider title="Internal Dictionary">
+                <Divider title="Internal Dictionary" ref={dict}>
                     <Editor />
                 </Divider>
             </div>
