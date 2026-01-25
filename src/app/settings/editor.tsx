@@ -31,9 +31,8 @@ function SymbolPicker({ update }: { update: (s: string) => void }) {
 }
 
 // placeholder denotes that we should not care about the validity of this line (i.e. is the last line)
-function Line({ edit, placeholder, fn }: { edit: DictionaryEdit, placeholder: boolean, fn: lineFn }) {
+function Line({ edit, expanded, placeholder, fn }: { edit: DictionaryEdit, expanded: boolean, placeholder: boolean, fn: lineFn }) {
     const [searchFailed, setSearchFailed] = useState(false);
-    const [expanded, setExpanded] = useState(false);
     const wordRef = useRef<HTMLInputElement>(null);
     const pronRef = useRef<HTMLInputElement>(null);
 
@@ -55,10 +54,6 @@ function Line({ edit, placeholder, fn }: { edit: DictionaryEdit, placeholder: bo
         setSearchFailed(fn.search());
         setTimeout(() => setSearchFailed(false), 2000);
     }
-
-    useEffect(() => {
-        if (edit.part || edit.def) setExpanded(true);
-    }, [edit]);
 
     return (
         <div className="flex gap-1.5">
@@ -95,7 +90,7 @@ function Line({ edit, placeholder, fn }: { edit: DictionaryEdit, placeholder: bo
                             </textarea>
                         </div>
                     : <></>}
-                    <button className={"w-full bg-surface10 rounded-b-md " + (expanded ? 'h-5' : 'h-3')} onClick={() => setExpanded(!expanded)}>
+                    <button className={"w-full bg-surface10 rounded-b-md " + (expanded ? 'h-5' : 'h-3')} onClick={() => fn.setExpanded(!expanded)}>
                         <i className={"absolute -translate-y-2 -translate-x-1/2 ri-lg " + (expanded ? 'ri-arrow-drop-up-fill' : 'ri-arrow-drop-down-fill')}></i>
                     </button>
                 </div>
@@ -118,10 +113,13 @@ interface lineFn {
 
     clearSelected: (s: HTMLInputElement | undefined) => void;
     setFocus: (input: HTMLInputElement, isPron: boolean) => void;
+
+    setExpanded: (b: boolean) => void;
 }
 
 export interface lineData {
     edit: DictionaryEdit;
+    expanded: boolean;
     id: number;
 }
 
@@ -143,16 +141,18 @@ export function DictionaryEditor({ apply }: { apply: (edits: DictionaryEdit[]) =
     function emptyLine(): lineData {
         return {
             edit: new DictionaryEdit(),
+            expanded: false,
             id: Date.now(),
         }
     }
 
     // TODO: in above code we directly modify edit, does that propagate here (and so we dont need to pass data?)
-    function updateLine(index: number | undefined, data: DictionaryEdit) {
+    function updateLine(index: number | undefined, data: DictionaryEdit, expand?: boolean) {
         if (index == undefined) index = lines.length - 1;
 
         const l = [...lines];
-        l[index].edit = data;
+        l[index].edit = new DictionaryEdit(data.word, data.pron, data.part, data.def);
+        if (expand != undefined) l[index].expanded = expand;
 
         const isLast = index == l.length - 1;
         if (data.isEmpty() && !isLast) l.splice(index, 1); // dont remove last entry
@@ -214,7 +214,7 @@ export function DictionaryEditor({ apply }: { apply: (edits: DictionaryEdit[]) =
                 return;
             }
 
-            updateLine(undefined, edit);
+            updateLine(undefined, edit, true);
         }
     
         window.addEventListener('resize', handleResize);
@@ -247,10 +247,15 @@ export function DictionaryEditor({ apply }: { apply: (edits: DictionaryEdit[]) =
                         </button>
                     </div>
                     {lines.map((x, k) => {
-                        return (<Line key={x.id} edit={x.edit} placeholder={k == lines.length - 1} fn={{
+                        return (<Line key={x.id} expanded={x.expanded} edit={x.edit} placeholder={k == lines.length - 1} fn={{
                             update: (edit) => updateLine(k, edit),
                             search: () => search(k),
                             setFocus: (input, isPron) => setSelected({ inp: input, ind: k, isPron: isPron }),
+                            setExpanded: (val) => {
+                                const l = [...lines];
+                                l[k].expanded = val;
+                                setLines(l);
+                            },
                             clearSelected: clearSelected,
                         }}/>);
                     }
