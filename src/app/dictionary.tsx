@@ -207,8 +207,17 @@ export class Dictionary {
                 return;
             }
 
-            const [src, word, pron, part, ...defs] = line;
+            let [src, word, pron, part, ..._defs] = line;
             if (seen.has(word)) return;
+            // because csv format supports new lines, we need to adjust them
+            // remove in all but definitions, definitions new lines are considered new definitions
+            // the latter case may happen when editing in something like excel and entering a new line there (rather than add another entry)
+            [src, word, pron, part] = [src, word, pron, part].map(x => x.replaceAll('\n', '').trim());
+            const defs: string[] = [];
+            _defs.forEach(x => x.split('\n').forEach(y => {
+                const z = y.trim();
+                if (z.length != 0) defs.push(z);
+            }));
 
             let source: StandardType | undefined = undefined;
             switch (src) {
