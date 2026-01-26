@@ -235,6 +235,7 @@ export class Tokenization {
         [StandardTypeUnion.external, (toks, word) => { // 7.2.2.6 false ʊɚ detector
             this.conditionalReplacementRule(['ɚ'], ['ə'], ['yu'])(toks, word); // yuɚ -> yuə (note that this is yu+ɚ)
             this.conditionalReplacementRule(['ʊɚ'], ['yu', 'r'], [], [TokenType.vowel])(toks, word); // ʊɚ + vowel -> yur
+            this.conditionalReplacementRule(['ʊɚ'], ['u', 'ə'], ['y'])(toks, word); // yʊɚ -> yuə
             return toks;
         }],
 
